@@ -34,7 +34,8 @@ GY521 sensor(0x68);
 
 
 
-#ifdef ARDUINO_ARCH_ESP32 OPGELET!!!! niet uitgewerkt voor 3 motoren
+#ifdef ARDUINO_ARCH_ESP32 
+// OPGELET!!!! niet uitgewerkt voor 3 motoren
 #include <WiFi.h>
 #include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
 //#include <ESP32Servo.h> // https://github.com/madhephaestus/ESP32Servo 
