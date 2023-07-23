@@ -38,7 +38,7 @@ GY521 sensor(0x68);
 // OPGELET!!!! niet uitgewerkt voor 3 motoren
 #include <WiFi.h>
 #include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
-//#include <ESP32Servo.h> // https://github.com/madhephaestus/ESP32Servo 
+#include <ESP32Servo.h> // https://github.com/madhephaestus/ESP32Servo nodig voor AnalogWrite
 
 #define DEBUG_SERIAL Serial
 
@@ -48,13 +48,13 @@ GY521 sensor(0x68);
 //#define PIN_MOTOR          19
 //#define PIN_LEDCONNECTIE   LED_BUILTIN
 
-// TODO voor Lolin ESP32-S2
-#define PIN_1AMOTOR          D8 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
-#define PIN_2AMOTOR          D7 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
-#define PIN_1BMOTOR          D6 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
-#define PIN_2BMOTOR          D5 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
-#define PIN_ZMOTOR           D3 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
-#define PIN_LEDCONNECTIE     2 // De ingebouwde LED zit op GPIO2 of GPIO16, dus aanpassen naar 16 als de LED niet werkt
+// Lolin ESP32-S2
+#define PIN_1AMOTOR          12 // Positie D8 op Wemos D1 mini
+#define PIN_2AMOTOR          11 // Positie D7 op Wemos D1 mini
+#define PIN_1BMOTOR          9  // Positie D6 op Wemos D1 mini
+#define PIN_2BMOTOR          7  // Positie D5 op Wemos D1 mini
+#define PIN_ZMOTOR           18 // Positie D3 op Wemos D1 mini
+#define PIN_LEDCONNECTIE     15 // De ingebouwde LED 
 #define PIN_EXTERNSIGNAAL    D0
 
 #define LED_BRIGHTNESS_ON  HIGH
