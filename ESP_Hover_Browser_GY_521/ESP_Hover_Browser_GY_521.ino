@@ -230,37 +230,44 @@ void updateMotors()
 
     if (counter % 10 == 0)
     {
-      //Serial.println("gyroZ/angleZ");
-      // Serial.println("PITCH\tROLL\tYAW");
-      // Serial.println("\nAX\tAY\tAZ");
+/*
+#ifdef DEBUG_SERIAL
+        DEBUG_SERIAL.println("gyroZ/angleZ");
+        DEBUG_SERIAL.println("PITCH\tROLL\tYAW");
+        DEBUG_SERIAL.println("\nAX\tAY\tAZ");
+#endif
+*/
     }
 
-//    Serial.print(gyrox, 3);
-//    Serial.print('\t');
-//    Serial.print(gyroy, 3);
-//    Serial.print('\t');
-//    Serial.print(gyroz, 3);
-//    Serial.print('\t');
-//    Serial.print(yaw, 3);
-//    Serial.println();
-
+#ifdef DEBUG_SERIAL
+/*
+    DEBUG_SERIAL.print(gyrox, 3);
+    DEBUG_SERIAL.print('\t');
+    DEBUG_SERIAL.print(gyroy, 3);
+    DEBUG_SERIAL.print('\t');
+    DEBUG_SERIAL.print(gyroz, 3);
+    DEBUG_SERIAL.print('\t');
+    DEBUG_SERIAL.print(yaw, 3);
+    DEBUG_SERIAL.println();
+*/
     /*
-      Serial.print(pitch, 3);
-      Serial.print('\t');
-      Serial.print(roll, 3);
-      Serial.print('\t');
-      Serial.print(yaw, 3);
-      Serial.println();
+      DEBUG_SERIAL.print(pitch, 3);
+      DEBUG_SERIAL.print('\t');
+      DEBUG_SERIAL.print(roll, 3);
+      DEBUG_SERIAL.print('\t');
+      DEBUG_SERIAL.print(yaw, 3);
+      DEBUG_SERIAL.println();
     */
 
     /*
-      Serial.print(ax);
-      Serial.print('\t');
-      Serial.print(ay);
-      Serial.print('\t');
-      Serial.print(az);
-      Serial.println();
+      DEBUG_SERIAL.print(ax);
+      DEBUG_SERIAL.print('\t');
+      DEBUG_SERIAL.print(ay);
+      DEBUG_SERIAL.print('\t');
+      DEBUG_SERIAL.print(az);
+      DEBUG_SERIAL.println();
     */
+#endif
 
     }
   else
@@ -499,8 +506,10 @@ void setup()
   {
   if (sensor.wakeup() == false)
     {
-      Serial.print(millis());
-      Serial.println("\tCould not connect to GY521");
+#ifdef DEBUG_SERIAL
+      DEBUG_SERIAL.print(millis());
+      DEBUG_SERIAL.println("\tCould not connect to GY521");
+#endif
       delay(1000);
      }
   else
@@ -516,7 +525,9 @@ if (gyroBeschikbaar)
   sensor.setGyroSensitivity(1);   // 500 degrees/s
 
   sensor.setThrottle();
-  Serial.println("start...");
+#ifdef DEBUG_SERIAL
+      DEBUG_SERIAL.println("start...");
+#endif
 
   // set all calibration errors to zero
   sensor.gze = 0;
