@@ -103,9 +103,6 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 const char ssid[] = "HoverG-";
 const char password[] = "12345678";
 
-//char ssid[] = "telenet-95F2F4F-2.4";
-//char password[] = "rvkscEn2mw6j1";
-
 #ifdef USE_SOFTAP
 #include <DNSServer.h>
 DNSServer dnsServer;
