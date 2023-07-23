@@ -44,13 +44,18 @@ GY521 sensor(0x68);
 
 #define PWM_RANGE 255 // PWM range voor analogWrite (in ESP32Servo)
 
-//#define PIN_SERVO          12
-//#define PIN_MOTOR          13
-//#define PIN_LEDCONNECTIE   4
+//#define PIN_SERVO          // Geen servo, stond op 18
+//#define PIN_MOTOR          19
+//#define PIN_LEDCONNECTIE   LED_BUILTIN
 
-#define PIN_SERVO          18
-#define PIN_MOTOR          19
-#define PIN_LEDCONNECTIE   LED_BUILTIN
+// TODO voor Lolin ESP32-S2
+#define PIN_1AMOTOR          D8 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
+#define PIN_2AMOTOR          D7 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
+#define PIN_1BMOTOR          D6 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
+#define PIN_2BMOTOR          D5 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
+#define PIN_ZMOTOR           D3 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
+#define PIN_LEDCONNECTIE     2 // De ingebouwde LED zit op GPIO2 of GPIO16, dus aanpassen naar 16 als de LED niet werkt
+#define PIN_EXTERNSIGNAAL    D0
 
 #define LED_BRIGHTNESS_ON  HIGH
 #define LED_BRIGHTNESS_OFF LOW
