@@ -515,7 +515,7 @@ void setup()
   else
      {
      gyroBeschikbaar = true;
-     t = 11;
+     break;
      }
   }
 
