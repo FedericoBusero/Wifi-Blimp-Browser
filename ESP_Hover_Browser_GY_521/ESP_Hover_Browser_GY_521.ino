@@ -153,14 +153,6 @@ float regelX = 0;
 float currentY = 0;
 bool gyroBeschikbaar = false;
 
-//In Deze versie NIET:
-// Bij het verhogen van de snelheid van de motor, doen we dat in stappen om niet te bruusk op te trekken
-// want dit kan de hovercraft onbestuurbaar maken of teveel stroom trekken waardoor de chip gaat resetten
-// Pas gerust aan, 1=traag optrekken, 5=snel optrekken
-// De waarde is minimaal 1 en maximaal 1023
-// #define MAX_MOTOR_SPEED_STAP 4
-
-//int motor_snelheid = 0; niet meer gebruikt, was voor 1 motorversie
 int z_motorsnelheid = 0; // voor zweefmotor
 int doel_motorsnelheidA; // voor 2 stuwmotoren
 int doel_motorsnelheidB; // voor 2 stuwmotoren
@@ -290,19 +282,14 @@ void updateMotors()
   //  servo1.write(servohoek);  // We verplaatsen de servo naar de nieuwe positie servohoek
 
 
-    /*
-      We gaan de motor nog niet onmiddellijk naar zijn snelheid doel_motorsnelheid brengen, maar elke keer dat we hier passeren
-      gaan we ietsje dichter naar zijn doel. Daartoe mag hij elke keer maximum MAX_MOTOR_SPEED_STAP verhogen in snelheid
-    */
+
     /*
       #ifdef DEBUG_SERIAL
       DEBUG_SERIAL.print(F("doel_motorsnelheid="));
       DEBUG_SERIAL.println(doel_motorsnelheid);
-      DEBUG_SERIAL.print(F("motor_snelheid="));
-      DEBUG_SERIAL.println(motor_snelheid);
       #endif
     */
-    // motor_snelheid = min(doel_motorsnelheid, motor_snelheid + MAX_MOTOR_SPEED_STAP);
+   
 
       z_motorsnelheid = map(currentSlider2,0,360,0,PWM_RANGE);
       if (abs(currentY * currentX) < 5) {
