@@ -245,8 +245,6 @@ void updateMotors()
     DEBUG_SERIAL.print('\t');
     DEBUG_SERIAL.print(gyroz, 3);
     DEBUG_SERIAL.print('\t');
-    DEBUG_SERIAL.print(yaw, 3);
-    DEBUG_SERIAL.println();
 */
     /*
       DEBUG_SERIAL.print(pitch, 3);
