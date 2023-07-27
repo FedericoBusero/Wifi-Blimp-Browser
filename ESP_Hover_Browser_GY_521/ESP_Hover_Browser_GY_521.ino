@@ -154,8 +154,8 @@ float currentY = 0;
 bool gyroBeschikbaar = false;
 
 int z_motorsnelheid = 0; // voor zweefmotor
-int doel_motorsnelheidA; // voor 2 stuwmotoren
-int doel_motorsnelheidB; // voor 2 stuwmotoren
+int motorsnelheidA; // voor 2 stuwmotoren
+int motorsnelheidB; // voor 2 stuwmotoren
 int max_motorsnelheid;
 bool motors_halt;
 
@@ -331,11 +331,11 @@ void updateMotors()
       float temp1 = currentY + regelX; //gewone mix onder gyro regeling
       float temp2 = currentY - regelX; //gewone mix zonder gyro regeling
          
-      doel_motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
-      doel_motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
+      motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
+      motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
     
-    hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, doel_motorsnelheidA);
-    hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, doel_motorsnelheidB);
+    hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, motorsnelheidA);
+    hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, motorsnelheidB);
     analogWrite(PIN_ZMOTOR, z_motorsnelheid); // zweefmotor/ z-as motor naar zijn snelheid z_motorsnelheid
 
    #ifdef DEBUG_SERIAL
@@ -344,9 +344,9 @@ void updateMotors()
  //   DEBUG_SERIAL.print(F("temp2 "));
  //   DEBUG_SERIAL.println(temp2);
     DEBUG_SERIAL.print(F("motorsnelheid A="));
-    DEBUG_SERIAL.print(doel_motorsnelheidA);
+    DEBUG_SERIAL.print(motorsnelheidA);
     DEBUG_SERIAL.print(F(" B="));
-    DEBUG_SERIAL.println(doel_motorsnelheidB);
+    DEBUG_SERIAL.println(motorsnelheidB);
       #endif
   
   }
@@ -394,8 +394,8 @@ void init_motors()
  // doel_servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
 
   z_motorsnelheid = 0;
-  doel_motorsnelheidA = 0; //opgesplitst voor 2 motoren
-  doel_motorsnelheidB = 0;  
+  motorsnelheidA = 0; //opgesplitst voor 2 motoren
+  motorsnelheidB = 0;  
   max_motorsnelheid = PWM_RANGE; // komt van (300 * PWM_RANGE) / 360; als startwaarde toen 2e slider hierop werkte.
   motors_halt = false;
 
