@@ -393,7 +393,6 @@ void init_motors()
  // servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
  // doel_servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
 
-//  motor_snelheid = 0;
   z_motorsnelheid = 0;
   doel_motorsnelheidA = 0; //opgesplitst voor 2 motoren
   doel_motorsnelheidB = 0;  
