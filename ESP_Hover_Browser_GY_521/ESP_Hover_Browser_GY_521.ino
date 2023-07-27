@@ -146,9 +146,6 @@ int TrimServopositie; // -180 .. 180 //voorlopig niet hernoemd
 int currentSlider2 = 0;
 
 float gyroZ;
-float yaw;
-float doel_yaw; 
-unsigned long vorigeMillisYaw;
 unsigned long vorigeMillisZ;
 float doel_draaisnelheid;
 float currentX = 0; //moet float zijn voor berekenind doel yaw
@@ -228,7 +225,6 @@ void updateMotors()
     float    gyroy = sensor.getGyroY();
      */
      gyroZ = sensor.getGyroZ();
-     yaw   = sensor.getYaw();
 
     if (counter % 10 == 0)
     {
@@ -275,7 +271,6 @@ void updateMotors()
   else
     {
     gyroZ = 0;
-    yaw   = 0;
     }
 
     counter++;
@@ -322,7 +317,7 @@ void updateMotors()
       if ((millis()-vorigeMillisZ) >= 1000) // langer dan 1 sec niet aan het zweven, dus wordt verondersteld stil tye staan.
       {
         kalibreer ();
-        regelX = 0; // doel yaw (gewenste richting hovercraft) gelijk gesteld aan gemeten yaw
+        regelX = 0;
       }
       else
       {
@@ -333,34 +328,19 @@ void updateMotors()
         { 
           vorigeMillisZ = millis(); // om bij te houden hoe lang geleden zweefmotor aan stond
         }
-
-
       
 #ifdef DEBUG_SERIAL
-//      DEBUG_SERIAL.print("  vorigeMillisYaw ");
-//      DEBUG_SERIAL.println(vorigeMillisYaw);
 //      DEBUG_SERIAL.print("  millis() ");
 //      DEBUG_SERIAL.println(millis());
       DEBUG_SERIAL.print("  currentX ");
       DEBUG_SERIAL.println(currentX);
 //      DEBUG_SERIAL.print("  currentY ");
 //      DEBUG_SERIAL.println(currentY);
-//        DEBUG_SERIAL.print("  yaw en doel_yaw ");
-//        DEBUG_SERIAL.print('\t');
-//        DEBUG_SERIAL.print(yaw);
-//        DEBUG_SERIAL.print("  doel_yaw: ");
-//        DEBUG_SERIAL.print('\t');
-//        DEBUG_SERIAL.print(doel_yaw);
-//        DEBUG_SERIAL.println();
-//      DEBUG_SERIAL.print(" delta doel_yaw: ");
-//      DEBUG_SERIAL.println(((currentX * (millis() - vorigeMillisYaw)) / 500));
 //      DEBUG_SERIAL.print("  Pfactor: ");
 //      DEBUG_SERIAL.print(Pfactor);
       DEBUG_SERIAL.print("  regelX: ");
       DEBUG_SERIAL.println(regelX);
 #endif
-
-      vorigeMillisYaw = millis();
     
     // x en y omzetten naar motorsnelheden
       float temp1 = currentY + regelX; //gewone mix onder gyro regeling
@@ -368,10 +348,6 @@ void updateMotors()
          
       doel_motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
       doel_motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
-     
-
-      
-      
     
     hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, doel_motorsnelheidA);
     hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, doel_motorsnelheidB);
@@ -535,8 +511,6 @@ if (gyroBeschikbaar)
   kalibreer();
 
   sensor.read();
-  float yaw   = sensor.getYaw();
-  doel_yaw = yaw;
   }
   
   // Wifi instellingen
