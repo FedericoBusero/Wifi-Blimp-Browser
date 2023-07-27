@@ -54,7 +54,6 @@ GY521 sensor(0x68);
 #define PIN_2BMOTOR          7  // Positie D5 op Wemos D1 mini
 #define PIN_ZMOTOR           18 // Positie D3 op Wemos D1 mini
 #define PIN_LEDCONNECTIE     15 // De ingebouwde LED 
-#define PIN_EXTERNSIGNAAL    D0
 
 #define LED_BRIGHTNESS_ON  HIGH
 #define LED_BRIGHTNESS_OFF LOW
@@ -91,7 +90,6 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 #define PIN_2BMOTOR          D5 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
 #define PIN_ZMOTOR           D3 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
 #define PIN_LEDCONNECTIE     2 // De ingebouwde LED zit op GPIO2 of GPIO16, dus aanpassen naar 16 als de LED niet werkt
-#define PIN_EXTERNSIGNAAL    D0
 
 // Pas de voltagefactor aan, dat is bij elke chip hetzelfde. Calibreer bv. met USB stroom die 3.3V op de chip moet geven
 #define VOLTAGE_FACTOR 910.0f
@@ -452,7 +450,6 @@ void setup()
   setup_pin_mode_output(PIN_1BMOTOR);
   setup_pin_mode_output(PIN_2BMOTOR);
   setup_pin_mode_output(PIN_ZMOTOR);
-  setup_pin_mode_output(PIN_EXTERNSIGNAAL);
     
 #ifdef ESP8266
   // Aangezien de PWM range van analogWrite afhankelijk van de Arduino ESP8266 versie 255 ofwel 1023 is, stellen we de range vast in op 1023
@@ -466,7 +463,6 @@ void setup()
   analogWrite(PIN_2AMOTOR, 0);
   analogWrite(PIN_1BMOTOR, 0);
   analogWrite(PIN_2BMOTOR, 0);
-  digitalWrite(PIN_EXTERNSIGNAAL,LOW);
 
   delay(200); // 200 milliseconden wachten tot de stroom stabiel is
 
@@ -667,15 +663,6 @@ void handleJoystick(int x, int y)
 
 currentX = x;
 currentY = y;
-
-if (y < -1000)
-  {
-  digitalWrite(PIN_EXTERNSIGNAAL,HIGH);
-  }
-else
-  {
-  digitalWrite(PIN_EXTERNSIGNAAL,LOW);
-  }
  
 //      doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
 //      
