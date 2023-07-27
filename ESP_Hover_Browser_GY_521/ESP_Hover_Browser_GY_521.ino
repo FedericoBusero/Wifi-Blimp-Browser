@@ -147,8 +147,7 @@ int currentSlider2 = 0;
 
 float gyroZ;
 unsigned long vorigeMillisZ;
-float doel_draaisnelheid;
-float currentX = 0; //moet float zijn voor berekenind doel yaw
+float currentX = 0; //moet float zijn voor berekeningen
 float regelX = 0;
 float currentY = 0;
 bool gyroBeschikbaar = false;
@@ -306,7 +305,7 @@ void updateMotors()
       }
       else
       {
-        regelX = currentX + (Pfactor * (gyroZ)); // sturen in verhouding tot afwijking nu niet gebruikte formule:doel_draaisnelheid = currentX/2; // X van joystik bepaalt hoe snel we willen draaien
+        regelX = currentX + (Pfactor * (gyroZ)); // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
       }
       
       if (z_motorsnelheid > 0) //alleen bij zweefmotor aan
