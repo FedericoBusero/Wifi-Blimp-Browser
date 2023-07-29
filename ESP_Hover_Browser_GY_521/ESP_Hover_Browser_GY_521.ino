@@ -77,7 +77,7 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 #define PIN_MOTOR          3
 #define PIN_LEDCONNECTIE   1
 
-// Pas de voltagefactor aan, dat is bij elke chip hetzelfde. Calibreer bv. met USB stroom die 3.3V op de chip moet geven
+// Pas de voltagefactor aan, dat is bij elke chip hetzelfde. Kalibreer bv. met USB stroom die 3.3V op de chip moet geven
 #define VOLTAGE_FACTOR 1060.0f
 
 #else // Wemos D1 mini, NodeMCU, ...
@@ -91,7 +91,7 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 #define PIN_ZMOTOR           D3 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
 #define PIN_LEDCONNECTIE     2 // De ingebouwde LED zit op GPIO2 of GPIO16, dus aanpassen naar 16 als de LED niet werkt
 
-// Pas de voltagefactor aan, dat is bij elke chip hetzelfde. Calibreer bv. met USB stroom die 3.3V op de chip moet geven
+// Pas de voltagefactor aan, dat is bij elke chip hetzelfde. Kalibreer bv. met USB stroom die 3.3V op de chip moet geven
 #define VOLTAGE_FACTOR 910.0f
 
 #endif // MODE_ESP01
@@ -300,7 +300,7 @@ void updateMotors()
       
       if ((millis()-vorigeMillisZ) >= 1000) // langer dan 1 sec niet aan het zweven, dus wordt verondersteld stil tye staan.
       {
-        kalibreer ();
+        kalibreer_gyro(20,0.01); // TODO 1,0.01 is voldoende, want wordt continu uitgevoerd
         regelX = 0;
       }
       else
@@ -491,7 +491,7 @@ if (gyroBeschikbaar)
   // set all calibration errors to zero
   sensor.gze = 0;
 
-  kalibreer();
+  kalibreer_gyro(20,0.01); // product moet 1 zijn :  TODO vervangen door 20,0.05 of 100,0.01
 
   sensor.read();
   }
@@ -572,15 +572,15 @@ if (gyroBeschikbaar)
   last_activity_message = millis();
 }
 
-void kalibreer()
+void kalibreer_gyro(int num_iter, float kalib_factor)
 {
 float gz = 0;
-  for (int i = 0; i < 20; i++)
+  for (int i = 0; i < num_iter; i++)
   {
     sensor.read();
     gz -= sensor.getGyroZ();
   }
-sensor.gze += gz * 0.01;
+sensor.gze += gz * kalib_factor;
 #ifdef DEBUG_SERIAL
  //   DEBUG_SERIAL.print(F("sensor.gze   "));
  //   DEBUG_SERIAL.println(sensor.gze);
