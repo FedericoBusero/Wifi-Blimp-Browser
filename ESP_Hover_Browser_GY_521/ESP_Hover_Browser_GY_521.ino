@@ -431,9 +431,10 @@ void setup()
   DEBUG_SERIAL.println(F("\nHover Browser setup started"));
 #endif
 
+#ifdef PIN_LEDCONNECTIE
   setup_pin_mode_output(PIN_LEDCONNECTIE);
-
-  // De LEd flasht 2x om te tonen dat er een reboot is
+   
+  // De LED flasht 2x om te tonen dat er een reboot is
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON);
   delay(10);
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
@@ -441,7 +442,7 @@ void setup()
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON);
   delay(10);
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
-
+#endif
 
   // steering servo PWM             HIER GEEN
 //  setup_pin_mode_output(PIN_SERVO);
@@ -453,8 +454,10 @@ void setup()
 
   init_motors();
 
+#ifdef PIN_LEDCONNECTIE
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON );
-
+#endif
+   
   // setup gyro module
   Wire.begin();
 
@@ -670,8 +673,10 @@ void handle_message(websockets::WebsocketsMessage msg) {
   //  DEBUG_SERIAL.println(param2);
 #endif
 
+#ifdef PIN_LEDCONNECTIE
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON);
-
+#endif
+   
   last_activity_message = millis();
 
   switch (id)
@@ -698,8 +703,10 @@ void handle_message(websockets::WebsocketsMessage msg) {
 
 void onConnect()
 {
+#ifdef PIN_LEDCONNECTIE
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
-
+#endif
+   
 #ifdef DEBUG_SERIAL
   DEBUG_SERIAL.println(F("onConnect"));
 #endif
@@ -745,7 +752,9 @@ void loop()
 
   if (millis() > last_activity_message + TIMEOUT_MS_LED)
   {
+#ifdef PIN_LEDCONNECTIE
     digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
+#endif
   }
 
   if (millis() > last_activity_message + TIMEOUT_MS_MOTORS)
@@ -798,7 +807,9 @@ void loop()
 
   if (!is_connected)
   {
+#ifdef PIN_LEDCONNECTIE
     digitalWrite(PIN_LEDCONNECTIE, (millis() % 1000) > 500 ? LOW : HIGH);
+#endif
   }
 
   // delay(2);
