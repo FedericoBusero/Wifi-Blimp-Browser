@@ -327,8 +327,8 @@ void updateMotors()
 #endif
     
     // x en y omzetten naar motorsnelheden
-      float temp1 = currentY + regelX; //gewone mix onder gyro regeling
-      float temp2 = currentY - regelX; //gewone mix zonder gyro regeling
+      float temp1 = constrain(currentY + regelX,-180,180); //gewone mix onder gyro regeling
+      float temp2 = constrain(currentY - regelX,-180,180); //gewone mix zonder gyro regeling
          
       motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
       motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
