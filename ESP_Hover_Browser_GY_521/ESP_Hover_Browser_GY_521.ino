@@ -217,16 +217,16 @@ void updateMotors()
      */
      gyroZ = sensor.getGyroZ();
 
-    if (counter % 10 == 0)
-    {
 /*
 #ifdef DEBUG_SERIAL
+    if (counter % 10 == 0)
+    {
         DEBUG_SERIAL.println("gyroZ/angleZ");
         DEBUG_SERIAL.println("PITCH\tROLL\tYAW");
         DEBUG_SERIAL.println("\nAX\tAY\tAZ");
+    }
 #endif
 */
-    }
 
 #ifdef DEBUG_SERIAL
 /*
