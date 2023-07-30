@@ -145,7 +145,7 @@ int TrimServopositie; // -180 .. 180 //voorlopig niet hernoemd
 // int doel_servohoek;
 int currentSlider2 = 0;
 
-float gyroZ;
+
 unsigned long vorigeMillisZ;
 float currentX = 0; //moet float zijn voor berekeningen
 float regelX = 0;
@@ -171,8 +171,6 @@ void setup_pin_mode_output(int pin)
 
 void updateMotors()
 {
-  static int counter = 0;
-
   if (motors_halt)
   {
     analogWrite(PIN_ZMOTOR, 0);
@@ -183,104 +181,27 @@ void updateMotors()
   }
   else
   {
+    float werkelijke_draaisnelheid;
+     
     if (gyroBeschikbaar) // gyro
     {
-
-    sensor.read();
-    /*
-      float    getAccelX()   { return _ax; };
-      float    getAccelY()   { return _ay; };
-      float    getAccelZ()   { return _az; };
-      float    getAngleX()   { return _aax; };
-      float    getAngleY()   { return _aay; };
-      float    getAngleZ()   { return _aaz; };
-      float    getTemperature() { return _temperature; };
-      float    getGyroX()    { return _gx; };
-      float    getGyroY()    { return _gy; };
-      float    getGyroZ()    { return _gz; };
-      float    getPitch()    { return _pitch; };
-      float    getRoll()     { return _roll; };
-      float    getYaw()      { return _yaw; };
-    */
-    /*
-      float ax = sensor.getAccelX();
-      float ay = sensor.getAccelY();
-      float az = sensor.getAccelZ();
-    */
-    /*
-      float pitch = sensor.getPitch();
-      float roll  = sensor.getRoll();
-      float yaw   = sensor.getYaw();
-   
-    float    gyrox = sensor.getGyroX();
-    float    gyroy = sensor.getGyroY();
-     */
-     gyroZ = sensor.getGyroZ();
-
-/*
-#ifdef DEBUG_SERIAL
-    if (counter % 10 == 0)
-    {
-        DEBUG_SERIAL.println("gyroZ/angleZ");
-        DEBUG_SERIAL.println("PITCH\tROLL\tYAW");
-        DEBUG_SERIAL.println("\nAX\tAY\tAZ");
-    }
-#endif
-*/
-
-#ifdef DEBUG_SERIAL
-/*
-    DEBUG_SERIAL.print(gyrox, 3);
-    DEBUG_SERIAL.print('\t');
-    DEBUG_SERIAL.print(gyroy, 3);
-    DEBUG_SERIAL.print('\t');
-    DEBUG_SERIAL.print(gyroz, 3);
-    DEBUG_SERIAL.print('\t');
-*/
-    /*
-      DEBUG_SERIAL.print(pitch, 3);
-      DEBUG_SERIAL.print('\t');
-      DEBUG_SERIAL.print(roll, 3);
-      DEBUG_SERIAL.print('\t');
-      DEBUG_SERIAL.print(yaw, 3);
-      DEBUG_SERIAL.println();
-    */
-
-    /*
-      DEBUG_SERIAL.print(ax);
-      DEBUG_SERIAL.print('\t');
-      DEBUG_SERIAL.print(ay);
-      DEBUG_SERIAL.print('\t');
-      DEBUG_SERIAL.print(az);
-      DEBUG_SERIAL.println();
-    */
-#endif
-
+       sensor.read();
+       werkelijke_draaisnelheid = sensor.getGyroZ(); // getGyroX, getGyroY zijn ook mogelijk afhankelijk van positie sensor
     }
   else
     {
-    gyroZ = 0;
+      werkelijke_draaisnelheid = 0;
     }
-
-    counter++;
-
 
     /* We berekenen naar welke doelpositie we de servo willen krijgen:
         we herschalen de som van de slider posities in de browser ( Servopositie_x (-180 .. 180) en TrimServopositie (-180 .. 180) )
         naar de minimum en maximum graden die de servo motor aankan (SERVO_HOEK_MIN .. SERVO_HOEK_MAX)
     */
   //  doel_servohoek = map(Servopositie_x + TrimServopositie, -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
-
-    /*
-      We gaan de servo nog niet onmiddellijk naar zijn nieuwe positie doel_servohoek brengen, maar elke keer dat we hier passeren
-      gaan we ietsje dichter naar zijn doel. Daartoe beperken we de verplaatsing t.o.v. de oude servohoek tot maximum SERVO_HOEK_STAP stappen
-    */
     // servohoek = constrain(doel_servohoek, servohoek - SERVO_HOEK_STAP, servohoek + SERVO_HOEK_STAP);
   //  servohoek = doel_servohoek;
 
   //  servo1.write(servohoek);  // We verplaatsen de servo naar de nieuwe positie servohoek
-
-
 
     /*
       #ifdef DEBUG_SERIAL
@@ -305,7 +226,7 @@ void updateMotors()
       }
       else
       {
-        regelX = currentX + (Pfactor * (gyroZ)); // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
+        regelX = currentX + (Pfactor * (werkelijke_draaisnelheid)); // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
       }
       
       if (z_motorsnelheid > 0) //alleen bij zweefmotor aan
@@ -495,7 +416,6 @@ if (gyroBeschikbaar)
   sensor.gze = 0;
 
   kalibreer_gyro(20,0.01); // product moet 1 zijn :  TODO vervangen door 20,0.05 of 100,0.01
-
   sensor.read();
   }
   
