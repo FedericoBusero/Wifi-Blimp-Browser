@@ -146,11 +146,11 @@ int ui_slider1; // -180 .. 180
 // int servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;  niet gebruikt in deze motorversie
 // int doel_servohoek;
 int ui_slider2 = 0; // 0 .. 360
+int ui_joystick_x = 0;
+float currentY = 0;
+float regelX = 0;
 
 unsigned long vorigeMillisZ;
-float currentX = 0; //moet float zijn voor berekeningen
-float regelX = 0;
-float currentY = 0;
 bool gyroBeschikbaar = false;
 
 int motorsnelheidA; // voor 2 stuwmotoren
@@ -211,7 +211,7 @@ void updateMotors()
     */
      
       int z_motorsnelheid = map(ui_slider2,0,360,0,PWM_RANGE); // voor zweefmotor
-      if (abs(currentY * currentX) < 5) {
+      if (abs(currentY * (float)ui_joystick_x) < 5) {
         z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
       }
 
@@ -225,7 +225,7 @@ void updateMotors()
       }
       else
       {
-        regelX = currentX + (Pfactor * (werkelijke_draaisnelheid)); // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
+        regelX = (float)ui_joystick_x + (Pfactor * (werkelijke_draaisnelheid)); // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
       }
       
       if (z_motorsnelheid > 0) //alleen bij zweefmotor aan
@@ -540,7 +540,7 @@ void handleJoystick(int x, int y)
 //  
 #endif
 
-currentX = x;
+ui_joystick_x = x;
 currentY = y;
  
 //      doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
