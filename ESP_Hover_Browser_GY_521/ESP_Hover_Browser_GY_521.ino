@@ -145,7 +145,7 @@ long last_activity_message;
 int ui_slider1; // -180 .. 180 
 // int servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;  niet gebruikt in deze motorversie
 // int doel_servohoek;
-int ui_slider2 = 0;
+int ui_slider2 = 0; // 0 .. 360
 
 unsigned long vorigeMillisZ;
 float currentX = 0; //moet float zijn voor berekeningen
