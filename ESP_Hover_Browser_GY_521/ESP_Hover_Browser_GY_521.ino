@@ -239,8 +239,8 @@ void updateMotors()
 //      DEBUG_SERIAL.println(millis());
       DEBUG_SERIAL.print("  ui_joystick_x ");
       DEBUG_SERIAL.println(ui_joystick_x);
-//      Dwerkelijke_draaisnelhui_joystick_y ");
-//      DEBUG_SERIAL.pafwijkiui_joystick_y);
+//      DEBUG_SERIAL.print("  ui_joystick_x ");
+//      DEBUG_SERIAL.println(ui_joystick_x);
 //      DEBUG_SERIAL.print("  Pfactor: ");
 //      DEBUG_SERIAL.print(Pfactor);
       DEBUG_SERIAL.print("  regelX: ");
