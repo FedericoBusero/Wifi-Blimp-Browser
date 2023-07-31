@@ -150,7 +150,6 @@ int ui_slider2 = 0; // 0 .. 360
 int ui_joystick_x = 0;
 int ui_joystick_y = 0;
 
-unsigned long vorigeMillisZ;
 bool gyroBeschikbaar = false;
 
 int motorsnelheidA; // voor 2 stuwmotoren
@@ -171,6 +170,8 @@ void setup_pin_mode_output(int pin)
 
 void updateMotors()
 {
+   static unsigned long vorigeMillisZ=0;
+   
   if (motors_halt)
   {
     analogWrite(PIN_ZMOTOR, 0);
