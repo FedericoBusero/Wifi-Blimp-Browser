@@ -7,7 +7,7 @@
    Dan ga je naar de browser (chrome, firefox, safari, ..) naar de website 192.168.4.1 maar elke andere http-URL werkt ook bv. http://a.be
 
    De bovenste regel toont de connectie-status. Op ESP8266 wordt het voltage getoond tijdens de connectie, te calibreren met VOLTAGE_FACTOR
-   De bovenste slider wordt niet gebruikt voorlopig, was om de servo te trimmen.
+   De bovenste slider wordt gebruikt om de gevoeligheid van de gyro te regelen (p-factor)
    De slider eronder stelt de zweefmotor in.
    Met de joystick worden 2 stuwmotoren bestuurd
 
