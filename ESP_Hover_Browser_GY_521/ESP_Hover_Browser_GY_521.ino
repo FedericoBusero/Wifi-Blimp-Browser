@@ -142,14 +142,15 @@ long last_activity_message;
 // #define SERVO_HOEK_STAP 2
 
 //int Servopositie_x;   // -180 .. 180 niet gebruikt in deze motorversie
-int ui_slider1; // -180 .. 180 
 // int servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;  niet gebruikt in deze motorversie
 // int doel_servohoek;
+
+int ui_slider1; // -180 .. 180 
 int ui_slider2 = 0; // 0 .. 360
 int ui_joystick_x = 0;
-float currentY = 0;
-float regelX = 0;
+int ui_joystick_y = 0;
 
+float regelX = 0;
 unsigned long vorigeMillisZ;
 bool gyroBeschikbaar = false;
 
@@ -211,7 +212,7 @@ void updateMotors()
     */
      
       int z_motorsnelheid = map(ui_slider2,0,360,0,PWM_RANGE); // voor zweefmotor
-      if (abs(currentY * (float)ui_joystick_x) < 5) {
+      if (abs((float)ui_joystick_y * (float)ui_joystick_x) < 5) {
         z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
       }
 
@@ -238,8 +239,8 @@ void updateMotors()
 //      DEBUG_SERIAL.println(millis());
       DEBUG_SERIAL.print("  ui_joystick_x ");
       DEBUG_SERIAL.println(ui_joystick_x);
-//      DEBUG_SERIAL.print("  currentY ");
-//      DEBUG_SERIAL.println(currentY);
+//      Dwerkelijke_draaisnelhui_joystick_y ");
+//      DEBUG_SERIAL.pafwijkiui_joystick_y);
 //      DEBUG_SERIAL.print("  Pfactor: ");
 //      DEBUG_SERIAL.print(Pfactor);
       DEBUG_SERIAL.print("  regelX: ");
@@ -247,8 +248,8 @@ void updateMotors()
 #endif
     
     // x en y omzetten naar motorsnelheden
-      float temp1 = constrain(currentY + regelX,-180,180); //gewone mix onder gyro regeling
-      float temp2 = constrain(currentY - regelX,-180,180); //gewone mix zonder gyro regeling
+      float temp1 = constrain((float)ui_current_y + regelX,-180,180); //gewone mix onder gyro regeling
+      float temp2 = constrain((float)ui_current_y - regelX,-180,180); //gewone mix zonder gyro regeling
          
       motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
       motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
@@ -541,7 +542,7 @@ void handleJoystick(int x, int y)
 #endif
 
 ui_joystick_x = x;
-currentY = y;
+ui_joystick_y = y;
  
 //      doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
 //      
