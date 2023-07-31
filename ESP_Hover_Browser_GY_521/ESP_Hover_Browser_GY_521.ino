@@ -150,7 +150,6 @@ int ui_slider2 = 0; // 0 .. 360
 int ui_joystick_x = 0;
 int ui_joystick_y = 0;
 
-float regelX = 0;
 unsigned long vorigeMillisZ;
 bool gyroBeschikbaar = false;
 
@@ -218,7 +217,8 @@ void updateMotors()
 
 // "gyro"-regeling
       float Pfactor=mapf((float)ui_slider1,-180.0,180.0,0,2.4);
-      
+
+      float regelX;
       if ((millis()-vorigeMillisZ) >= 1000) // langer dan 1 sec niet aan het zweven, dus wordt verondersteld stil tye staan.
       {
         kalibreer_gyro(20,0.01); // TODO 1,0.01 is voldoende, want wordt continu uitgevoerd
