@@ -145,7 +145,7 @@ long last_activity_message;
 int ui_slider1; // -180 .. 180 
 // int servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;  niet gebruikt in deze motorversie
 // int doel_servohoek;
-int currentSlider2 = 0;
+int ui_slider2 = 0;
 
 unsigned long vorigeMillisZ;
 float currentX = 0; //moet float zijn voor berekeningen
@@ -153,7 +153,6 @@ float regelX = 0;
 float currentY = 0;
 bool gyroBeschikbaar = false;
 
-int z_motorsnelheid = 0; // voor zweefmotor
 int motorsnelheidA; // voor 2 stuwmotoren
 int motorsnelheidB; // voor 2 stuwmotoren
 int max_motorsnelheid;
@@ -210,9 +209,8 @@ void updateMotors()
       DEBUG_SERIAL.println(doel_motorsnelheid);
       #endif
     */
-   
-
-      z_motorsnelheid = map(currentSlider2,0,360,0,PWM_RANGE);
+     
+      int z_motorsnelheid = map(ui_slider2,0,360,0,PWM_RANGE); // voor zweefmotor
       if (abs(currentY * currentX) < 5) {
         z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
       }
@@ -314,7 +312,7 @@ void init_motors()
  // servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
  // doel_servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
 
-  z_motorsnelheid = 0;
+  ui_slider2 = 0;
   motorsnelheidA = 0; //opgesplitst voor 2 motoren
   motorsnelheidB = 0;  
   max_motorsnelheid = PWM_RANGE;
@@ -512,14 +510,14 @@ sensor.gze += gz * kalib_factor;
 }
 
 
-void handleSliderZSpeed(int value) // Z (zweef) motor besturing geworden
+void handleSlider2(int value) // Z (zweef) motor besturing geworden
 {
 #ifdef DEBUG_SERIAL
-  DEBUG_SERIAL.print(F("handleSliderZSpeed value="));
+  DEBUG_SERIAL.print(F("handleSlider2 value="));
   DEBUG_SERIAL.println(value);
 #endif
   //max_motorsnelheid = map(value, 0, 360, PWM_RANGE / 2, PWM_RANGE);
-  currentSlider2 = value;
+  ui_slider2 = value;
   
   updateMotors();
 }
@@ -609,10 +607,10 @@ void handle_message(websockets::WebsocketsMessage msg) {
       handleJoystick(param1, param2);
       break;
 
-    case 2: handleSliderZSpeed(param1);
+    case 2: handleSlider2(param1); // z-speed
       break;
 
-    case 3: handleSlider1(param1);
+    case 3: handleSlider1(param1); // p-control
       break;
 
   }
