@@ -648,27 +648,6 @@ void updatevoltage()
 #ifdef ESP8266
   static unsigned long lastupdate_voltage = 0;
   unsigned long currentmillis = millis();
-  char voltagestr[20];
-
-  if (currentmillis > lastupdate_voltage + TIMEOUT_MS_VOLTAGE)
-  {
-    lastupdate_voltage = currentmillis;
-    float voltage = ESP.getVcc() / VOLTAGE_FACTOR;
-    snprintf(voltagestr, 10, "%4.2f V", voltage);
-#ifdef DEBUG_SERIAL
-    //    DEBUG_SERIAL.print("Sending voltage: ");
-    //    DEBUG_SERIAL.println(voltagestr);
-#endif
-    sclient.send(voltagestr);
-  }
-#endif
-}
-
-void updatevoltage()
-{
-#ifdef ESP8266
-  static unsigned long lastupdate_voltage = 0;
-  unsigned long currentmillis = millis();
   char voltagestr[50];
 
   if (currentmillis > lastupdate_voltage + TIMEOUT_MS_VOLTAGE)
