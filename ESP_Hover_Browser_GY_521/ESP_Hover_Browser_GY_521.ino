@@ -79,6 +79,7 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 
 // Pas de voltagefactor aan, dat is bij elke chip hetzelfde. Kalibreer bv. met USB stroom die 3.3V op de chip moet geven
 #define VOLTAGE_FACTOR 1060.0f
+#define VOLTAGE_THRESHOLD 2.4 // onder dit voltage valt de chip uit om de batterij te beschermen
 
 #else // Wemos D1 mini, NodeMCU, ...
 #define DEBUG_SERIAL Serial
@@ -93,6 +94,7 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 
 // Pas de voltagefactor aan, dat is bij elke chip hetzelfde. Kalibreer bv. met USB stroom die 3.3V op de chip moet geven
 #define VOLTAGE_FACTOR 910.0f
+#define VOLTAGE_THRESHOLD 2.4 // onder dit voltage valt de chip uit om de batterij te beschermen
 
 #endif // MODE_ESP01
 
@@ -658,6 +660,43 @@ void updatevoltage()
     //    DEBUG_SERIAL.println(voltagestr);
 #endif
     sclient.send(voltagestr);
+  }
+#endif
+}
+
+void updatevoltage()
+{
+#ifdef ESP8266
+  static unsigned long lastupdate_voltage = 0;
+  unsigned long currentmillis = millis();
+  char voltagestr[50];
+
+  if (currentmillis > lastupdate_voltage + TIMEOUT_MS_VOLTAGE)
+  {
+    lastupdate_voltage = currentmillis;
+    float voltage = ESP.getVcc() / VOLTAGE_FACTOR;
+
+    if (voltage >= VOLTAGE_THRESHOLD)
+    {
+      snprintf(voltagestr, sizeof(voltagestr), "%4.2f V", voltage);
+#ifdef DEBUG_SERIAL
+      // DEBUG_SERIAL.print("Sending voltage: ");
+      // DEBUG_SERIAL.println(voltagestr);
+#endif
+      sclient.send(voltagestr);
+    }
+    else
+    {
+      snprintf(voltagestr, sizeof(voltagestr), "Battery low: %4.2f V. Shutting down", voltage);
+#ifdef DEBUG_SERIAL
+      DEBUG_SERIAL.print("Sending voltage: ");
+      DEBUG_SERIAL.println(voltagestr);
+#endif
+      sclient.send(voltagestr);
+      motors_pause();
+      delay(20000); // boodschap wordt 20 seconden getoond in browser alvorens hij disconnecteert
+      ESP.deepSleep(0);
+    }
   }
 #endif
 }
