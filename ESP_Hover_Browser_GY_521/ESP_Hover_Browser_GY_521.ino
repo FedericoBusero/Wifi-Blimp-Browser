@@ -236,8 +236,8 @@ void updateMotors()
 #ifdef DEBUG_SERIAL
 //      DEBUG_SERIAL.print("  millis() ");
 //      DEBUG_SERIAL.println(millis());
-      DEBUG_SERIAL.print("  currentX ");
-      DEBUG_SERIAL.println(currentX);
+      DEBUG_SERIAL.print("  ui_joystick_x ");
+      DEBUG_SERIAL.println(ui_joystick_x);
 //      DEBUG_SERIAL.print("  currentY ");
 //      DEBUG_SERIAL.println(currentY);
 //      DEBUG_SERIAL.print("  Pfactor: ");
