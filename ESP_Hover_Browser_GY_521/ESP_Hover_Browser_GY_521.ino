@@ -142,11 +142,10 @@ long last_activity_message;
 // #define SERVO_HOEK_STAP 2
 
 //int Servopositie_x;   // -180 .. 180 niet gebruikt in deze motorversie
-int TrimServopositie; // -180 .. 180 //voorlopig niet hernoemd
+int ui_slider1; // -180 .. 180 
 // int servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;  niet gebruikt in deze motorversie
 // int doel_servohoek;
 int currentSlider2 = 0;
-
 
 unsigned long vorigeMillisZ;
 float currentX = 0; //moet float zijn voor berekeningen
@@ -199,7 +198,7 @@ void updateMotors()
         we herschalen de som van de slider posities in de browser ( Servopositie_x (-180 .. 180) en TrimServopositie (-180 .. 180) )
         naar de minimum en maximum graden die de servo motor aankan (SERVO_HOEK_MIN .. SERVO_HOEK_MAX)
     */
-  //  doel_servohoek = map(Servopositie_x + TrimServopositie, -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
+  //  doel_servohoek = map(Servopositie_x + ui_slider1, -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
     // servohoek = constrain(doel_servohoek, servohoek - SERVO_HOEK_STAP, servohoek + SERVO_HOEK_STAP);
   //  servohoek = doel_servohoek;
 
@@ -219,7 +218,7 @@ void updateMotors()
       }
 
 // "gyro"-regeling
-      float Pfactor = abs(TrimServopositie+180)/150; // TrimServopositie slider is voorlopig niet hernoemd of herschaald
+      float Pfactor=mapf((float)ui_slider1,-180.0,180.0,0,2.4);
       
       if ((millis()-vorigeMillisZ) >= 1000) // langer dan 1 sec niet aan het zweven, dus wordt verondersteld stil tye staan.
       {
@@ -310,7 +309,7 @@ void motors_resume()
 
 void init_motors()
 {
-  TrimServopositie = 0;
+  ui_slider1 = 0;
  // Servopositie_x = 0;
  // servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
  // doel_servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
@@ -318,7 +317,7 @@ void init_motors()
   z_motorsnelheid = 0;
   motorsnelheidA = 0; //opgesplitst voor 2 motoren
   motorsnelheidB = 0;  
-  max_motorsnelheid = PWM_RANGE; // komt van (300 * PWM_RANGE) / 360; als startwaarde toen 2e slider hierop werkte.
+  max_motorsnelheid = PWM_RANGE;
   motors_halt = false;
 
   updateMotors();
@@ -525,14 +524,14 @@ void handleSliderZSpeed(int value) // Z (zweef) motor besturing geworden
   updateMotors();
 }
 
-void handleSliderTrimServo(int value)
+void handleSlider1(int value)
 {
 #ifdef DEBUG_SERIAL
-  DEBUG_SERIAL.print(F("handleSliderTrimServo value="));
+  DEBUG_SERIAL.print(F("handleSlider1 value="));
   DEBUG_SERIAL.println(value);
 #endif
 
-  TrimServopositie = value;
+  ui_slider1 = (float)value;
 
   updateMotors();
 }
@@ -613,7 +612,7 @@ void handle_message(websockets::WebsocketsMessage msg) {
     case 2: handleSliderZSpeed(param1);
       break;
 
-    case 3: handleSliderTrimServo(param1);
+    case 3: handleSlider1(param1);
       break;
 
   }
