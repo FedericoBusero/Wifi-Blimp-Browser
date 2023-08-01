@@ -306,12 +306,14 @@ void motors_resume()
 
 void init_motors()
 {
-  ui_slider1 = 0;
+  
  // Servopositie_x = 0;
  // servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
  // doel_servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
-
-  ui_slider2 = 0;
+   ui_slider1 = 0;
+   ui_slider2 = 0;
+   ui_joystick_x = 0;
+   ui_joystick_y = 0;
   max_motorsnelheid = PWM_RANGE;
   motors_halt = false;
 
