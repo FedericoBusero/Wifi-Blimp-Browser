@@ -151,9 +151,6 @@ int ui_joystick_x = 0;
 int ui_joystick_y = 0;
 
 bool gyroBeschikbaar = false;
-
-int motorsnelheidA; // voor 2 stuwmotoren
-int motorsnelheidB; // voor 2 stuwmotoren
 int max_motorsnelheid;
 bool motors_halt;
 
@@ -252,8 +249,8 @@ void updateMotors()
       float temp1 = constrain((float)ui_current_y + regelX,-180,180); //gewone mix onder gyro regeling
       float temp2 = constrain((float)ui_current_y - regelX,-180,180); //gewone mix zonder gyro regeling
          
-      motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
-      motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
+      int motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
+      int motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
     
     hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, motorsnelheidA);
     hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, motorsnelheidB);
@@ -315,8 +312,6 @@ void init_motors()
  // doel_servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
 
   ui_slider2 = 0;
-  motorsnelheidA = 0; //opgesplitst voor 2 motoren
-  motorsnelheidB = 0;  
   max_motorsnelheid = PWM_RANGE;
   motors_halt = false;
 
