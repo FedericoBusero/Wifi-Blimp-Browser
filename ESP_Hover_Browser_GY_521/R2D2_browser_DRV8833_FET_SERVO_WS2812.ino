@@ -169,7 +169,7 @@ float currentY = 0;
 bool gyroBeschikbaar = false;
 float Pfactor;
 
-const float Cfactor = -2; // conversfactor van gemeten gyroZ naar de arbitraire eenheden van currentX
+const float Cfactor = -2; // conversiefactor van gemeten gyroZ naar de arbitraire eenheden van currentX
 const float maxPfactor = 4; // maximum voor de proportionele regelfactor Pfactor, bepaald met slider
 
 //In Deze versie NIET:
@@ -220,8 +220,20 @@ void updateMotors()
   else
   {
     if (gyroBeschikbaar) {// gyro
-            sensor.read();
+         sensor.read();
         gyroZ = sensor.getGyroZ();
+
+// "gyro"-regeling
+        float Pfactor = map(TrimServopositie, -180, 180, 0, maxPfactor); // TrimServopositie slider voorlopig dubbel gebruikt
+        
+        if ((millis()-vorigeMillisZ) >= 2000) // langer dan 2 sec alle motoren uit, dus wordt verondersteld stil te staan.
+        {
+          regelX = 0;kalibreer ();
+        }
+        else
+        {
+          regelX = ((1+(Pfactor)) * currentX) - (Pfactor * Cfactor * (gyroZ)); // bijgestuurde x in verhouding tot afwijking op gewenste draaisnelheid, X van joystick is de gewenste draaisnelheid
+        }
 
         if (counter % 10 == 0)
         {
@@ -231,9 +243,14 @@ void updateMotors()
     }
   else {
     gyroZ = 0;
+    regelX = currentX;
   }
     counter++;
 
+if (!((z_motorsnelheid = 0) && (doel_motorsnelheidA = 0) && (doel_motorsnelheidB = 0))); //alleen bij alle motoren uit aan
+        { 
+          vorigeMillisZ = millis(); // om bij te houden hoe lang geleden een motor aan stond
+        }
 
     /* We berekenen naar welke doelpositie we de servo willen krijgen:
         we herschalen de som van de slider posities in de browser ( Servopositie_x (-180 .. 180) en TrimServopositie (-180 .. 180) )
@@ -270,7 +287,7 @@ void updateMotors()
       if (abs(currentY * currentX) < 5) { //opgelet gebeurt soms tussendoor heel kort blijkbaar geled op geflikker WS2812?!
         z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
         leds[0] = CRGB::Red; 
-        leds[3] = CRGB::Green;
+        leds[3] = CRGB::DarkGreen;
         FastLED.show();
       }
      else {
@@ -287,25 +304,6 @@ void updateMotors()
         LaatstMotorsOfGeluid = millis(); //weer even wachten
       }
 
-// "gyro"-regeling
-     float Pfactor = map(TrimServopositie, -180, 180, 0, maxPfactor); // TrimServopositie slider is voorlopig niet hernoemd en dubbel gebruikt
-       
-      if ((millis()-vorigeMillisZ) >= 1000) // langer dan 1 sec niet aan het zweven, dus wordt verondersteld stil tye staan.
-      {
-        kalibreer ();
-        regelX = 0; 
-      }
-      else
-      {
-          regelX = ((1+(Pfactor)) * currentX) - (Pfactor * Cfactor * (gyroZ)); // sturen in verhouding tot afwijking // X van joystik bepaalt hoe snel we willen draaien
-      }
-      
-      if (z_motorsnelheid > 0) //alleen bij zweefmotor aan
-        { 
-          vorigeMillisZ = millis(); // om bij te houden hoe lang geleden zweefmotor aan stond
-        }
-
-
       
 #ifdef DEBUG_SERIAL
 //      DEBUG_SERIAL.print("  millis() ");
@@ -321,8 +319,8 @@ void updateMotors()
 #endif
 
     // x en y omzetten naar motorsnelheden
-      float temp1 = currentY + currentX; //gewone mix zonder gyro regeling
-      float temp2 = currentY - currentX; //gewone mix na gyro regeling
+      float temp1 = currentY + regelX; // mix na gyro regeling
+      float temp2 = currentY - regelX; // mix na gyro regeling
          
       doel_motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
       doel_motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
@@ -600,7 +598,7 @@ float gz = 0;
     sensor.read();
     gz -= sensor.getGyroZ();
   }
-sensor.gze += gz * 0.01;
+sensor.gze += gz * 0.05;
 #ifdef DEBUG_SERIAL
  //   DEBUG_SERIAL.print(F("sensor.gze   "));
  //   DEBUG_SERIAL.println(sensor.gze);
