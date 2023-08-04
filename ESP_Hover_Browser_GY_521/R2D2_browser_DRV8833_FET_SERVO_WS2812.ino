@@ -653,14 +653,6 @@ void handleJoystick(int x, int y)
 currentX = x;
 currentY = y;
 
-// if (y < -1000)
-//   {
-//   digitalWrite(PIN_EXTERNSIGNAAL,HIGH);
-//   }
-// else
-//   {
-//   digitalWrite(PIN_EXTERNSIGNAAL,LOW);
-//   }
  
 //      doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
 //      
