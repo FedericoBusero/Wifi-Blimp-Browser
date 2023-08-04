@@ -87,6 +87,8 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 
 #include <FastLED.h>
 
+// todo define erbij voor r2d2 effects?
+
 // todo beter PIN_2812 definieren, naast PIN_LEDCONNECTIE
 #define PIN_LEDCONNECTIE 2 // jawel op zelfde bin als gewone LED, zou volgens WEMOS mini shield vbn moeten werken
 #define LEDSTRIP_MAX_BRIGHTNESS 50
