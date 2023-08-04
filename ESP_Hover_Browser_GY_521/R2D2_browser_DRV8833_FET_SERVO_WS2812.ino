@@ -858,6 +858,7 @@ void loop()
 
   if (millis() > last_activity_message + TIMEOUT_MS_LED)
   {
+     // todo enkel als led pin en ws2812 pin verschillend zijn
   //  digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);// te vervangen door WS2812
   }
 
