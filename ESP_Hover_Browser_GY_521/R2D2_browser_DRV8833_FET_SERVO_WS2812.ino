@@ -1,3 +1,4 @@
+// todo eens autoformat doen zodat indentatie goed komt: control-t if zo in arduino
 /*
    Code voor het besturen van een hover mbv Wifi via de browser
 
