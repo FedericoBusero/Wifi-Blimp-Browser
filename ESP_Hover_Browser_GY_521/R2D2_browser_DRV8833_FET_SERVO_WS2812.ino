@@ -908,7 +908,8 @@ void loop()
     onConnect();
     is_connected = 1;
   }
-   
+
+   // todo beter volgender2d2_show zodat random slechts 1 keer uitgevoerd wordt
   if ((millis()-LaatstMotorsOfGeluid) >= random(3000, 30000)) // langer dan 3 a 30 sec motors niet aan.
   {
      R2D2sound();
