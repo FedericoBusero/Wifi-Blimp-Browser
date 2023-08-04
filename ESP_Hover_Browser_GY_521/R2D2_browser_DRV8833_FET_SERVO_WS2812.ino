@@ -483,6 +483,7 @@ void setup()
 
   init_motors();
 
+   // todo code enkel als ws2812 anders dan led pin
   //digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON ); uit om via die pin WS2812 aan te sturen
 
   // setup gyro module
@@ -514,7 +515,7 @@ if (gyroBeschikbaar)
   sensor.setThrottle();
   Serial.println("start...");
 
-  // set all calibration errors to zero
+  // todo set all calibration errors to zero
   sensor.gze = 0;
 
   kalibreer();
