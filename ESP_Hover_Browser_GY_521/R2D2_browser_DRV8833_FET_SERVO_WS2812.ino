@@ -160,11 +160,11 @@ int servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2; // wel weer niet gebruikt
 int doel_servohoek;
 int currentSlider2 = 0;
 
-// volgende variabele wordt foutief niet geinitialiseerd, en wordt enkel gebruikt in update_mitors, beter static lokale variabele van maken in update_motors
+// todo: volgende variabele wordt foutief niet geinitialiseerd, en wordt enkel gebruikt in update_mitors, beter static lokale variabele van maken in update_motors
 unsigned long vorigeMillisZ;
 
 float gyroZ;
-float currentX = 0; //moet float zijn voor berekening met float Pfactor
+float currentX = 0; //moet float zijn voor berekening met float Pfactor. todo, dat klopt niet: beter als int definieren, en bij pfactor berekening explicit casten
 float regelX = 0;
 float currentY = 0;
 bool gyroBeschikbaar = false;
