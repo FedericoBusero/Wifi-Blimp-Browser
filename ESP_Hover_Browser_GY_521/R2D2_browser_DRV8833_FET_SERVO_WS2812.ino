@@ -85,7 +85,7 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 #define PIN_2BMOTOR          D0  // om D5 vrij te maken voor speker, want met speaker op D0 werkt wifi opstart niet meer? Mogelijks door dubbel gebruik PIN_EXTERNSIGNAAL, maar probleem ontstond ook zonder speaker, maar aansluiting input andere ESP op D0
 #define PIN_ZMOTOR           D3 
 
-// todo je kan toch niet debuggen als debug_serial en servo gelijktijdig aanstaan??
+// todo je kan toch niet debuggen als debug_serial en servo gelijktijdig aanstaan?? debug_serial en pin_servo kunnen niet gelijktijdig aan staan
 #define PIN_SERVO            1 //TX dus, werkt alvast op ESP01, dus waarschijnlijk ook op andere SEP8266 modules
 
 #include <FastLED.h>
@@ -286,7 +286,8 @@ if (!((z_motorsnelheid = 0) && (doel_motorsnelheidA = 0) && (doel_motorsnelheidB
     */
    servohoek = constrain(doel_servohoek, servohoek - SERVO_HOEK_STAP, servohoek + SERVO_HOEK_STAP);
    servohoek = doel_servohoek;
-
+// todo ifdef servopin
+     // todo vertraagcode kan er beter uit en gyro corretie erin
     servo1.write(servohoek);  // We verplaatsen de servo naar de nieuwe positie servohoek
 
 
