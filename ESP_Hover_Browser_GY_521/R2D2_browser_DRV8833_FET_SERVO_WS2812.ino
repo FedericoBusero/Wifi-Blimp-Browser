@@ -739,6 +739,7 @@ void handle_message(websockets::WebsocketsMessage msg) {
 
 void onConnect()
 {
+   // todo enkel als led pin verschillend van ws2812 pin
 //  digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);// te vervangen door WS2812
 
 #ifdef DEBUG_SERIAL
