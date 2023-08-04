@@ -479,7 +479,7 @@ void setup()
   
   FastLED.delay(2); // nodig bij plotse overgangen?
   
-
+// todo ifdef servopin
   // steering servo PWM             hier servo tegelijk met x input naar motoren
   setup_pin_mode_output(PIN_SERVO);
   /* we verbinden de servo met de gekozen servopin PIN_SERVO en leggen de uiterste signalen vast:
