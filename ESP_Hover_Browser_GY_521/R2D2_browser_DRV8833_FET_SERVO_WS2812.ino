@@ -167,7 +167,10 @@ unsigned long vorigeMillisZ;
 float gyroZ;
 
 float currentX = 0; //moet float zijn voor berekening met float Pfactor. todo, dat klopt niet: beter als int definieren, en bij pfactor berekening explicit casten
+
+// todo regelx staat als globale variabele, maar enkel lokaal gebruikt, dus beter lokaal definieren in update_motors
 float regelX = 0;
+
 float currentY = 0;
 bool gyroBeschikbaar = false;
 
