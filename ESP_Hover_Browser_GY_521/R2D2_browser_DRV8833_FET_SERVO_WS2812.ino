@@ -297,14 +297,6 @@ if (!((z_motorsnelheid = 0) && (doel_motorsnelheidA = 0) && (doel_motorsnelheidB
         FastLED.show();
       }
       
-
-      if ((millis()-LaatstMotorsOfGeluid) >= random(3000, 30000)) // langer dan 3 a 30 sec motors niet aan.
-      {
-        R2D2sound(); 
-        LaatstMotorsOfGeluid = millis(); //weer even wachten
-      }
-
-      
 #ifdef DEBUG_SERIAL
 //      DEBUG_SERIAL.print("  millis() ");
 //      DEBUG_SERIAL.println(millis());
@@ -894,14 +886,16 @@ void loop()
     onConnect();
     is_connected = 1;
   }
-
+   
+  if ((millis()-LaatstMotorsOfGeluid) >= random(3000, 30000)) // langer dan 3 a 30 sec motors niet aan.
+  {
+     R2D2sound();
+     LaatstMotorsOfGeluid = millis(); //weer even wachten
+  }
+   
   if (!is_connected)
   {
     digitalWrite(PIN_LEDCONNECTIE, (millis() % 1000) > 500 ? LOW : HIGH);
-    if ((millis() % 30000) > 29000) // om de 30 sec laten horen, ik sta nog aan!
-      {
-        R2D2sound(); 
-      }
   }
   
   // delay(2);
