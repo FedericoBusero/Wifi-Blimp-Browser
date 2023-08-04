@@ -449,7 +449,8 @@ void setup()
   delay(10);
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
   delay(10);
-  
+
+   // todo: beter nieuwe define voor ws2812, zelfs al is deze gelijk aan led_connectie: voor platformen waar led en ws2812 verschillend zijn
   pinMode(PIN_LEDCONNECTIE, OUTPUT);
   FastLED.addLeds<NEOPIXEL, PIN_LEDCONNECTIE>(leds, NUMLEDPIXELS); //gewone LED en WS2812 op zelfde pin dus
   FastLED.setBrightness(LEDSTRIP_MAX_BRIGHTNESS);
