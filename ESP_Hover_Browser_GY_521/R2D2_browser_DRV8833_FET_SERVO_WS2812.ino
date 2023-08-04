@@ -171,7 +171,8 @@ int currentSlider2 = 0;
 // ook is naamgeving niet meer juist want gaat over alle alle motoren ipv enkel z
 unsigned long vorigeMillisZ;
 
-// todo gyroz staat als globale variabele, maar enkel lokaal gebruikt, dus beter lokaal definieren in update_motors
+// todo gyroz staat als globale variabele, maar enkel lokaal gebruikt, dus beter lokaal definieren in update_motors.
+// todo beter andere naam kiezen zzoalsgemeten_rotatie_snelheid voor het geval gyro anders bevestigd is
 float gyroZ;
 
 float currentX = 0; //moet float zijn voor berekening met float Pfactor. todo, dat klopt niet: beter als int definieren, en bij pfactor berekening explicit casten
@@ -618,6 +619,7 @@ float gz = 0;
     gz -= sensor.getGyroZ();
   }
 sensor.gze += gz * 0.05;
+   // todo best ook andere richtingen bijkalibreren nu je toch bezig bent. Voor het geval de gyro anders bevestigd is
 #ifdef DEBUG_SERIAL
  //   DEBUG_SERIAL.print(F("sensor.gze   "));
  //   DEBUG_SERIAL.println(sensor.gze);
