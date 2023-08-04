@@ -604,6 +604,7 @@ fill_solid (leds, NUMLEDPIXELS, CRGB::Black); //WS2812 leds uit
 FastLED.show();
 }
 
+// todo num_iter en factor als parameter meegeven
 void kalibreer()
 {
 float gz = 0;
