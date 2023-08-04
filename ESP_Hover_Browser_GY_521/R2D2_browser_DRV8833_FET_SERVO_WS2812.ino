@@ -160,6 +160,7 @@ int servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2; // wel weer niet gebruikt
 int doel_servohoek;
 int currentSlider2 = 0;
 
+// volgende variabele wordt foutief niet geinitialiseerd, en wordt enkel gebruikt in update_mitors, beter static lokale variabele van maken in update_motors
 unsigned long vorigeMillisZ;
 
 float gyroZ;
