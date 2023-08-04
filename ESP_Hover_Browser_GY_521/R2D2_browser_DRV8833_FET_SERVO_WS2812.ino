@@ -96,7 +96,7 @@ CRGB leds[NUMLEDPIXELS];
 
 CRGB current_led_color; //gebruikt?
 
-struct //nog niet gebruikt?
+struct // todo nog niet gebruikt?
 {
   int brightness;
   int hue;
@@ -105,7 +105,7 @@ struct //nog niet gebruikt?
 //voor R2D2sound
 #define speakerPin D5
 int frequency; // todo lokale variabele van maken
-unsigned long LaatstMotorsOfGeluid;
+unsigned long LaatstMotorsOfGeluid; // todo beter wijzigen in volgendR2d2geluid (random slechts eenmaal uitvoeren)
 
 
 // Pas de voltagefactor aan, dat is bij elke chip hetzelfde. Calibreer bv. met USB stroom die 3.3V op de chip moet geven
@@ -137,10 +137,12 @@ WebsocketsClient sclient;
 
 // timeoutes
 #define TIMEOUT_MS_MOTORS 2500L // Timeout om motoren uit veiligheid stil te leggen, na x milliseconden niks te hebben ontvangen
-#define TIMEOUT_MS_LED 1L        // Aantal milliseconden dat LED blijft branden na het ontvangen van een boodschap
-#define TIMEOUT_MS_VOLTAGE 10000L // Aantal milliseconden tussen update voltage
 
+// todo volgende regels enkel  als led pin verschillend van ws2812 pin #if x != y
+#define TIMEOUT_MS_LED 1L        // Aantal milliseconden dat LED blijft branden na het ontvangen van een boodschap
 long last_activity_message;
+
+#define TIMEOUT_MS_VOLTAGE 10000L // Aantal milliseconden tussen update voltage
 
 // In deze versie weer een servo
 // We maken een servo "object" aan om de servo aan te sturen.
@@ -191,7 +193,7 @@ const float maxPfactor = 4; // maximum voor de proportionele regelfactor Pfactor
 
 //int motor_snelheid = 0; niet meer gebruikt, was voor 1 motorversie
 
-// todo volgende variabelen staan als glibale variabelen, maar moeten lokale worden in iodate_motors
+// todo volgende variabelen staan als globale variabelen, maar moeten lokale worden in iodate_motors
 int z_motorsnelheid = 0; // voor zweefmotor
 int doel_motorsnelheidA; // voor 2 stuwmotoren
 int doel_motorsnelheidB; // voor 2 stuwmotoren
@@ -220,7 +222,7 @@ void setup_pin_mode_output(int pin)
 
 void updateMotors()
 {
-  static int counter = 0;
+  static int counter = 0; // todo wordt niet gebruikt
 
   if (motors_halt)
   {
@@ -256,7 +258,7 @@ void updateMotors()
     }
   else {
     gyroZ = 0;
-    regelX = currentX;
+    regelX = currentX; 
   }
     counter++;
      
@@ -297,7 +299,9 @@ if (!((z_motorsnelheid = 0) && (doel_motorsnelheidA = 0) && (doel_motorsnelheidB
     // motor_snelheid = min(doel_motorsnelheid, motor_snelheid + MAX_MOTOR_SPEED_STAP);
 
       z_motorsnelheid = map(currentSlider2,0,360,0,PWM_RANGE);
-     
+
+     // todo onduidelijke implicit typecasting int/float in abs
+     // gehele lichtcode zou eigenlijk beter in een nieuwe functie update_lichten die opgeroepen wordt vanuit loop
       if (abs(currentY * currentX) < 5) { //opgelet gebeurt soms tussendoor heel kort blijkbaar geled op geflikker WS2812?!
         z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
         leds[0] = CRGB::Red; 
@@ -327,11 +331,9 @@ if (!((z_motorsnelheid = 0) && (doel_motorsnelheidA = 0) && (doel_motorsnelheidB
     // x en y omzetten naar motorsnelheden
       float temp1 = currentY + regelX; // mix na gyro regeling
       float temp2 = currentY - regelX; // mix na gyro regeling
-         
+// todo bug : waarden temp1&temp2 moeten binnen range -180 180 dus constrain te gebruiken
       doel_motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
       doel_motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
-      
-      
     
     hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, doel_motorsnelheidA);
     hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, doel_motorsnelheidB);
@@ -393,9 +395,12 @@ void init_motors()
   doel_servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
 
 //  motor_snelheid = 0;
+   
+   // todo volgende regels niet meer nodig als ze lokale variabelen worden in update_motors
   z_motorsnelheid = 0;
   doel_motorsnelheidA = 0; //opgesplitst voor 2 motoren
   doel_motorsnelheidB = 0;  
+   
   max_motorsnelheid = PWM_RANGE; // komt van (300 * PWM_RANGE) / 360; als startwaarde toen 2e slider hierop werkte.
   motors_halt = false;
 
@@ -405,7 +410,8 @@ void init_motors()
 
 void setup()
 {
-
+  // todo andere define voor ws2812
+   // maar waarom staat dit blok hier eigenlijk, want ietsje verder staat opnieuw de initialisatie, maar dan correct
   setup_pin_mode_output(PIN_LEDCONNECTIE); // eerste en vooral WS2812 even testen bij opstart
 
   fill_solid (leds, NUMLEDPIXELS, CRGB::DarkOrange);
