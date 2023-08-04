@@ -247,7 +247,7 @@ void updateMotors()
   }
     counter++;
      
-// todo: volgende code is compleet fout: = doet een assignment ipv vergelijking. verder is doel_motorsnelheid nog niet berekend, moet na de berekening ???
+// todo: volgende code is compleet fout: = doet een assignment ipv vergelijking. verder is doel_motorsnelheid en z_motorsnelheid nog niet berekend, moet na de berekening ???
 if (!((z_motorsnelheid = 0) && (doel_motorsnelheidA = 0) && (doel_motorsnelheidB = 0))); //alleen bij alle motoren uit aan
         { 
           vorigeMillisZ = millis(); // om bij te houden hoe lang geleden een motor aan stond
