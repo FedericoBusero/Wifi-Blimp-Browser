@@ -168,6 +168,8 @@ float currentX = 0; //moet float zijn voor berekening met float Pfactor
 float regelX = 0;
 float currentY = 0;
 bool gyroBeschikbaar = false;
+
+// todo: waarom staat volgende definitie hier van pfactor?? Die wordt nergens gebruikt: in update_motors staat ze correct lokaal gedefinieerd
 float Pfactor;
 
 const float Cfactor = -2; // conversiefactor van gemeten gyroZ naar de arbitraire eenheden van currentX
