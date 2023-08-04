@@ -710,7 +710,7 @@ void handle_message(websockets::WebsocketsMessage msg) {
   //  DEBUG_SERIAL.print(F(" param2 = "));
   //  DEBUG_SERIAL.println(param2);
 #endif
-
+// todo enkel als led pin verschillend van ws2812 pin
   //digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON); ; uit om via die pin WS2812 aan te sturen
 
   last_activity_message = millis();
