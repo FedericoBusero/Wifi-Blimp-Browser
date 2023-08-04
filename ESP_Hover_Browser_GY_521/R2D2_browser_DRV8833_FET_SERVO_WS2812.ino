@@ -166,7 +166,8 @@ int servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2; // wel weer niet gebruikt
 int doel_servohoek;
 int currentSlider2 = 0;
 
-// todo: volgende variabele wordt foutief niet geinitialiseerd, en wordt enkel gebruikt in update_mitors, beter static lokale variabele van maken in update_motors
+// todo: volgende variabele wordt foutief niet geinitialiseerd, en wordt enkel gebruikt in update_motors, beter static lokale variabele van maken. move to loop?
+// ook is naamgeving niet meer juist want gaat over alle alle motoren ipv enkel z
 unsigned long vorigeMillisZ;
 
 // todo gyroz staat als globale variabele, maar enkel lokaal gebruikt, dus beter lokaal definieren in update_motors
@@ -245,7 +246,7 @@ void updateMotors()
         
         if ((millis()-vorigeMillisZ) >= 2000) // langer dan 2 sec alle motoren uit, dus wordt verondersteld stil te staan.
         {
-          regelX = 0;kalibreer ();
+          regelX = 0;kalibreer (); // todo. dit zijn toch 2 compleet afzonderlijke zaken? en kalibratie beter oproepen vanuit loop ipv wifi-calkback?
         }
         else
         {
