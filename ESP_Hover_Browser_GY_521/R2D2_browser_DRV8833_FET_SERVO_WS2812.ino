@@ -180,9 +180,12 @@ const float maxPfactor = 4; // maximum voor de proportionele regelfactor Pfactor
 // #define MAX_MOTOR_SPEED_STAP 4
 
 //int motor_snelheid = 0; niet meer gebruikt, was voor 1 motorversie
+
+// todo volgende variabelen staan als glibale variabelen, maar moeten lokale worden in iodate_motors
 int z_motorsnelheid = 0; // voor zweefmotor
 int doel_motorsnelheidA; // voor 2 stuwmotoren
 int doel_motorsnelheidB; // voor 2 stuwmotoren
+
 int max_motorsnelheid;
 bool motors_halt;
 
