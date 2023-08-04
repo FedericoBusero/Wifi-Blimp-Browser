@@ -647,9 +647,10 @@ void handleSliderTrimServo(int value)
 void handleJoystick(int x, int y)
 {
 #ifdef DEBUG_SERIAL
-//  
+//  todo code terugzetten
 #endif
 
+// todo implicit typecasting
 currentX = x;
 currentY = y;
 
