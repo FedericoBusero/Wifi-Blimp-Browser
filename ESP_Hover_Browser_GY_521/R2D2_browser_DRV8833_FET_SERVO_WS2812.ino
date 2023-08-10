@@ -145,7 +145,7 @@ WebsocketsClient sclient;
 
 // todo volgende regels enkel  als led pin verschillend van ws2812 pin #if x != y
 #define TIMEOUT_MS_LED 1L        // Aantal milliseconden dat LED blijft branden na het ontvangen van een boodschap
-long last_activity_message;
+long last_activity_message; // TODO moet zijn unsigned long
 
 #define TIMEOUT_MS_VOLTAGE 10000L // Aantal milliseconden tussen update voltage
 
