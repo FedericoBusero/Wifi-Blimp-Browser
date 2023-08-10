@@ -238,7 +238,7 @@ void updateMotors()
     */
      
       int z_motorsnelheid = map(ui_slider2,0,360,0,PWM_RANGE); // voor zweefmotor
-      if (abs((ui_joystick_y * ui_joystick_x) < 5) {
+      if (abs(ui_joystick_y * ui_joystick_x) < 5) {
         z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
       }
 
