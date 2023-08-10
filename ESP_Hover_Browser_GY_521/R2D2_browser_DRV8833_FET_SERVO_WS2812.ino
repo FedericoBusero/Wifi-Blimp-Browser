@@ -245,6 +245,7 @@ void updateMotors()
         gyroZ = sensor.getGyroZ();
 
 // "gyro"-regeling
+       // TODO: map is integer macro? p factor enkel integer?
         float Pfactor = map(TrimServopositie, -180, 180, 0, maxPfactor); // TrimServopositie slider voorlopig dubbel gebruikt
         
         if ((millis()-vorigeMillisZ) >= 2000) // langer dan 2 sec alle motoren uit, dus wordt verondersteld stil te staan.
