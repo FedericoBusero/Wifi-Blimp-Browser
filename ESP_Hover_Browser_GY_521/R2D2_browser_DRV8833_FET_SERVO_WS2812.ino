@@ -33,22 +33,23 @@
 GY521 sensor(0x68);
 
 
-#ifdef ARDUINO_ARCH_ESP32 //OPGELET!!!! dit project is niet uitgewerkt voor ESP32
+#ifdef ARDUINO_ARCH_ESP32 // TODO eigenlijk S2 //OPGELET!!!! dit project is niet uitgewerkt voor ESP32
 // #include <WiFi.h>
 // #include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
 // //#include <ESP32Servo.h> // https://github.com/madhephaestus/ESP32Servo 
-// TODO typedef SERVO_TYPE ESP32Servo
 // #define DEBUG_SERIAL Serial
 
 // #define PWM_RANGE 255 // PWM range voor analogWrite (in ESP32Servo)
 
-// //#define PIN_SERVO          12
-// //#define PIN_MOTOR          13
-// //#define PIN_LEDCONNECTIE   4
+// Lolin ESP32-S2
+// #define PIN_1AMOTOR          12 // Positie D8 op Wemos D1 mini
+// #define PIN_2AMOTOR          11 // Positie D7 op Wemos D1 mini
+// #define PIN_1BMOTOR          9  // Positie D6 op Wemos D1 mini
+// #define PIN_2BMOTOR          7  // Positie D5 op Wemos D1 mini
+// #define PIN_ZMOTOR           18 // Positie D3 op Wemos D1 mini
+// #define PIN_LEDCONNECTIE     15 // De ingebouwde LED 
 
-// #define PIN_SERVO          18
-// #define PIN_MOTOR          19
-// #define PIN_LEDCONNECTIE   LED_BUILTIN
+// #define PIN_SERVO          17
 
 // #define LED_BRIGHTNESS_ON  HIGH
 // #define LED_BRIGHTNESS_OFF LOW
