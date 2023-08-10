@@ -180,6 +180,20 @@ sensor.gze += gz * kalib_factor;
 #endif
 }
 
+void hbridge_setspeed(int pin1, int pin2, long motorspeed)
+{
+      if (motorspeed >= 0)
+      {
+        digitalWrite(pin1, HIGH);
+        analogWrite(pin2, PWM_RANGE - motorspeed);
+      }
+      else
+      {
+        digitalWrite(pin1, LOW);
+        analogWrite(pin2, -motorspeed);
+      }
+}
+
 void updateMotors()
 {
    static unsigned long vorigeMillisZ=0;
@@ -283,21 +297,6 @@ void updateMotors()
       #endif
   
   }
-}
-
-
-void hbridge_setspeed(int pin1, int pin2, long motorspeed)
-{
-      if (motorspeed >= 0)
-      {
-        digitalWrite(pin1, HIGH);
-        analogWrite(pin2, PWMRANGE - motorspeed);
-      }
-      else
-      {
-        digitalWrite(pin1, LOW);
-        analogWrite(pin2, -motorspeed);
-      }
 }
 
 void motors_pause()
