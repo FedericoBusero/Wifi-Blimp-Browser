@@ -89,6 +89,7 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 // todo je kan toch niet debuggen als debug_serial en servo gelijktijdig aanstaan?? debug_serial en pin_servo kunnen niet gelijktijdig aan staan
 #define PIN_SERVO            1 //TX dus, werkt alvast op ESP01, dus waarschijnlijk ook op andere SEP8266 modules
 
+// TODO verplaats alles van licht en geluid naar platform onafhankelijk deel (behalve pin definitie)
 #include <FastLED.h>
 
 // todo define erbij voor r2d2 effects?
