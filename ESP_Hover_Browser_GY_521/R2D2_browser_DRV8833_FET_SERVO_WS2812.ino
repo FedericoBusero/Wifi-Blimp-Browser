@@ -361,7 +361,7 @@ if (!((z_motorsnelheid = 0) && (doel_motorsnelheidA = 0) && (doel_motorsnelheidB
   }
 }
 
-
+// TODO functie hbridge_setspeed moet gedefinieerd zijn voor eerste gebruik in update_motors
 void hbridge_setspeed(int pin1, int pin2, long motorspeed)
 {
       if (motorspeed >= 0)
