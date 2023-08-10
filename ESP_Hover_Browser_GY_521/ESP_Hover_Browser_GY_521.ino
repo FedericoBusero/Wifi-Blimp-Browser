@@ -165,6 +165,21 @@ void setup_pin_mode_output(int pin)
   pinMode(pin, OUTPUT);
 }
 
+void kalibreer_gyro(int num_iter, float kalib_factor)
+{
+float gz = 0;
+  for (int i = 0; i < num_iter; i++)
+  {
+    sensor.read();
+    gz -= sensor.getGyroZ();
+  }
+sensor.gze += gz * kalib_factor;
+#ifdef DEBUG_SERIAL
+ //   DEBUG_SERIAL.print(F("sensor.gze   "));
+ //   DEBUG_SERIAL.println(sensor.gze);
+#endif
+}
+
 void updateMotors()
 {
    static unsigned long vorigeMillisZ=0;
@@ -492,22 +507,6 @@ if (gyroBeschikbaar)
 #endif
   last_activity_message = millis();
 }
-
-void kalibreer_gyro(int num_iter, float kalib_factor)
-{
-float gz = 0;
-  for (int i = 0; i < num_iter; i++)
-  {
-    sensor.read();
-    gz -= sensor.getGyroZ();
-  }
-sensor.gze += gz * kalib_factor;
-#ifdef DEBUG_SERIAL
- //   DEBUG_SERIAL.print(F("sensor.gze   "));
- //   DEBUG_SERIAL.println(sensor.gze);
-#endif
-}
-
 
 void handleSlider2(int value) // Z (zweef) motor besturing geworden
 {
