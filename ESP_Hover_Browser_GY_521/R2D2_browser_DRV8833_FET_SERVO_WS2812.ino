@@ -811,7 +811,7 @@ void R2D2sound() {
     noTone(speakerPin);         
     
  } 
-
+// TODO phrase1 en phrase2 moeten voor R2D2sound gedefinieerd zijn
 void phrase1() {
     
     int k = random(1000,2000);
