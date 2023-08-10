@@ -613,6 +613,7 @@ FastLED.show();
 }
 
 // todo num_iter en factor als parameter meegeven
+// todo kalibreer verhuizen: moet voor eerste gebruik in updateMotors gedefinieerd zijn
 void kalibreer()
 {
 float gz = 0;
