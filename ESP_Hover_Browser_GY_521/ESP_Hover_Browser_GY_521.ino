@@ -229,7 +229,7 @@ void updateMotors()
       }
 
 // "gyro"-regeling
-      float Pfactor=mapf((float)ui_slider1,-180.0,180.0,0,2.4);
+      float Pfactor = ((float)ui_slider1+180.0)/150.0; 
 
       float regelX;
       if ((millis()-vorigeMillisZ) >= 1000) // langer dan 1 sec niet aan het zweven, dus wordt verondersteld stil tye staan.
