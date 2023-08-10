@@ -37,7 +37,7 @@ GY521 sensor(0x68);
 // #include <WiFi.h>
 // #include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
 // //#include <ESP32Servo.h> // https://github.com/madhephaestus/ESP32Servo 
-
+// TODO typedef SERVO_TYPE ESP32Servo
 // #define DEBUG_SERIAL Serial
 
 // #define PWM_RANGE 255 // PWM range voor analogWrite (in ESP32Servo)
