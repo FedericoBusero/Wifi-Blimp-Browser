@@ -248,7 +248,7 @@ void updateMotors()
       float regelX;
       if ((millis()-vorigeMillisZ) >= 1000) // langer dan 1 sec niet aan het zweven, dus wordt verondersteld stil tye staan.
       {
-        kalibreer_gyro(20,0.01); // TODO 1,0.01 is voldoende, want wordt continu uitgevoerd
+        kalibreer_gyro(1,0.01);
         regelX = 0;
       }
       else
@@ -427,7 +427,7 @@ if (gyroBeschikbaar)
   // set all calibration errors to zero
   sensor.gze = 0;
 
-  kalibreer_gyro(20,0.01); // product moet 1 zijn :  TODO vervangen door 20,0.05 of 100,0.01
+  kalibreer_gyro(20,0.05);
   sensor.read();
   }
   
