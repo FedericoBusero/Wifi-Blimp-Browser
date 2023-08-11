@@ -136,11 +136,6 @@ unsigned long last_activity_message;
 // #define SERVO_HOEK_MIN 0
 // #define SERVO_HOEK_MAX 180
 
-// We verplaatsen de servo in stapjes om geen al te bruuske bewegingen te maken
-// Pas dit gerust aan, 1=servo traag bewegen, 2=normaal en vanaf 4 gaat het heel snel.
-// De waarde is minimaal 1 en maximaal 180, dan is er geen vertraging meer
-// #define SERVO_HOEK_STAP 2
-
 //int Servopositie_x;   // -180 .. 180 niet gebruikt in deze motorversie
 // int servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;  niet gebruikt in deze motorversie
 // int doel_servohoek;
@@ -225,7 +220,6 @@ void updateMotors()
         naar de minimum en maximum graden die de servo motor aankan (SERVO_HOEK_MIN .. SERVO_HOEK_MAX)
     */
   //  doel_servohoek = map(Servopositie_x + ui_slider1, -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
-    // servohoek = constrain(doel_servohoek, servohoek - SERVO_HOEK_STAP, servohoek + SERVO_HOEK_STAP);
   //  servohoek = doel_servohoek;
 
   //  servo1.write(servohoek);  // We verplaatsen de servo naar de nieuwe positie servohoek
