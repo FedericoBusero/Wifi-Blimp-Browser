@@ -34,7 +34,7 @@ GY521 sensor(0x68);
 
 
 
-#ifdef ARDUINO_ARCH_ESP32 
+#ifdef ARDUINO_ARCH_ESP32
 #include <WiFi.h>
 #include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
 #include <ESP32Servo.h> // https://github.com/madhephaestus/ESP32Servo nodig voor AnalogWrite
@@ -69,7 +69,7 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 #define PWM_RANGE 1023 // PWM range voor analogWrite
 #define MOTOR_FREQ 400 // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
 
-// #define MODE_ESP01     
+// #define MODE_ESP01
 //
 #ifdef MODE_ESP01 //niet voor 3motorversie
 
@@ -140,7 +140,7 @@ unsigned long last_activity_message;
 // int servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;  niet gebruikt in deze motorversie
 // int doel_servohoek;
 
-int ui_slider1; // -180 .. 180 
+int ui_slider1; // -180 .. 180
 int ui_slider2 = 0; // 0 .. 360
 int ui_joystick_x = 0;
 int ui_joystick_y = 0;
@@ -162,37 +162,37 @@ void setup_pin_mode_output(int pin)
 
 void kalibreer_gyro(int num_iter, float kalib_factor)
 {
-float gz = 0;
+  float gz = 0;
   for (int i = 0; i < num_iter; i++)
   {
     sensor.read();
     gz -= sensor.getGyroZ();
   }
-sensor.gze += gz * kalib_factor;
+  sensor.gze += gz * kalib_factor;
 #ifdef DEBUG_SERIAL
- //   DEBUG_SERIAL.print(F("sensor.gze   "));
- //   DEBUG_SERIAL.println(sensor.gze);
+  //   DEBUG_SERIAL.print(F("sensor.gze   "));
+  //   DEBUG_SERIAL.println(sensor.gze);
 #endif
 }
 
 void hbridge_setspeed(int pin1, int pin2, long motorspeed)
 {
-      if (motorspeed >= 0)
-      {
-        digitalWrite(pin1, HIGH);
-        analogWrite(pin2, PWM_RANGE - motorspeed);
-      }
-      else
-      {
-        digitalWrite(pin1, LOW);
-        analogWrite(pin2, -motorspeed);
-      }
+  if (motorspeed >= 0)
+  {
+    digitalWrite(pin1, HIGH);
+    analogWrite(pin2, PWM_RANGE - motorspeed);
+  }
+  else
+  {
+    digitalWrite(pin1, LOW);
+    analogWrite(pin2, -motorspeed);
+  }
 }
 
 void updateMotors()
 {
-   static unsigned long vorigeMillisZ=0;
-   
+  static unsigned long vorigeMillisZ = 0;
+
   if (motors_halt)
   {
     analogWrite(PIN_ZMOTOR, 0);
@@ -204,13 +204,13 @@ void updateMotors()
   else
   {
     float werkelijke_draaisnelheid;
-     
+
     if (gyroBeschikbaar) // gyro
     {
-       sensor.read();
-       werkelijke_draaisnelheid = sensor.getGyroZ(); // getGyroX, getGyroY zijn ook mogelijk afhankelijk van positie sensor
+      sensor.read();
+      werkelijke_draaisnelheid = sensor.getGyroZ(); // getGyroX, getGyroY zijn ook mogelijk afhankelijk van positie sensor
     }
-  else
+    else
     {
       werkelijke_draaisnelheid = 0;
     }
@@ -219,10 +219,10 @@ void updateMotors()
         we herschalen de som van de slider posities in de browser ( Servopositie_x (-180 .. 180) en TrimServopositie (-180 .. 180) )
         naar de minimum en maximum graden die de servo motor aankan (SERVO_HOEK_MIN .. SERVO_HOEK_MAX)
     */
-  //  doel_servohoek = map(Servopositie_x + ui_slider1, -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
-  //  servohoek = doel_servohoek;
+    //  doel_servohoek = map(Servopositie_x + ui_slider1, -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
+    //  servohoek = doel_servohoek;
 
-  //  servo1.write(servohoek);  // We verplaatsen de servo naar de nieuwe positie servohoek
+    //  servo1.write(servohoek);  // We verplaatsen de servo naar de nieuwe positie servohoek
 
     /*
       #ifdef DEBUG_SERIAL
@@ -230,66 +230,66 @@ void updateMotors()
       DEBUG_SERIAL.println(doel_motorsnelheid);
       #endif
     */
-     
-      int z_motorsnelheid = map(ui_slider2,0,360,0,PWM_RANGE); // voor zweefmotor
-      if (abs(ui_joystick_y * ui_joystick_x) < 5) {
-        z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
-      }
 
-// "gyro"-regeling
-      float Pfactor = ((float)ui_slider1+180.0)/150.0; 
+    int z_motorsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE); // voor zweefmotor
+    if (abs(ui_joystick_y * ui_joystick_x) < 5) {
+      z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
+    }
 
-      float regelX;
-      if ((millis()-vorigeMillisZ) >= 1000) // langer dan 1 sec niet aan het zweven, dus wordt verondersteld stil tye staan.
-      {
-        kalibreer_gyro(1,0.01);
-        regelX = 0;
-      }
-      else
-      {
-        regelX = (float)ui_joystick_x + (Pfactor * (werkelijke_draaisnelheid)); // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
-      }
-      
-      if (z_motorsnelheid > 0) //alleen bij zweefmotor aan
-        { 
-          vorigeMillisZ = millis(); // om bij te houden hoe lang geleden zweefmotor aan stond
-        }
-      
+    // "gyro"-regeling
+    float Pfactor = ((float)ui_slider1 + 180.0) / 150.0;
+
+    float regelX;
+    if ((millis() - vorigeMillisZ) >= 1000) // langer dan 1 sec niet aan het zweven, dus wordt verondersteld stil tye staan.
+    {
+      kalibreer_gyro(1, 0.01);
+      regelX = 0;
+    }
+    else
+    {
+      regelX = (float)ui_joystick_x + (Pfactor * (werkelijke_draaisnelheid)); // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
+    }
+
+    if (z_motorsnelheid > 0) //alleen bij zweefmotor aan
+    {
+      vorigeMillisZ = millis(); // om bij te houden hoe lang geleden zweefmotor aan stond
+    }
+
 #ifdef DEBUG_SERIAL
-//      DEBUG_SERIAL.print("  millis() ");
-//      DEBUG_SERIAL.println(millis());
-      DEBUG_SERIAL.print("  ui_joystick_x ");
-      DEBUG_SERIAL.println(ui_joystick_x);
-//      DEBUG_SERIAL.print("  ui_joystick_x ");
-//      DEBUG_SERIAL.println(ui_joystick_x);
-//      DEBUG_SERIAL.print("  Pfactor: ");
-//      DEBUG_SERIAL.print(Pfactor);
-      DEBUG_SERIAL.print("  regelX: ");
-      DEBUG_SERIAL.println(regelX);
+    //      DEBUG_SERIAL.print("  millis() ");
+    //      DEBUG_SERIAL.println(millis());
+    DEBUG_SERIAL.print("  ui_joystick_x ");
+    DEBUG_SERIAL.println(ui_joystick_x);
+    //      DEBUG_SERIAL.print("  ui_joystick_x ");
+    //      DEBUG_SERIAL.println(ui_joystick_x);
+    //      DEBUG_SERIAL.print("  Pfactor: ");
+    //      DEBUG_SERIAL.print(Pfactor);
+    DEBUG_SERIAL.print("  regelX: ");
+    DEBUG_SERIAL.println(regelX);
 #endif
-    
+
     // x en y omzetten naar motorsnelheden
-      float temp1 = constrain((float)ui_joystick_y + regelX,-180,180); //gewone mix onder gyro regeling
-      float temp2 = constrain((float)ui_joystick_y - regelX,-180,180); //gewone mix zonder gyro regeling
-         
-      int motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
-      int motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
-    
+    float temp1 = constrain((float)ui_joystick_y + regelX, -180, 180); //gewone mix onder gyro regeling
+    float temp2 = constrain((float)ui_joystick_y - regelX, -180, 180); //gewone mix zonder gyro regeling
+
+    int motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
+    int motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
+
     hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, motorsnelheidA);
     hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, motorsnelheidB);
     analogWrite(PIN_ZMOTOR, z_motorsnelheid); // zweefmotor/ z-as motor naar zijn snelheid z_motorsnelheid
 
-   #ifdef DEBUG_SERIAL
- //   DEBUG_SERIAL.print(F("temp1 "));
- //   DEBUG_SERIAL.print(temp1);
- //   DEBUG_SERIAL.print(F("temp2 "));
- //   DEBUG_SERIAL.println(temp2);
+#ifdef DEBUG_SERIAL
+    //   DEBUG_SERIAL.print(F("temp1 "));
+    //   DEBUG_SERIAL.print(temp1);
+    //   DEBUG_SERIAL.print(F("temp2 "));
+    //   DEBUG_SERIAL.println(temp2);
     DEBUG_SERIAL.print(F("motorsnelheid A="));
     DEBUG_SERIAL.print(motorsnelheidA);
     DEBUG_SERIAL.print(F(" B="));
     DEBUG_SERIAL.println(motorsnelheidB);
-      #endif
-  
+#endif
+
   }
 }
 
@@ -314,14 +314,14 @@ void motors_resume()
 
 void init_motors()
 {
-  
- // Servopositie_x = 0;
- // servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
- // doel_servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
-   ui_slider1 = 0;
-   ui_slider2 = 0;
-   ui_joystick_x = 0;
-   ui_joystick_y = 0;
+
+  // Servopositie_x = 0;
+  // servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
+  // doel_servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
+  ui_slider1 = 0;
+  ui_slider2 = 0;
+  ui_joystick_x = 0;
+  ui_joystick_y = 0;
   max_motorsnelheid = PWM_RANGE;
   motors_halt = false;
 
@@ -336,7 +336,7 @@ void setup()
   setup_pin_mode_output(PIN_1BMOTOR);
   setup_pin_mode_output(PIN_2BMOTOR);
   setup_pin_mode_output(PIN_ZMOTOR);
-    
+
 #ifdef ESP8266
   // Aangezien de PWM range van analogWrite afhankelijk van de Arduino ESP8266 versie 255 ofwel 1023 is, stellen we de range vast in op 1023
   analogWriteRange(PWM_RANGE);
@@ -360,7 +360,7 @@ void setup()
 
 #ifdef PIN_LEDCONNECTIE
   setup_pin_mode_output(PIN_LEDCONNECTIE);
-   
+
   // De LED flasht 2x om te tonen dat er een reboot is
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON);
   delay(10);
@@ -372,11 +372,11 @@ void setup()
 #endif
 
   // steering servo PWM             HIER GEEN
-//  setup_pin_mode_output(PIN_SERVO);
+  //  setup_pin_mode_output(PIN_SERVO);
   /* we verbinden de servo met de gekozen servopin PIN_SERVO en leggen de uiterste signalen vast:
      een blokgolf signaal van 544ms stemt overeen met de servo-arm op 0° en 2400ms met 180°).
   */
- // servo1.attach(PIN_SERVO, 544, 2400);
+  // servo1.attach(PIN_SERVO, 544, 2400);
 
 
   init_motors();
@@ -384,47 +384,47 @@ void setup()
 #ifdef PIN_LEDCONNECTIE
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON );
 #endif
-   
+
   // setup gyro module
   Wire.begin();
 
   delay(100);
-  
+
   gyroBeschikbaar = false;
   for (int t = 0; t < 10; t++) // 10 keer proberen of gyro beschikbaar is
   {
-  if (sensor.wakeup() == false)
+    if (sensor.wakeup() == false)
     {
 #ifdef DEBUG_SERIAL
       DEBUG_SERIAL.print(millis());
       DEBUG_SERIAL.println("\tCould not connect to GY521");
 #endif
       delay(1000);
-     }
-  else
-     {
-     gyroBeschikbaar = true;
-     break;
-     }
+    }
+    else
+    {
+      gyroBeschikbaar = true;
+      break;
+    }
   }
 
-if (gyroBeschikbaar)
+  if (gyroBeschikbaar)
   {
-  sensor.setAccelSensitivity(2);  // 8g
-  sensor.setGyroSensitivity(1);   // 500 degrees/s
+    sensor.setAccelSensitivity(2);  // 8g
+    sensor.setGyroSensitivity(1);   // 500 degrees/s
 
-  sensor.setThrottle();
+    sensor.setThrottle();
 #ifdef DEBUG_SERIAL
-      DEBUG_SERIAL.println("start...");
+    DEBUG_SERIAL.println("start...");
 #endif
 
-  // set all calibration errors to zero
-  sensor.gze = 0;
+    // set all calibration errors to zero
+    sensor.gze = 0;
 
-  kalibreer_gyro(20,0.05);
-  sensor.read();
+    kalibreer_gyro(20, 0.05);
+    sensor.read();
   }
-  
+
   // Wifi instellingen
   WiFi.persistent(true);
 
@@ -509,7 +509,7 @@ void handleSlider2(int value) // Z (zweef) motor besturing geworden
 #endif
   //max_motorsnelheid = map(value, 0, 360, PWM_RANGE / 2, PWM_RANGE);
   ui_slider2 = value;
-  
+
   updateMotors();
 }
 
@@ -528,23 +528,23 @@ void handleSlider1(int value)
 void handleJoystick(int x, int y)
 {
 #ifdef DEBUG_SERIAL
-//  
+  //
 #endif
 
-ui_joystick_x = x;
-ui_joystick_y = y;
- 
-//      doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
-//      
-//      Servopositie_x = x;
-//  if (y <= 0)
-//  {
-//    doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
-//  }
-//  else
-//  {
-//    doel_motorsnelheid = 0;
-//  }
+  ui_joystick_x = x;
+  ui_joystick_y = y;
+
+  //      doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
+  //
+  //      Servopositie_x = x;
+  //  if (y <= 0)
+  //  {
+  //    doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
+  //  }
+  //  else
+  //  {
+  //    doel_motorsnelheid = 0;
+  //  }
 
   updateMotors();
 }
@@ -586,7 +586,7 @@ void handle_message(websockets::WebsocketsMessage msg) {
 #ifdef PIN_LEDCONNECTIE
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON);
 #endif
-   
+
   last_activity_message = millis();
 
   switch (id)
@@ -616,7 +616,7 @@ void onConnect()
 #ifdef PIN_LEDCONNECTIE
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
 #endif
-   
+
 #ifdef DEBUG_SERIAL
   DEBUG_SERIAL.println(F("onConnect"));
 #endif
