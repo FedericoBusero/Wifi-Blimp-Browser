@@ -247,7 +247,9 @@ void updateMotors()
     }
     else
     {
-      regelX = (float)ui_joystick_x + (Pfactor * (werkelijke_draaisnelheid)); // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
+      // regelX = (float)ui_joystick_x + (Pfactor * (werkelijke_draaisnelheid)); // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
+      float doel_draaisnelheid = (float)ui_joystick_x * (-1.0);
+      regelX = Pfactor * (werkelijke_draaisnelheid-doel_draaisnelheid); // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
     }
 
     if (z_motorsnelheid > 0) //alleen bij zweefmotor aan
