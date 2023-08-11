@@ -645,7 +645,7 @@ void updatevoltage()
 
     if (voltage >= VOLTAGE_THRESHOLD)
     {
-      snprintf(voltagestr, sizeof(voltagestr), "%4.2f V", voltage);
+      snprintf(voltagestr, sizeof(voltagestr), "%4.2f V gze:%4.2f", voltage,sensor.gze);
 #ifdef DEBUG_SERIAL
       // DEBUG_SERIAL.print("Sending voltage: ");
       // DEBUG_SERIAL.println(voltagestr);
