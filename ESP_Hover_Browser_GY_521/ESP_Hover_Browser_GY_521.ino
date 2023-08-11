@@ -237,7 +237,7 @@ void updateMotors()
     }
 
     // "gyro"-regeling
-    float Pfactor = ((float)ui_slider1 + 180.0) / 150.0;
+    float Pfactor = ((float)ui_slider1 + 180.0) / 150.0; // aanpassen waarde -180 .. 180 naar 0 .. 2.4
 
     float regelX;
     if ((millis() - vorigeMillisZ) >= 1000) // langer dan 1 sec niet aan het zweven, dus wordt verondersteld stil tye staan.
