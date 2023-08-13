@@ -244,7 +244,7 @@ void updateMotors()
     if ((millis() - vorigeMillisZ) >= 1000) // langer dan 1 sec niet aan het zweven, dus wordt verondersteld stil tye staan.
     {
       kalibreer_gyro(1, 0.01);
-      regelX = 0;
+      regelX = 0; // TODO dit kan weg als regelX=0 staat bij x*y<5
     }
     else
     {
