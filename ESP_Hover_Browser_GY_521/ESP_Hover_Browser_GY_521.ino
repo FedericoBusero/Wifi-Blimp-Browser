@@ -522,7 +522,7 @@ void handleSlider1(int value)
   DEBUG_SERIAL.println(value);
 #endif
 
-  ui_slider1 = (float)value;
+  ui_slider1 = value;
 
   updateMotors();
 }
