@@ -191,8 +191,6 @@ void hbridge_setspeed(int pin1, int pin2, long motorspeed)
 
 void updateMotors()
 {
-  static unsigned long vorigeMillisZ = 0;
-
   if (motors_halt)
   {
     analogWrite(PIN_ZMOTOR, 0);
@@ -203,16 +201,25 @@ void updateMotors()
   }
   else
   {
-    float werkelijke_draaisnelheid;
+    float regelX;
 
     if (gyroBeschikbaar) // gyro
     {
+      float werkelijke_draaisnelheid;
+       
+      // "gyro"-regeling
+      float Pfactor = ((float)ui_slider1 + 180.0) / 150.0; // aanpassen waarde -180 .. 180 naar 0 .. 2.4
+
       sensor.read();
       werkelijke_draaisnelheid = sensor.getGyroZ(); // getGyroX, getGyroY zijn ook mogelijk afhankelijk van positie sensor
+
+      // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
+      float doel_draaisnelheid = (float)ui_joystick_x * (-1.0); 
+      regelX = Pfactor * (werkelijke_draaisnelheid-doel_draaisnelheid); 
     }
     else
     {
-      werkelijke_draaisnelheid = 0;
+       regelX = (1.0)*(float)(ui_joystick_x);
     }
 
     /* We berekenen naar welke doelpositie we de servo willen krijgen:
@@ -234,27 +241,7 @@ void updateMotors()
     int z_motorsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE); // voor zweefmotor
     if (abs(ui_joystick_y * ui_joystick_x) < 5) {
       z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
-       // TODO : ook regel-x nul maken?
-    }
-
-    // "gyro"-regeling
-    float Pfactor = ((float)ui_slider1 + 180.0) / 150.0; // aanpassen waarde -180 .. 180 naar 0 .. 2.4
-
-    float regelX;
-    if ((millis() - vorigeMillisZ) >= 1000) // langer dan 1 sec niet aan het zweven, dus wordt verondersteld stil tye staan.
-    {
-      regelX = 0; // TODO dit kan weg als regelX=0 staat bij x*y<5
-    }
-    else
-    {
-      // regelX = (float)ui_joystick_x + (Pfactor * (werkelijke_draaisnelheid)); // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
-      float doel_draaisnelheid = (float)ui_joystick_x * (-1.0);
-      regelX = Pfactor * (werkelijke_draaisnelheid-doel_draaisnelheid); // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
-    }
-
-    if (z_motorsnelheid > 0) //alleen bij zweefmotor aan
-    {
-      vorigeMillisZ = millis(); // om bij te houden hoe lang geleden zweefmotor aan stond
+      regelX = 0; 
     }
 
 #ifdef DEBUG_SERIAL
