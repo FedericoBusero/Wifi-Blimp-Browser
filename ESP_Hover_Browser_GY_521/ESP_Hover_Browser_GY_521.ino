@@ -205,13 +205,11 @@ void updateMotors()
 
     if (gyroBeschikbaar) // gyro
     {
-      float werkelijke_draaisnelheid;
-       
       // "gyro"-regeling
       float Pfactor = ((float)ui_slider1 + 180.0) / 150.0; // aanpassen waarde -180 .. 180 naar 0 .. 2.4
 
       sensor.read();
-      werkelijke_draaisnelheid = sensor.getGyroZ(); // getGyroX, getGyroY zijn ook mogelijk afhankelijk van positie sensor
+      float werkelijke_draaisnelheid = sensor.getGyroZ(); // getGyroX, getGyroY zijn ook mogelijk afhankelijk van positie sensor
 
       // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
       float doel_draaisnelheid = (float)ui_joystick_x * (-1.0); 
