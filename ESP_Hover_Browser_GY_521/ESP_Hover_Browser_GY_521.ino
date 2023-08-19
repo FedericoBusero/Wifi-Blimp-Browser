@@ -639,7 +639,7 @@ void updatestatusbar()
 #ifdef ESP8266
   static unsigned long lastupdate_voltage = 0;
   unsigned long currentmillis = millis();
-  char statusstr[50];
+  char statusstr[80];
 
   if (currentmillis > lastupdate_voltage + TIMEOUT_MS_VOLTAGE)
   {
@@ -648,7 +648,13 @@ void updatestatusbar()
 
     if (voltage >= VOLTAGE_THRESHOLD)
     {
-      snprintf(statusstr, sizeof(statusstr), "%4.2f V gze:%4.2f", voltage,sensor.gze);
+      if (gyroBeschikbaar)
+      {
+        snprintf(statusstr, sizeof(statusstr), "%4.2f V gze:%4.2f gz:%4.2f", voltage,sensor.gze,sensor.getGyroZ());
+      } else
+      {
+        snprintf(statusstr, sizeof(statusstr), "%4.2f V", voltage);
+      }       
 #ifdef DEBUG_SERIAL
       // DEBUG_SERIAL.print("Sending status: ");
       // DEBUG_SERIAL.println(statusstr);
