@@ -488,6 +488,51 @@ void setup()
   last_activity_message = millis();
 }
 
+
+void updatestatusbar(boolean forceupdate)
+{
+#ifdef ESP8266
+  static unsigned long lastupdate_voltage = 0;
+  unsigned long currentmillis = millis();
+  char statusstr[80];
+
+  if (forceupdate || (currentmillis > lastupdate_voltage + TIMEOUT_MS_VOLTAGE))
+  {
+    lastupdate_voltage = currentmillis;
+    float voltage = ESP.getVcc() / VOLTAGE_FACTOR;
+
+    if (voltage >= VOLTAGE_THRESHOLD)
+    {
+      if (gyroBeschikbaar)
+      {
+        snprintf(statusstr, sizeof(statusstr), "%4.2f V gze:%4.2f gz:%4.2f", voltage,sensor.gze,sensor.getGyroZ());
+      } else
+      {
+        snprintf(statusstr, sizeof(statusstr), "%4.2f V", voltage);
+      }       
+#ifdef DEBUG_SERIAL
+      // DEBUG_SERIAL.print("Sending status: ");
+      // DEBUG_SERIAL.println(statusstr);
+#endif
+      sclient.send(statusstr);
+    }
+    else
+    {
+      snprintf(statusstr, sizeof(statusstr), "Battery low: %4.2f V. Shutting down", voltage);
+#ifdef DEBUG_SERIAL
+      DEBUG_SERIAL.print("Sending status: ");
+      DEBUG_SERIAL.println(statusstr);
+#endif
+      sclient.send(statusstr);
+      motors_pause();
+      delay(20000); // boodschap wordt 20 seconden getoond in browser alvorens hij disconnecteert
+      ESP.deepSleep(0);
+    }
+  }
+#endif
+}
+
+
 void handleSlider2(int value) // Z (zweef) motor besturing geworden
 {
 #ifdef DEBUG_SERIAL
@@ -535,6 +580,22 @@ void handleJoystick(int x, int y)
   //  {
   //    doel_motorsnelheid = 0;
   //  }
+
+  updateMotors();
+}
+
+void handleButton1(int value)
+{
+#ifdef DEBUG_SERIAL
+  DEBUG_SERIAL.print(F("handleButton1 value="));
+  DEBUG_SERIAL.println(value);
+#endif
+
+  if (gyroBeschikbaar)
+  {
+    kalibreer_gyro(20, 0.05);
+    updatestatusbar(true);
+  }
 
   updateMotors();
 }
@@ -593,7 +654,9 @@ void handle_message(websockets::WebsocketsMessage msg) {
 
     case 3: handleSlider1(param1); // p-control
       break;
-
+     
+    case 10: handleButton1(param1); 
+      break;
   }
   if (motors_halt)
   {
@@ -619,49 +682,6 @@ void onDisconnect()
   DEBUG_SERIAL.println(F("onDisconnect"));
 #endif
   init_motors();
-}
-
-void updatestatusbar()
-{
-#ifdef ESP8266
-  static unsigned long lastupdate_voltage = 0;
-  unsigned long currentmillis = millis();
-  char statusstr[80];
-
-  if (currentmillis > lastupdate_voltage + TIMEOUT_MS_VOLTAGE)
-  {
-    lastupdate_voltage = currentmillis;
-    float voltage = ESP.getVcc() / VOLTAGE_FACTOR;
-
-    if (voltage >= VOLTAGE_THRESHOLD)
-    {
-      if (gyroBeschikbaar)
-      {
-        snprintf(statusstr, sizeof(statusstr), "%4.2f V gze:%4.2f gz:%4.2f", voltage,sensor.gze,sensor.getGyroZ());
-      } else
-      {
-        snprintf(statusstr, sizeof(statusstr), "%4.2f V", voltage);
-      }       
-#ifdef DEBUG_SERIAL
-      // DEBUG_SERIAL.print("Sending status: ");
-      // DEBUG_SERIAL.println(statusstr);
-#endif
-      sclient.send(statusstr);
-    }
-    else
-    {
-      snprintf(statusstr, sizeof(statusstr), "Battery low: %4.2f V. Shutting down", voltage);
-#ifdef DEBUG_SERIAL
-      DEBUG_SERIAL.print("Sending status: ");
-      DEBUG_SERIAL.println(statusstr);
-#endif
-      sclient.send(statusstr);
-      motors_pause();
-      delay(20000); // boodschap wordt 20 seconden getoond in browser alvorens hij disconnecteert
-      ESP.deepSleep(0);
-    }
-  }
-#endif
 }
 
 void loop()
@@ -696,7 +716,7 @@ void loop()
     if (sclient.available()) { // als return non-nul, dan is er een client geconnecteerd
       sclient.poll(); // als return non-nul, dan is er iets ontvangen
 
-      updatestatusbar();
+      updatestatusbar(false);
 
       updateMotors();
     }
