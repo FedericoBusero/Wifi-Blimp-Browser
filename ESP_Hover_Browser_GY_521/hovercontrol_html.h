@@ -86,6 +86,7 @@ const char index_html[] PROGMEM = R"=====(
 <span id="connectiondisplay">Trying to connect</span>
 <input id="servotrim" type="range" min="-180" max="180" value="0"   step="1" class="slider-color" oninput="send(3, this.value,80,this)" onChange="send(3, this.value,0,this)" />
 <input id="maxspeed" type="range" min="0"    max="360" value="240" step="1" class="slider-color" oninput="send(2, this.value,80,this)" onChange="send(2, this.value,0,this)" />
+<input id="slider3_id" type="range" min="0"    max="200" value="100" step="1" class="slider-color" oninput="send(20, this.value,80,this)" onChange="send(20, this.value,0,this)" />
 <br>
   <div id='container'>
     <div id='item'> </div>
@@ -95,6 +96,7 @@ const char index_html[] PROGMEM = R"=====(
 <script>
 var trimslider = document.querySelector('#servotrim');
 var maxspeedslider = document.querySelector('#maxspeed');
+var slider3 = document.querySelector('#slider3_id');
 var dragItem = document.querySelector('#item');
 var joystick = document.querySelector('#container');
 
@@ -154,7 +156,8 @@ function connect_ws() {
   ws.onopen = function() {
     connectiondisplay.textContent = "Connected";
     send(3, trimslider.value,0,trimslider);
-    send(2, maxspeedslider.value,0,maxspeedslider); 
+    send(2, maxspeedslider.value,0,maxspeedslider);
+    send(20, slider3.value,0,slider3); 
     retransmitInterval=setInterval(function ws_onopen_ping() {
       if (ws.bufferedAmount == 0)
       {
