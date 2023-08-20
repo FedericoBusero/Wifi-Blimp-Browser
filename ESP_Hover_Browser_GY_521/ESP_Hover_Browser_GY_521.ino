@@ -9,6 +9,7 @@
    De bovenste regel toont de connectie-status. Op ESP8266 wordt het voltage getoond tijdens de connectie, te calibreren met VOLTAGE_FACTOR
    De bovenste slider wordt gebruikt om de gevoeligheid van de gyro te regelen (p-factor)
    De slider eronder stelt de zweefmotor in.
+   De derde slider stelt de maximale draaisnelheid in
    Met de joystick worden 2 stuwmotoren bestuurd
 
 */
@@ -142,6 +143,7 @@ unsigned long last_activity_message;
 
 int ui_slider1; // -180 .. 180
 int ui_slider2 = 0; // 0 .. 360
+int ui_slider3 = 0; // 0 .. 200
 int ui_joystick_x = 0;
 int ui_joystick_y = 0;
 
@@ -203,6 +205,7 @@ void updateMotors()
   else
   {
     float regelX;
+    float max_draai_factor = (float)ui_slider3 / 100.0; // ui_slider3 : 0 .. 200 
 
     if (gyroBeschikbaar) // gyro
     {
@@ -213,12 +216,13 @@ void updateMotors()
       float werkelijke_draaisnelheid = sensor.getGyroZ(); // getGyroX, getGyroY zijn ook mogelijk afhankelijk van positie sensor
 
       // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
-      float doel_draaisnelheid = (float)ui_joystick_x * (-1.0); 
+      
+      float doel_draaisnelheid = (float)ui_joystick_x * (-1.0) * max_draai_factor; 
       regelX = Pfactor * (werkelijke_draaisnelheid-doel_draaisnelheid); 
     }
     else
     {
-       regelX = (1.0)*(float)(ui_joystick_x);
+       regelX = (1.0)*(float)(ui_joystick_x) * max_draai_factor;
     }
 
     /* We berekenen naar welke doelpositie we de servo willen krijgen:
@@ -308,6 +312,7 @@ void init_motors()
   // doel_servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
   ui_slider1 = 0;
   ui_slider2 = 0;
+  ui_slider3 = 0;
   ui_joystick_x = 0;
   ui_joystick_y = 0;
   max_motorsnelheid = PWM_RANGE;
@@ -558,6 +563,18 @@ void handleSlider1(int value)
   updateMotors();
 }
 
+void handleSlider3(int value)
+{
+#ifdef DEBUG_SERIAL
+  DEBUG_SERIAL.print(F("handleSlider3 value="));
+  DEBUG_SERIAL.println(value);
+#endif
+
+  ui_slider3 = value;
+  updateMotors();
+}
+
+
 void handleJoystick(int x, int y)
 {
 #ifdef DEBUG_SERIAL
@@ -656,6 +673,9 @@ void handle_message(websockets::WebsocketsMessage msg) {
     case 3: handleSlider1(param1); // p-control
       break;
      
+    case 20: handleSlider3(param1); // draaisnelheid
+      break;
+
     case 10: handleButton1(param1); 
       break;
   }
