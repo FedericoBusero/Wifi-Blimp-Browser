@@ -169,6 +169,7 @@ void kalibreer_gyro(int num_iter, float kalib_factor)
     gz -= sensor.getGyroZ();
   }
   sensor.gze += gz * kalib_factor;
+  sensor.read();
 #ifdef DEBUG_SERIAL
   //   DEBUG_SERIAL.print(F("sensor.gze   "));
   //   DEBUG_SERIAL.println(sensor.gze);
