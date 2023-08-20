@@ -515,7 +515,10 @@ void handleSlider1(int value)
 void handleJoystick(int x, int y)
 {
 #ifdef DEBUG_SERIAL
-  //
+  // DEBUG_SERIAL.print(F("handleJoystick x="));
+  // DEBUG_SERIAL.print(x);
+  // DEBUG_SERIAL.print(F(" y="));
+  // DEBUG_SERIAL.println(y);
 #endif
 
   ui_joystick_x = x;
