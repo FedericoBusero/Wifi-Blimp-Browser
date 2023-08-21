@@ -222,6 +222,21 @@ void setup_pin_mode_output(int pin)
   pinMode(pin, OUTPUT);
 }
 
+void hbridge_setspeed(int pin1, int pin2, long motorspeed)
+{
+      if (motorspeed >= 0)
+      {
+        digitalWrite(pin1, HIGH);
+        analogWrite(pin2, PWM_RANGE - motorspeed); 
+      }
+      else
+      {
+        digitalWrite(pin1, LOW);
+        analogWrite(pin2, -motorspeed);
+      }
+}
+
+
 void updateMotors()
 {
   static int counter = 0; // todo wordt niet gebruikt
@@ -355,21 +370,6 @@ if (!((z_motorsnelheid == 0) && (doel_motorsnelheidA == 0) && (doel_motorsnelhei
       #endif
   
   }
-}
-
-// TODO functie hbridge_setspeed moet gedefinieerd zijn voor eerste gebruik in update_motors
-void hbridge_setspeed(int pin1, int pin2, long motorspeed)
-{
-      if (motorspeed >= 0)
-      {
-        digitalWrite(pin1, HIGH);
-        analogWrite(pin2, PWM_RANGE - motorspeed); 
-      }
-      else
-      {
-        digitalWrite(pin1, LOW);
-        analogWrite(pin2, -motorspeed);
-      }
 }
 
 void motors_pause()
