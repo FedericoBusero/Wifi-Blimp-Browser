@@ -777,37 +777,6 @@ void updatevoltage()
 #endif
 }
 
-void R2D2sound() {
- 
- int K = 2000;
-    switch (random(1,7)) {
-        
-        case 1:phrase1(); break;
-        case 2:phrase2(); break;
-        case 3:phrase1(); phrase2(); break;
-        case 4:phrase1(); phrase2(); phrase1();break;
-        case 5:phrase1(); phrase2(); phrase1(); phrase2(); phrase1();break;
-        case 6:phrase2(); phrase1(); phrase2(); break;
-       
-    }
-    for (int i = 0; i <= random(3, 9); i++){
-        
-        leds[1] = CRGB::DarkGreen;
-        FastLED.show();  
-        //duur = random(70, 170);
-        frequency = K + random(-1700, 2000);
-        tone(speakerPin, frequency);          
-        //delay(duur);  
-        delay(random(70, 170));
-        leds[1] = CRGB::Black;
-        FastLED.show();        
-        noTone(speakerPin);         
-        delay(random(0, 30));             
-    } 
-    noTone(speakerPin);         
-    
- } 
-// TODO phrase1 en phrase2 moeten voor R2D2sound gedefinieerd zijn
 void phrase1() {
     
     int k = random(1000,2000);
@@ -847,6 +816,37 @@ void phrase2() {
         delay(random(.9,2));             
     } 
 }
+
+void R2D2sound() {
+ 
+ int K = 2000;
+    switch (random(1,7)) {
+        
+        case 1:phrase1(); break;
+        case 2:phrase2(); break;
+        case 3:phrase1(); phrase2(); break;
+        case 4:phrase1(); phrase2(); phrase1();break;
+        case 5:phrase1(); phrase2(); phrase1(); phrase2(); phrase1();break;
+        case 6:phrase2(); phrase1(); phrase2(); break;
+       
+    }
+    for (int i = 0; i <= random(3, 9); i++){
+        
+        leds[1] = CRGB::DarkGreen;
+        FastLED.show();  
+        //duur = random(70, 170);
+        frequency = K + random(-1700, 2000);
+        tone(speakerPin, frequency);          
+        //delay(duur);  
+        delay(random(70, 170));
+        leds[1] = CRGB::Black;
+        FastLED.show();        
+        noTone(speakerPin);         
+        delay(random(0, 30));             
+    } 
+    noTone(speakerPin);         
+    
+ } 
 
 
 void loop()
