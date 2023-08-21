@@ -369,7 +369,7 @@ void hbridge_setspeed(int pin1, int pin2, long motorspeed)
       if (motorspeed >= 0)
       {
         digitalWrite(pin1, HIGH);
-        analogWrite(pin2, PWMRANGE - motorspeed); // TODO moet zijn PWM_RANGE
+        analogWrite(pin2, PWM_RANGE - motorspeed); 
       }
       else
       {
