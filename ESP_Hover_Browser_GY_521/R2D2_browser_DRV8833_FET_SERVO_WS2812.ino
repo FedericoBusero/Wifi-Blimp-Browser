@@ -103,12 +103,6 @@ CRGB leds[NUMLEDPIXELS];
 
 CRGB current_led_color; //gebruikt?
 
-struct // todo nog niet gebruikt?
-{
-  int brightness;
-  int hue;
-} configdata;
-
 //voor R2D2sound
 #define speakerPin D5
 int frequency; // todo lokale variabele van maken
