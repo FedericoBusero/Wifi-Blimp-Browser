@@ -274,19 +274,12 @@ void updateMotors()
 
     int z_motorsnelheid = map(currentSlider2, 0, 360, 0, PWM_RANGE);
 
-    // gehele lichtcode zou eigenlijk beter in een nieuwe functie update_lichten die opgeroepen wordt vanuit loop
-    if (abs(currentY * currentX) < 5) { //opgelet gebeurt soms tussendoor heel kort blijkbaar geled op geflikker WS2812?!
+    if (abs(currentY * currentX) < 5) { 
       z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
       regelX = 0;
-      leds[0] = CRGB::Red;
-      leds[3] = CRGB::DarkGreen;
-      FastLED.show();
     }
     else {
       LaatstMotorsOfGeluid = millis(); // bijhouden hoe lang geleden motors nog aan.
-      leds[0] = CRGB::Blue;
-      leds[3] = CRGB::Yellow;
-      FastLED.show();
     }
 
 #ifdef DEBUG_SERIAL
@@ -361,6 +354,19 @@ void init_motors()
   updateMotors();
 }
 
+void update_lichten()
+{
+  if (abs(currentY * currentX) < 5) {
+    leds[0] = CRGB::Red;
+    leds[3] = CRGB::DarkGreen;
+    FastLED.show();
+  }
+  else {
+    leds[0] = CRGB::Blue;
+    leds[3] = CRGB::Yellow;
+    FastLED.show();
+  }
+}
 
 void setup()
 {
@@ -839,6 +845,7 @@ void loop()
 
       updatestatusbar(false);
       updateMotors();
+      update_lichten();
     }
     else
     {
