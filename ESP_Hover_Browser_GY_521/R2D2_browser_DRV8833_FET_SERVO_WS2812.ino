@@ -216,8 +216,6 @@ void hbridge_setspeed(int pin1, int pin2, long motorspeed)
 
 void updateMotors()
 {
-  static int counter = 0; // todo wordt niet gebruikt
-
   if (motors_halt)
   {
     analogWrite(PIN_ZMOTOR, 0);
@@ -240,18 +238,11 @@ void updateMotors()
       float Pfactor = ((float)TrimServopositie + 180.0) * maxPfactor / 360.0; // aanpassen waarde -180 .. 180 naar maxPfactor
 
       regelX = ((1 + (Pfactor)) * (float)currentX) - (Pfactor * Cfactor * (gyroZ)); // bijgestuurde x in verhouding tot afwijking op gewenste draaisnelheid, X van joystick is de gewenste draaisnelheid
-
-      if (counter % 10 == 0)
-      {
-        // Serial.print("gyroZ: ");
-        // Serial.println(gyroz, 3);
-      }
     }
     else {
       gyroZ = 0;
       regelX = (float)currentX;
     }
-    counter++;
 
     /* We berekenen naar welke doelpositie we de servo willen krijgen:
         we herschalen de som van de slider posities in de browser ( Servopositie_x (-180 .. 180) en TrimServopositie (-180 .. 180) )
