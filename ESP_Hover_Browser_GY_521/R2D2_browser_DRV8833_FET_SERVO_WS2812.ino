@@ -88,15 +88,13 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 // todo je kan toch niet debuggen als debug_serial en servo gelijktijdig aanstaan?? debug_serial en pin_servo kunnen niet gelijktijdig aan staan
 #define PIN_SERVO            1 //TX dus, werkt alvast op ESP01, dus waarschijnlijk ook op andere SEP8266 modules
 
-
 // todo define erbij voor r2d2 effects?
 
 // WS2812 en led zit op zelfde pin !
 #define PIN_WS2812 2 
 #define PIN_LEDCONNECTIE 2 // jawel op zelfde bin als gewone LED, zou volgens WEMOS mini shield vbn moeten werken
 
-//voor R2D2sound
-#define speakerPin D5
+#define speakerPin D5 //voor R2D2sound
 
 // Pas de voltagefactor aan, dat is bij elke chip hetzelfde. Calibreer bv. met USB stroom die 3.3V op de chip moet geven
 #define VOLTAGE_FACTOR 910.0f
