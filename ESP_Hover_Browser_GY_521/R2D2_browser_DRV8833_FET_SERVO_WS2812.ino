@@ -276,7 +276,6 @@ void updateMotors()
 
     int z_motorsnelheid = map(currentSlider2, 0, 360, 0, PWM_RANGE);
 
-    // todo onduidelijke implicit typecasting int/float in abs
     // gehele lichtcode zou eigenlijk beter in een nieuwe functie update_lichten die opgeroepen wordt vanuit loop
     if (abs(currentY * currentX) < 5) { //opgelet gebeurt soms tussendoor heel kort blijkbaar geled op geflikker WS2812?!
       z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
