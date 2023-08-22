@@ -305,9 +305,9 @@ void updateMotors()
 #endif
 
     // x en y omzetten naar motorsnelheden
-    float temp1 = (float)currentY + regelX; // mix na gyro regeling
-    float temp2 = (float)currentY - regelX; // mix na gyro regeling
-    // todo bug : waarden temp1&temp2 moeten binnen range -180 180 dus constrain te gebruiken
+    float temp1 = constrain((float)currentY + regelX, -180, 180); 
+    float temp2 = constrain((float)currentY - regelX, -180, 180); 
+     
     int doel_motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
     int doel_motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
 
