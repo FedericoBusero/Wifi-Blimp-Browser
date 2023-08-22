@@ -104,7 +104,6 @@ CRGB current_led_color; //gebruikt?
 
 //voor R2D2sound
 #define speakerPin D5
-int frequency; // todo lokale variabele van maken
 unsigned long LaatstMotorsOfGeluid; // todo beter wijzigen in volgendR2d2geluid (random slechts eenmaal uitvoeren)
 
 
@@ -835,6 +834,7 @@ void phrase2() {
 }
 
 void R2D2sound() {
+  int frequency;
 
   int K = 2000;
   switch (random(1, 7)) {
