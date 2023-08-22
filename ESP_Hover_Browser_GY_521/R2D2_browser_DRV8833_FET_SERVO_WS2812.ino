@@ -260,7 +260,7 @@ void updateMotors()
 
       if ((millis() - vorigeMillisZ) >= 2000) // langer dan 2 sec alle motoren uit, dus wordt verondersteld stil te staan.
       {
-        regelX = 0; kalibreer (); // todo. dit zijn toch 2 compleet afzonderlijke zaken? en kalibratie beter oproepen vanuit loop ipv wifi-calkback?
+        regelX = 0;
       }
       else
       {
@@ -520,9 +520,6 @@ void setup()
 
     // todo set all calibration errors to zero
     sensor.gze = 0;
-
-    kalibreer();
-
   }
 
   // Wifi instellingen
@@ -607,24 +604,49 @@ void setup()
   FastLED.show();
 }
 
-// todo num_iter en factor als parameter meegeven
-// todo kalibreer verhuizen: moet voor eerste gebruik in updateMotors gedefinieerd zijn
-void kalibreer()
+void kalibreer_gyro(int num_iter, float kalib_factor)
 {
   float gz = 0;
-  for (int i = 0; i < 20; i++)
+  for (int i = 0; i < num_iter; i++)
   {
     sensor.read();
     gz -= sensor.getGyroZ();
   }
-  sensor.gze += gz * 0.05;
-  // todo best ook andere richtingen bijkalibreren nu je toch bezig bent. Voor het geval de gyro anders bevestigd is
+  sensor.gze += gz * kalib_factor;
+  sensor.read();
 #ifdef DEBUG_SERIAL
   //   DEBUG_SERIAL.print(F("sensor.gze   "));
   //   DEBUG_SERIAL.println(sensor.gze);
 #endif
 }
 
+void updatestatusbar(boolean forceupdate)
+{
+#ifdef ESP8266
+  static unsigned long lastupdate_voltage = 0;
+  unsigned long currentmillis = millis();
+  char statusstr[80];
+
+  if (forceupdate || (currentmillis > lastupdate_voltage + TIMEOUT_MS_VOLTAGE))
+  {
+    lastupdate_voltage = currentmillis;
+    float voltage = ESP.getVcc() / VOLTAGE_FACTOR;
+
+    if (gyroBeschikbaar)
+    {
+      snprintf(statusstr, sizeof(statusstr), "%4.2f V gze:%4.2f gz:%4.2f", voltage,sensor.gze,sensor.getGyroZ());
+    } else
+    {
+      snprintf(statusstr, sizeof(statusstr), "%4.2f V", voltage);
+    }       
+#ifdef DEBUG_SERIAL
+    // DEBUG_SERIAL.print("Sending status: ");
+    // DEBUG_SERIAL.println(statusstr);
+#endif
+    sclient.send(statusstr);
+  }
+#endif
+}
 
 void handleSliderZSpeed(int value) // Z (zweef) motor besturing geworden
 {
@@ -673,6 +695,21 @@ void handleJoystick(int x, int y)
   //    doel_motorsnelheid = 0;
   //  }
 
+  updateMotors();
+}
+
+void handleButton1(int value)
+{
+#ifdef DEBUG_SERIAL
+  DEBUG_SERIAL.print(F("handleButton1 value="));
+  DEBUG_SERIAL.println(value);
+#endif
+
+  if (gyroBeschikbaar)
+  {
+    kalibreer_gyro(20, 0.05);
+    updatestatusbar(true);
+  }
   updateMotors();
 }
 
@@ -729,6 +766,8 @@ void handle_message(websockets::WebsocketsMessage msg) {
     case 3: handleSliderTrimServo(param1);
       break;
 
+    case 10: handleButton1(param1); 
+      break;
   }
   if (motors_halt)
   {
@@ -753,27 +792,6 @@ void onDisconnect()
   DEBUG_SERIAL.println(F("onDisconnect"));
 #endif
   init_motors();
-}
-
-void updatevoltage()
-{
-#ifdef ESP8266
-  static unsigned long lastupdate_voltage = 0;
-  unsigned long currentmillis = millis();
-  char voltagestr[20];
-
-  if (currentmillis > lastupdate_voltage + TIMEOUT_MS_VOLTAGE)
-  {
-    lastupdate_voltage = currentmillis;
-    float voltage = ESP.getVcc() / VOLTAGE_FACTOR;
-    snprintf(voltagestr, 10, "%4.2f V", voltage);
-#ifdef DEBUG_SERIAL
-    //    DEBUG_SERIAL.print("Sending voltage: ");
-    //    DEBUG_SERIAL.println(voltagestr);
-#endif
-    sclient.send(voltagestr);
-  }
-#endif
 }
 
 void phrase1() {
@@ -879,8 +897,7 @@ void loop()
     if (sclient.available()) { // als return non-nul, dan is er een client geconnecteerd
       sclient.poll(); // als return non-nul, dan is er iets ontvangen
 
-      updatevoltage();
-
+      updatestatusbar(false);
       updateMotors();
     }
     else
