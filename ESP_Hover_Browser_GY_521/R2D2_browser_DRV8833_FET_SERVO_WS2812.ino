@@ -237,8 +237,7 @@ void updateMotors()
       gyroZ = sensor.getGyroZ();
 
       // "gyro"-regeling
-      // TODO: map is integer macro? p factor enkel integer?
-      float Pfactor = map(TrimServopositie, -180, 180, 0, maxPfactor); // TrimServopositie slider voorlopig dubbel gebruikt
+      float Pfactor = ((float)TrimServopositie + 180.0) * maxPfactor / 360.0; // aanpassen waarde -180 .. 180 naar maxPfactor
 
       regelX = ((1 + (Pfactor)) * (float)currentX) - (Pfactor * Cfactor * (gyroZ)); // bijgestuurde x in verhouding tot afwijking op gewenste draaisnelheid, X van joystick is de gewenste draaisnelheid
 
