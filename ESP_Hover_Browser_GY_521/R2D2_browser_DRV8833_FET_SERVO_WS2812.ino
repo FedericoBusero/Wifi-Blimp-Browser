@@ -165,10 +165,6 @@ int currentSlider2 = 0;
 // ook is naamgeving niet meer juist want gaat over alle alle motoren ipv enkel z
 unsigned long vorigeMillisZ;
 
-// todo gyroz staat als globale variabele, maar enkel lokaal gebruikt, dus beter lokaal definieren in update_motors.
-// todo beter andere naam kiezen zzoalsgemeten_rotatie_snelheid voor het geval gyro anders bevestigd is
-float gyroZ;
-
 int currentX = 0;
 
 // todo regelx staat als globale variabele, maar enkel lokaal gebruikt, dus beter lokaal definieren in update_motors
@@ -247,6 +243,9 @@ void updateMotors()
   }
   else
   {
+    // todo beter andere naam kiezen zoals werkelijke_draaisnelheid voor het geval gyro anders bevestigd is
+    float gyroZ;
+
     if (gyroBeschikbaar) {// gyro
       sensor.read();
       gyroZ = sensor.getGyroZ();
