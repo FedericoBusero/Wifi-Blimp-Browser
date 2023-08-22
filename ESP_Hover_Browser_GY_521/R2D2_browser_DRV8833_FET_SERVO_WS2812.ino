@@ -161,10 +161,6 @@ int servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2; // wel weer niet gebruikt
 int doel_servohoek;
 int currentSlider2 = 0;
 
-// todo: volgende variabele wordt foutief niet geinitialiseerd, en wordt enkel gebruikt in update_motors, beter static lokale variabele van maken. move to loop?
-// ook is naamgeving niet meer juist want gaat over alle alle motoren ipv enkel z
-unsigned long vorigeMillisZ;
-
 int currentX = 0;
 int currentY = 0;
 bool gyroBeschikbaar = false;
@@ -180,11 +176,6 @@ const float maxPfactor = 4; // maximum voor de proportionele regelfactor Pfactor
 // #define MAX_MOTOR_SPEED_STAP 4
 
 //int motor_snelheid = 0; niet meer gebruikt, was voor 1 motorversie
-
-// todo volgende variabelen staan als globale variabelen, maar moeten lokale worden in iodate_motors
-int z_motorsnelheid = 0; // voor zweefmotor
-int doel_motorsnelheidA; // voor 2 stuwmotoren
-int doel_motorsnelheidB; // voor 2 stuwmotoren
 
 int max_motorsnelheid;
 bool motors_halt;
@@ -239,7 +230,7 @@ void updateMotors()
     // todo beter andere naam kiezen zoals werkelijke_draaisnelheid voor het geval gyro anders bevestigd is
     float gyroZ;
     float regelX = 0;
-
+     
     if (gyroBeschikbaar) {// gyro
       sensor.read();
       gyroZ = sensor.getGyroZ();
@@ -248,14 +239,7 @@ void updateMotors()
       // TODO: map is integer macro? p factor enkel integer?
       float Pfactor = map(TrimServopositie, -180, 180, 0, maxPfactor); // TrimServopositie slider voorlopig dubbel gebruikt
 
-      if ((millis() - vorigeMillisZ) >= 2000) // langer dan 2 sec alle motoren uit, dus wordt verondersteld stil te staan.
-      {
-        regelX = 0;
-      }
-      else
-      {
-        regelX = ((1 + (Pfactor)) * (float)currentX) - (Pfactor * Cfactor * (gyroZ)); // bijgestuurde x in verhouding tot afwijking op gewenste draaisnelheid, X van joystick is de gewenste draaisnelheid
-      }
+      regelX = ((1 + (Pfactor)) * (float)currentX) - (Pfactor * Cfactor * (gyroZ)); // bijgestuurde x in verhouding tot afwijking op gewenste draaisnelheid, X van joystick is de gewenste draaisnelheid
 
       if (counter % 10 == 0)
       {
@@ -268,12 +252,6 @@ void updateMotors()
       regelX = (float)currentX;
     }
     counter++;
-
-    // todo:  doel_motorsnelheid en z_motorsnelheid zijn nog niet berekend, moet na de berekening ???
-    if (!((z_motorsnelheid == 0) && (doel_motorsnelheidA == 0) && (doel_motorsnelheidB == 0))) //alleen bij alle motoren uit aan
-    {
-      vorigeMillisZ = millis(); // om bij te houden hoe lang geleden een motor aan stond
-    }
 
     /* We berekenen naar welke doelpositie we de servo willen krijgen:
         we herschalen de som van de slider posities in de browser ( Servopositie_x (-180 .. 180) en TrimServopositie (-180 .. 180) )
@@ -291,7 +269,6 @@ void updateMotors()
     // todo vertraagcode kan er beter uit en gyro corretie erin
     servo1.write(servohoek);  // We verplaatsen de servo naar de nieuwe positie servohoek
 
-
     /*
       We gaan de motor nog niet onmiddellijk naar zijn snelheid doel_motorsnelheid brengen, maar elke keer dat we hier passeren
       gaan we ietsje dichter naar zijn doel. Daartoe mag hij elke keer maximum MAX_MOTOR_SPEED_STAP verhogen in snelheid
@@ -306,12 +283,13 @@ void updateMotors()
     */
     // motor_snelheid = min(doel_motorsnelheid, motor_snelheid + MAX_MOTOR_SPEED_STAP);
 
-    z_motorsnelheid = map(currentSlider2, 0, 360, 0, PWM_RANGE);
+    int z_motorsnelheid = map(currentSlider2, 0, 360, 0, PWM_RANGE);
 
     // todo onduidelijke implicit typecasting int/float in abs
     // gehele lichtcode zou eigenlijk beter in een nieuwe functie update_lichten die opgeroepen wordt vanuit loop
     if (abs(currentY * currentX) < 5) { //opgelet gebeurt soms tussendoor heel kort blijkbaar geled op geflikker WS2812?!
       z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
+      regelX = 0;
       leds[0] = CRGB::Red;
       leds[3] = CRGB::DarkGreen;
       FastLED.show();
@@ -340,8 +318,8 @@ void updateMotors()
     float temp1 = (float)currentY + regelX; // mix na gyro regeling
     float temp2 = (float)currentY - regelX; // mix na gyro regeling
     // todo bug : waarden temp1&temp2 moeten binnen range -180 180 dus constrain te gebruiken
-    doel_motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
-    doel_motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
+    int doel_motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
+    int doel_motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
 
     hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, doel_motorsnelheidA);
     hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, doel_motorsnelheidB);
@@ -388,11 +366,6 @@ void init_motors()
   doel_servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
 
   //  motor_snelheid = 0;
-
-  // todo volgende regels niet meer nodig als ze lokale variabelen worden in update_motors
-  z_motorsnelheid = 0;
-  doel_motorsnelheidA = 0; //opgesplitst voor 2 motoren
-  doel_motorsnelheidB = 0;
 
   max_motorsnelheid = PWM_RANGE; // komt van (300 * PWM_RANGE) / 360; als startwaarde toen 2e slider hierop werkte.
   motors_halt = false;
