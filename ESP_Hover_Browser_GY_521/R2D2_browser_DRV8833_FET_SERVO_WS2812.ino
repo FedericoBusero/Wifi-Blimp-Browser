@@ -1,4 +1,3 @@
-// todo eens autoformat doen zodat indentatie goed komt: control-t if zo in arduino
 /*
    Code voor het besturen van een hover mbv Wifi via de browser
 
@@ -36,7 +35,7 @@ GY521 sensor(0x68);
 #ifdef ARDUINO_ARCH_ESP32 // TODO eigenlijk S2 //OPGELET!!!! dit project is niet uitgewerkt voor ESP32
 // #include <WiFi.h>
 // #include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
-// //#include <ESP32Servo.h> // https://github.com/madhephaestus/ESP32Servo 
+// //#include <ESP32Servo.h> // https://github.com/madhephaestus/ESP32Servo
 // #define DEBUG_SERIAL Serial
 
 // #define PWM_RANGE 255 // PWM range voor analogWrite (in ESP32Servo)
@@ -47,7 +46,7 @@ GY521 sensor(0x68);
 // #define PIN_1BMOTOR          9  // Positie D6 op Wemos D1 mini
 // #define PIN_2BMOTOR          7  // Positie D5 op Wemos D1 mini
 // #define PIN_ZMOTOR           18 // Positie D3 op Wemos D1 mini
-// #define PIN_LEDCONNECTIE     15 // De ingebouwde LED 
+// #define PIN_LEDCONNECTIE     15 // De ingebouwde LED
 
 // #define PIN_SERVO          17
 
@@ -65,7 +64,7 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 #define PWM_RANGE 1023 // PWM range voor analogWrite
 #define MOTOR_FREQ 400 // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
 
-// #define MODE_ESP01     
+// #define MODE_ESP01
 //
 #ifdef MODE_ESP01 //OPGELET!!! dit project is niet uitgewerkt voor ESP01
 
@@ -81,10 +80,10 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 
 //#define PIN_SERVO          Geen servo D3 // STOND OP D2 = GPIO4  op NodeMCU & Wemos D1 mini
 #define PIN_1AMOTOR          D8 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
-#define PIN_2AMOTOR          D7 
-#define PIN_1BMOTOR          D6 
+#define PIN_2AMOTOR          D7
+#define PIN_1BMOTOR          D6
 #define PIN_2BMOTOR          D0  // om D5 vrij te maken voor speker, want met speaker op D0 werkt wifi opstart niet meer? Mogelijks door dubbel gebruik PIN_EXTERNSIGNAAL, maar probleem ontstond ook zonder speaker, maar aansluiting input andere ESP op D0
-#define PIN_ZMOTOR           D3 
+#define PIN_ZMOTOR           D3
 
 // todo je kan toch niet debuggen als debug_serial en servo gelijktijdig aanstaan?? debug_serial en pin_servo kunnen niet gelijktijdig aan staan
 #define PIN_SERVO            1 //TX dus, werkt alvast op ESP01, dus waarschijnlijk ook op andere SEP8266 modules
@@ -224,16 +223,16 @@ void setup_pin_mode_output(int pin)
 
 void hbridge_setspeed(int pin1, int pin2, long motorspeed)
 {
-      if (motorspeed >= 0)
-      {
-        digitalWrite(pin1, HIGH);
-        analogWrite(pin2, PWM_RANGE - motorspeed); 
-      }
-      else
-      {
-        digitalWrite(pin1, LOW);
-        analogWrite(pin2, -motorspeed);
-      }
+  if (motorspeed >= 0)
+  {
+    digitalWrite(pin1, HIGH);
+    analogWrite(pin2, PWM_RANGE - motorspeed);
+  }
+  else
+  {
+    digitalWrite(pin1, LOW);
+    analogWrite(pin2, -motorspeed);
+  }
 }
 
 
@@ -252,39 +251,39 @@ void updateMotors()
   else
   {
     if (gyroBeschikbaar) {// gyro
-         sensor.read();
-        gyroZ = sensor.getGyroZ();
+      sensor.read();
+      gyroZ = sensor.getGyroZ();
 
-// "gyro"-regeling
-       // TODO: map is integer macro? p factor enkel integer?
-        float Pfactor = map(TrimServopositie, -180, 180, 0, maxPfactor); // TrimServopositie slider voorlopig dubbel gebruikt
-        
-        if ((millis()-vorigeMillisZ) >= 2000) // langer dan 2 sec alle motoren uit, dus wordt verondersteld stil te staan.
-        {
-          regelX = 0;kalibreer (); // todo. dit zijn toch 2 compleet afzonderlijke zaken? en kalibratie beter oproepen vanuit loop ipv wifi-calkback?
-        }
-        else
-        {
-          regelX = ((1+(Pfactor)) * currentX) - (Pfactor * Cfactor * (gyroZ)); // bijgestuurde x in verhouding tot afwijking op gewenste draaisnelheid, X van joystick is de gewenste draaisnelheid
-        }
+      // "gyro"-regeling
+      // TODO: map is integer macro? p factor enkel integer?
+      float Pfactor = map(TrimServopositie, -180, 180, 0, maxPfactor); // TrimServopositie slider voorlopig dubbel gebruikt
 
-        if (counter % 10 == 0)
-        {
-          // Serial.print("gyroZ: ");
-          // Serial.println(gyroz, 3);
-        }
+      if ((millis() - vorigeMillisZ) >= 2000) // langer dan 2 sec alle motoren uit, dus wordt verondersteld stil te staan.
+      {
+        regelX = 0; kalibreer (); // todo. dit zijn toch 2 compleet afzonderlijke zaken? en kalibratie beter oproepen vanuit loop ipv wifi-calkback?
+      }
+      else
+      {
+        regelX = ((1 + (Pfactor)) * currentX) - (Pfactor * Cfactor * (gyroZ)); // bijgestuurde x in verhouding tot afwijking op gewenste draaisnelheid, X van joystick is de gewenste draaisnelheid
+      }
+
+      if (counter % 10 == 0)
+      {
+        // Serial.print("gyroZ: ");
+        // Serial.println(gyroz, 3);
+      }
     }
-  else {
-    gyroZ = 0;
-    regelX = currentX; 
-  }
+    else {
+      gyroZ = 0;
+      regelX = currentX;
+    }
     counter++;
-     
-// todo:  doel_motorsnelheid en z_motorsnelheid zijn nog niet berekend, moet na de berekening ???
-if (!((z_motorsnelheid == 0) && (doel_motorsnelheidA == 0) && (doel_motorsnelheidB == 0))) //alleen bij alle motoren uit aan
-        { 
-          vorigeMillisZ = millis(); // om bij te houden hoe lang geleden een motor aan stond
-        }
+
+    // todo:  doel_motorsnelheid en z_motorsnelheid zijn nog niet berekend, moet na de berekening ???
+    if (!((z_motorsnelheid == 0) && (doel_motorsnelheidA == 0) && (doel_motorsnelheidB == 0))) //alleen bij alle motoren uit aan
+    {
+      vorigeMillisZ = millis(); // om bij te houden hoe lang geleden een motor aan stond
+    }
 
     /* We berekenen naar welke doelpositie we de servo willen krijgen:
         we herschalen de som van de slider posities in de browser ( Servopositie_x (-180 .. 180) en TrimServopositie (-180 .. 180) )
@@ -296,10 +295,10 @@ if (!((z_motorsnelheid == 0) && (doel_motorsnelheidA == 0) && (doel_motorsnelhei
       We gaan de servo nog niet onmiddellijk naar zijn nieuwe positie doel_servohoek brengen, maar elke keer dat we hier passeren
       gaan we ietsje dichter naar zijn doel. Daartoe beperken we de verplaatsing t.o.v. de oude servohoek tot maximum SERVO_HOEK_STAP stappen
     */
-   servohoek = constrain(doel_servohoek, servohoek - SERVO_HOEK_STAP, servohoek + SERVO_HOEK_STAP);
-   servohoek = doel_servohoek;
-// todo ifdef servopin
-     // todo vertraagcode kan er beter uit en gyro corretie erin
+    servohoek = constrain(doel_servohoek, servohoek - SERVO_HOEK_STAP, servohoek + SERVO_HOEK_STAP);
+    servohoek = doel_servohoek;
+    // todo ifdef servopin
+    // todo vertraagcode kan er beter uit en gyro corretie erin
     servo1.write(servohoek);  // We verplaatsen de servo naar de nieuwe positie servohoek
 
 
@@ -317,58 +316,58 @@ if (!((z_motorsnelheid == 0) && (doel_motorsnelheidA == 0) && (doel_motorsnelhei
     */
     // motor_snelheid = min(doel_motorsnelheid, motor_snelheid + MAX_MOTOR_SPEED_STAP);
 
-      z_motorsnelheid = map(currentSlider2,0,360,0,PWM_RANGE);
+    z_motorsnelheid = map(currentSlider2, 0, 360, 0, PWM_RANGE);
 
-     // todo onduidelijke implicit typecasting int/float in abs
-     // gehele lichtcode zou eigenlijk beter in een nieuwe functie update_lichten die opgeroepen wordt vanuit loop
-      if (abs(currentY * currentX) < 5) { //opgelet gebeurt soms tussendoor heel kort blijkbaar geled op geflikker WS2812?!
-        z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
-        leds[0] = CRGB::Red; 
-        leds[3] = CRGB::DarkGreen;
-        FastLED.show();
-      }
-     else {
-        LaatstMotorsOfGeluid = millis(); // bijhouden hoe lang geleden motors nog aan.
-        leds[0] = CRGB::Blue; 
-        leds[3] = CRGB::Yellow;
-        FastLED.show();
-      }
-      
+    // todo onduidelijke implicit typecasting int/float in abs
+    // gehele lichtcode zou eigenlijk beter in een nieuwe functie update_lichten die opgeroepen wordt vanuit loop
+    if (abs(currentY * currentX) < 5) { //opgelet gebeurt soms tussendoor heel kort blijkbaar geled op geflikker WS2812?!
+      z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
+      leds[0] = CRGB::Red;
+      leds[3] = CRGB::DarkGreen;
+      FastLED.show();
+    }
+    else {
+      LaatstMotorsOfGeluid = millis(); // bijhouden hoe lang geleden motors nog aan.
+      leds[0] = CRGB::Blue;
+      leds[3] = CRGB::Yellow;
+      FastLED.show();
+    }
+
 #ifdef DEBUG_SERIAL
-//      DEBUG_SERIAL.print("  millis() ");
-//      DEBUG_SERIAL.println(millis());
-      DEBUG_SERIAL.print("  currentX ");
-      DEBUG_SERIAL.println(currentX);
-//      DEBUG_SERIAL.print("  currentY ");
-//      DEBUG_SERIAL.println(currentY);
-//      DEBUG_SERIAL.print("  Pfactor: ");
-//      DEBUG_SERIAL.print(Pfactor);
-      DEBUG_SERIAL.print("  regelX: ");
-      DEBUG_SERIAL.println(regelX);
+    //      DEBUG_SERIAL.print("  millis() ");
+    //      DEBUG_SERIAL.println(millis());
+    DEBUG_SERIAL.print("  currentX ");
+    DEBUG_SERIAL.println(currentX);
+    //      DEBUG_SERIAL.print("  currentY ");
+    //      DEBUG_SERIAL.println(currentY);
+    //      DEBUG_SERIAL.print("  Pfactor: ");
+    //      DEBUG_SERIAL.print(Pfactor);
+    DEBUG_SERIAL.print("  regelX: ");
+    DEBUG_SERIAL.println(regelX);
 #endif
 
     // x en y omzetten naar motorsnelheden
-      float temp1 = currentY + regelX; // mix na gyro regeling
-      float temp2 = currentY - regelX; // mix na gyro regeling
-// todo bug : waarden temp1&temp2 moeten binnen range -180 180 dus constrain te gebruiken
-      doel_motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
-      doel_motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
-    
+    float temp1 = currentY + regelX; // mix na gyro regeling
+    float temp2 = currentY - regelX; // mix na gyro regeling
+    // todo bug : waarden temp1&temp2 moeten binnen range -180 180 dus constrain te gebruiken
+    doel_motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
+    doel_motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
+
     hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, doel_motorsnelheidA);
     hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, doel_motorsnelheidB);
     analogWrite(PIN_ZMOTOR, z_motorsnelheid); // zweefmotor/ z-as motor naar zijn snelheid z_motorsnelheid
 
-   #ifdef DEBUG_SERIAL
- //   DEBUG_SERIAL.print(F("temp1 "));
- //   DEBUG_SERIAL.print(temp1);
- //   DEBUG_SERIAL.print(F("temp2 "));
- //   DEBUG_SERIAL.println(temp2);
+#ifdef DEBUG_SERIAL
+    //   DEBUG_SERIAL.print(F("temp1 "));
+    //   DEBUG_SERIAL.print(temp1);
+    //   DEBUG_SERIAL.print(F("temp2 "));
+    //   DEBUG_SERIAL.println(temp2);
     DEBUG_SERIAL.print(F("motorsnelheid A="));
     DEBUG_SERIAL.print(doel_motorsnelheidA);
     DEBUG_SERIAL.print(F(" B="));
     DEBUG_SERIAL.println(doel_motorsnelheidB);
-      #endif
-  
+#endif
+
   }
 }
 
@@ -398,13 +397,13 @@ void init_motors()
   servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
   doel_servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
 
-//  motor_snelheid = 0;
-   
-   // todo volgende regels niet meer nodig als ze lokale variabelen worden in update_motors
+  //  motor_snelheid = 0;
+
+  // todo volgende regels niet meer nodig als ze lokale variabelen worden in update_motors
   z_motorsnelheid = 0;
   doel_motorsnelheidA = 0; //opgesplitst voor 2 motoren
-  doel_motorsnelheidB = 0;  
-   
+  doel_motorsnelheidB = 0;
+
   max_motorsnelheid = PWM_RANGE; // komt van (300 * PWM_RANGE) / 360; als startwaarde toen 2e slider hierop werkte.
   motors_halt = false;
 
@@ -415,20 +414,20 @@ void init_motors()
 void setup()
 {
   // todo andere define voor ws2812
-   // maar waarom staat dit blok hier eigenlijk, want ietsje verder staat opnieuw de initialisatie, maar dan correct
+  // maar waarom staat dit blok hier eigenlijk, want ietsje verder staat opnieuw de initialisatie, maar dan correct
   setup_pin_mode_output(PIN_LEDCONNECTIE); // eerste en vooral WS2812 even testen bij opstart
 
   fill_solid (leds, NUMLEDPIXELS, CRGB::DarkOrange);
   FastLED.show();
-  
+
   FastLED.delay(2); // nodig? lijkt bedoeld voor geleidelijke overgangen?
-  
+
   setup_pin_mode_output(PIN_1AMOTOR);
   setup_pin_mode_output(PIN_2AMOTOR);
   setup_pin_mode_output(PIN_1BMOTOR);
   setup_pin_mode_output(PIN_2BMOTOR);
   setup_pin_mode_output(PIN_ZMOTOR);
-  
+
 #ifdef ESP8266
   // Aangezien de PWM range van analogWrite afhankelijk van de Arduino ESP8266 versie 255 ofwel 1023 is, stellen we de range vast in op 1023
   analogWriteRange(PWM_RANGE);
@@ -441,7 +440,7 @@ void setup()
   analogWrite(PIN_2AMOTOR, 0);
   analogWrite(PIN_1BMOTOR, 0);
   analogWrite(PIN_2BMOTOR, 0);
-  
+
   delay(200); // 200 milliseconden wachten tot de stroom stabiel is
 
 #ifdef DEBUG_SERIAL
@@ -460,7 +459,7 @@ void setup()
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
   delay(10);
 
-   // todo: beter nieuwe define voor ws2812, zelfs al is deze gelijk aan led_connectie: voor platformen waar led en ws2812 verschillend zijn
+  // todo: beter nieuwe define voor ws2812, zelfs al is deze gelijk aan led_connectie: voor platformen waar led en ws2812 verschillend zijn
   pinMode(PIN_LEDCONNECTIE, OUTPUT);
   FastLED.addLeds<NEOPIXEL, PIN_LEDCONNECTIE>(leds, NUMLEDPIXELS); //gewone LED en WS2812 op zelfde pin dus
   FastLED.setBrightness(LEDSTRIP_MAX_BRIGHTNESS);
@@ -473,10 +472,10 @@ void setup()
 
   fill_solid (leds, NUMLEDPIXELS, CRGB::DarkOrange);
   FastLED.show();
-  
+
   FastLED.delay(2); // nodig bij plotse overgangen?
-  
-// todo ifdef servopin
+
+  // todo ifdef servopin
   // steering servo PWM             hier servo tegelijk met x input naar motoren
   setup_pin_mode_output(PIN_SERVO);
   /* we verbinden de servo met de gekozen servopin PIN_SERVO en leggen de uiterste signalen vast:
@@ -487,45 +486,45 @@ void setup()
 
   init_motors();
 
-   // todo code enkel als ws2812 anders dan led pin
+  // todo code enkel als ws2812 anders dan led pin
   //digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON ); uit om via die pin WS2812 aan te sturen
 
   // setup gyro module
   Wire.begin();
 
   delay(100);
-  
+
   gyroBeschikbaar = false;
   for (int t = 0; t < 3; t++) // 3 keer proberen of gyro beschikbaar is
   {
-  if (sensor.wakeup() == false)
+    if (sensor.wakeup() == false)
     {
       Serial.print(millis());
       Serial.println("\tCould not connect to GY521");
       delay(1000);
-     }
-  else
-     {
-     gyroBeschikbaar = true;
-     break;
-     }
+    }
+    else
+    {
+      gyroBeschikbaar = true;
+      break;
+    }
   }
 
-if (gyroBeschikbaar)
+  if (gyroBeschikbaar)
   {
-  sensor.setAccelSensitivity(2);  // 8g
-  sensor.setGyroSensitivity(1);   // 500 degrees/s
+    sensor.setAccelSensitivity(2);  // 8g
+    sensor.setGyroSensitivity(1);   // 500 degrees/s
 
-  sensor.setThrottle();
-  Serial.println("start...");
+    sensor.setThrottle();
+    Serial.println("start...");
 
-  // todo set all calibration errors to zero
-  sensor.gze = 0;
+    // todo set all calibration errors to zero
+    sensor.gze = 0;
 
-  kalibreer();
+    kalibreer();
 
   }
-  
+
   // Wifi instellingen
   WiFi.persistent(true);
 
@@ -602,27 +601,27 @@ if (gyroBeschikbaar)
   last_activity_message = millis();
 
   //R2D2sound
-    pinMode(speakerPin, OUTPUT);
+  pinMode(speakerPin, OUTPUT);
 
-fill_solid (leds, NUMLEDPIXELS, CRGB::Black); //WS2812 leds uit
-FastLED.show();
+  fill_solid (leds, NUMLEDPIXELS, CRGB::Black); //WS2812 leds uit
+  FastLED.show();
 }
 
 // todo num_iter en factor als parameter meegeven
 // todo kalibreer verhuizen: moet voor eerste gebruik in updateMotors gedefinieerd zijn
 void kalibreer()
 {
-float gz = 0;
+  float gz = 0;
   for (int i = 0; i < 20; i++)
   {
     sensor.read();
     gz -= sensor.getGyroZ();
   }
-sensor.gze += gz * 0.05;
-   // todo best ook andere richtingen bijkalibreren nu je toch bezig bent. Voor het geval de gyro anders bevestigd is
+  sensor.gze += gz * 0.05;
+  // todo best ook andere richtingen bijkalibreren nu je toch bezig bent. Voor het geval de gyro anders bevestigd is
 #ifdef DEBUG_SERIAL
- //   DEBUG_SERIAL.print(F("sensor.gze   "));
- //   DEBUG_SERIAL.println(sensor.gze);
+  //   DEBUG_SERIAL.print(F("sensor.gze   "));
+  //   DEBUG_SERIAL.println(sensor.gze);
 #endif
 }
 
@@ -635,7 +634,7 @@ void handleSliderZSpeed(int value) // Z (zweef) motor besturing geworden
 #endif
   //max_motorsnelheid = map(value, 0, 360, PWM_RANGE / 2, PWM_RANGE);
   currentSlider2 = value;
-  
+
   updateMotors();
 }
 
@@ -654,25 +653,25 @@ void handleSliderTrimServo(int value)
 void handleJoystick(int x, int y)
 {
 #ifdef DEBUG_SERIAL
-//  todo code terugzetten
+  //  todo code terugzetten
 #endif
 
-// todo implicit typecasting
-currentX = x;
-currentY = y;
+  // todo implicit typecasting
+  currentX = x;
+  currentY = y;
 
- 
-//      doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
-//      
-      Servopositie_x = x; //dus X doet zowel servo als motoren in deze versie
-//  if (y <= 0)
-//  {
-//    doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
-//  }
-//  else
-//  {
-//    doel_motorsnelheid = 0;
-//  }
+
+  //      doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
+  //
+  Servopositie_x = x; //dus X doet zowel servo als motoren in deze versie
+  //  if (y <= 0)
+  //  {
+  //    doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
+  //  }
+  //  else
+  //  {
+  //    doel_motorsnelheid = 0;
+  //  }
 
   updateMotors();
 }
@@ -710,7 +709,7 @@ void handle_message(websockets::WebsocketsMessage msg) {
   //  DEBUG_SERIAL.print(F(" param2 = "));
   //  DEBUG_SERIAL.println(param2);
 #endif
-// todo enkel als led pin verschillend van ws2812 pin
+  // todo enkel als led pin verschillend van ws2812 pin
   //digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON); ; uit om via die pin WS2812 aan te sturen
 
   last_activity_message = millis();
@@ -739,8 +738,8 @@ void handle_message(websockets::WebsocketsMessage msg) {
 
 void onConnect()
 {
-   // todo enkel als led pin verschillend van ws2812 pin
-//  digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);// te vervangen door WS2812
+  // todo enkel als led pin verschillend van ws2812 pin
+  //  digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);// te vervangen door WS2812
 
 #ifdef DEBUG_SERIAL
   DEBUG_SERIAL.println(F("onConnect"));
@@ -778,75 +777,75 @@ void updatevoltage()
 }
 
 void phrase1() {
-    
-    int k = random(1000,2000);
-    leds[1] = CRGB::DarkGreen;
-    FastLED.show();
-    for (int i = 0; i <=  random(100,2000); i++){
-        
-        delay(random(.9,2));
-        tone(speakerPin, k+(-i*2));          
-        delay(random(.9,2));             
-    } 
-    leds[1] = CRGB::Black;// uit
-    FastLED.show();  
-    for (int i = 0; i <= random(100,1000); i++){
-        delay(random(.9,2)); 
 
-        tone(speakerPin, k + (i * 10));          
-        delay(random(.9,2));             
-    } 
+  int k = random(1000, 2000);
+  leds[1] = CRGB::DarkGreen;
+  FastLED.show();
+  for (int i = 0; i <=  random(100, 2000); i++) {
+
+    delay(random(.9, 2));
+    tone(speakerPin, k + (-i * 2));
+    delay(random(.9, 2));
+  }
+  leds[1] = CRGB::Black;// uit
+  FastLED.show();
+  for (int i = 0; i <= random(100, 1000); i++) {
+    delay(random(.9, 2));
+
+    tone(speakerPin, k + (i * 10));
+    delay(random(.9, 2));
+  }
 }
 
 void phrase2() {
-    
-    int k = random(1000,2000);
-    leds[1] = CRGB::DarkGreen;
-    FastLED.show(); 
-    for (int i = 0; i <= -random(100,2000); i--){
-        
-        tone(speakerPin, k+(i*2));          
-        delay(random(.9,2));             
-    } 
-    leds[1] = CRGB::Black;
-    FastLED.show();   
-    for (int i = 0; i <= random(100,1000); i++){
-        
-        tone(speakerPin, k + (-i * 10));          
-        delay(random(.9,2));             
-    } 
+
+  int k = random(1000, 2000);
+  leds[1] = CRGB::DarkGreen;
+  FastLED.show();
+  for (int i = 0; i <= -random(100, 2000); i--) {
+
+    tone(speakerPin, k + (i * 2));
+    delay(random(.9, 2));
+  }
+  leds[1] = CRGB::Black;
+  FastLED.show();
+  for (int i = 0; i <= random(100, 1000); i++) {
+
+    tone(speakerPin, k + (-i * 10));
+    delay(random(.9, 2));
+  }
 }
 
 void R2D2sound() {
- 
- int K = 2000;
-    switch (random(1,7)) {
-        
-        case 1:phrase1(); break;
-        case 2:phrase2(); break;
-        case 3:phrase1(); phrase2(); break;
-        case 4:phrase1(); phrase2(); phrase1();break;
-        case 5:phrase1(); phrase2(); phrase1(); phrase2(); phrase1();break;
-        case 6:phrase2(); phrase1(); phrase2(); break;
-       
-    }
-    for (int i = 0; i <= random(3, 9); i++){
-        
-        leds[1] = CRGB::DarkGreen;
-        FastLED.show();  
-        //duur = random(70, 170);
-        frequency = K + random(-1700, 2000);
-        tone(speakerPin, frequency);          
-        //delay(duur);  
-        delay(random(70, 170));
-        leds[1] = CRGB::Black;
-        FastLED.show();        
-        noTone(speakerPin);         
-        delay(random(0, 30));             
-    } 
-    noTone(speakerPin);         
-    
- } 
+
+  int K = 2000;
+  switch (random(1, 7)) {
+
+    case 1: phrase1(); break;
+    case 2: phrase2(); break;
+    case 3: phrase1(); phrase2(); break;
+    case 4: phrase1(); phrase2(); phrase1(); break;
+    case 5: phrase1(); phrase2(); phrase1(); phrase2(); phrase1(); break;
+    case 6: phrase2(); phrase1(); phrase2(); break;
+
+  }
+  for (int i = 0; i <= random(3, 9); i++) {
+
+    leds[1] = CRGB::DarkGreen;
+    FastLED.show();
+    //duur = random(70, 170);
+    frequency = K + random(-1700, 2000);
+    tone(speakerPin, frequency);
+    //delay(duur);
+    delay(random(70, 170));
+    leds[1] = CRGB::Black;
+    FastLED.show();
+    noTone(speakerPin);
+    delay(random(0, 30));
+  }
+  noTone(speakerPin);
+
+}
 
 
 void loop()
@@ -859,8 +858,8 @@ void loop()
 
   if (millis() > last_activity_message + TIMEOUT_MS_LED)
   {
-     // todo enkel als led pin en ws2812 pin verschillend zijn
-  //  digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);// te vervangen door WS2812
+    // todo enkel als led pin en ws2812 pin verschillend zijn
+    //  digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);// te vervangen door WS2812
   }
 
   if (millis() > last_activity_message + TIMEOUT_MS_MOTORS)
@@ -911,17 +910,17 @@ void loop()
     is_connected = 1;
   }
 
-   // todo beter volgender2d2_show zodat random slechts 1 keer uitgevoerd wordt
-  if ((millis()-LaatstMotorsOfGeluid) >= random(3000, 30000)) // langer dan 3 a 30 sec motors niet aan.
+  // todo beter volgender2d2_show zodat random slechts 1 keer uitgevoerd wordt
+  if ((millis() - LaatstMotorsOfGeluid) >= random(3000, 30000)) // langer dan 3 a 30 sec motors niet aan.
   {
-     R2D2sound();
-     LaatstMotorsOfGeluid = millis(); //weer even wachten
+    R2D2sound();
+    LaatstMotorsOfGeluid = millis(); //weer even wachten
   }
-   
+
   if (!is_connected)
   {
     digitalWrite(PIN_LEDCONNECTIE, (millis() % 1000) > 500 ? LOW : HIGH);
   }
-  
+
   // delay(2);
 }
