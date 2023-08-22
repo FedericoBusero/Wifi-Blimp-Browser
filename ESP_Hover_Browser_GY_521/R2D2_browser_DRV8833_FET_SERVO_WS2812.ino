@@ -135,8 +135,9 @@ WebsocketsClient sclient;
 // timeoutes
 #define TIMEOUT_MS_MOTORS 2500L // Timeout om motoren uit veiligheid stil te leggen, na x milliseconden niks te hebben ontvangen
 
-// todo volgende regels enkel  als led pin verschillend van ws2812 pin #if x != y
+#if (PIN_WS2812 != PIN_LEDCONNECTIE)
 #define TIMEOUT_MS_LED 1L        // Aantal milliseconden dat LED blijft branden na het ontvangen van een boodschap
+#endif
 unsigned long last_activity_message;
 
 #define TIMEOUT_MS_VOLTAGE 10000L // Aantal milliseconden tussen update voltage
@@ -542,6 +543,7 @@ void setup()
   DEBUG_SERIAL.print(F("Is server live? "));
   DEBUG_SERIAL.println(server.available());
 #endif
+
   last_activity_message = millis();
 
   //R2D2sound
@@ -822,17 +824,15 @@ void loop()
 #if defined(USE_SOFTAP)
   dnsServer.processNextRequest();
 #endif
-
+#if (PIN_WS2812 != PIN_LEDCONNECTIE)
   if (millis() > last_activity_message + TIMEOUT_MS_LED)
   {
-#if (PIN_WS2812 != PIN_LEDCONNECTIE)
     digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
-#endif
   }
+#endif
 
   if (millis() > last_activity_message + TIMEOUT_MS_MOTORS)
   {
-
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.println(F("Safety shutdown ..."));
 #endif
