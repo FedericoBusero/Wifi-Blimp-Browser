@@ -169,7 +169,7 @@ unsigned long vorigeMillisZ;
 // todo beter andere naam kiezen zzoalsgemeten_rotatie_snelheid voor het geval gyro anders bevestigd is
 float gyroZ;
 
-float currentX = 0; //moet float zijn voor berekening met float Pfactor. todo, dat klopt niet: beter als int definieren, en bij pfactor berekening explicit casten
+int currentX = 0;
 
 // todo regelx staat als globale variabele, maar enkel lokaal gebruikt, dus beter lokaal definieren in update_motors
 float regelX = 0;
@@ -261,7 +261,7 @@ void updateMotors()
       }
       else
       {
-        regelX = ((1 + (Pfactor)) * currentX) - (Pfactor * Cfactor * (gyroZ)); // bijgestuurde x in verhouding tot afwijking op gewenste draaisnelheid, X van joystick is de gewenste draaisnelheid
+        regelX = ((1 + (Pfactor)) * (float)currentX) - (Pfactor * Cfactor * (gyroZ)); // bijgestuurde x in verhouding tot afwijking op gewenste draaisnelheid, X van joystick is de gewenste draaisnelheid
       }
 
       if (counter % 10 == 0)
@@ -272,7 +272,7 @@ void updateMotors()
     }
     else {
       gyroZ = 0;
-      regelX = currentX;
+      regelX = (float)currentX;
     }
     counter++;
 
@@ -659,7 +659,6 @@ void handleJoystick(int x, int y)
   //  todo code terugzetten
 #endif
 
-  // todo implicit typecasting
   currentX = x;
   currentY = y;
 
