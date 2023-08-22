@@ -928,7 +928,7 @@ void loop()
   }
 
   // todo beter volgender2d2_show zodat random slechts 1 keer uitgevoerd wordt
-  if ((millis() - LaatstMotorsOfGeluid) >= random(3000, 30000)) // langer dan 3 a 30 sec motors niet aan.
+  if ((millis() - LaatstMotorsOfGeluid) >= (unsigned long)random(3000, 30000)) // langer dan 3 a 30 sec motors niet aan.
   {
     R2D2sound();
     LaatstMotorsOfGeluid = millis(); //weer even wachten
