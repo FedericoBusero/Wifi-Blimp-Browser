@@ -88,19 +88,13 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 // todo je kan toch niet debuggen als debug_serial en servo gelijktijdig aanstaan?? debug_serial en pin_servo kunnen niet gelijktijdig aan staan
 #define PIN_SERVO            1 //TX dus, werkt alvast op ESP01, dus waarschijnlijk ook op andere SEP8266 modules
 
-// TODO verplaats alles van licht en geluid naar platform onafhankelijk deel (behalve pin definitie)
-#include <FastLED.h>
 
 // todo define erbij voor r2d2 effects?
 
 // todo beter PIN_2812 definieren, naast PIN_LEDCONNECTIE
 #define PIN_LEDCONNECTIE 2 // jawel op zelfde bin als gewone LED, zou volgens WEMOS mini shield vbn moeten werken
-#define LEDSTRIP_MAX_BRIGHTNESS 50
-#define NUMLEDPIXELS      4
-CRGB leds[NUMLEDPIXELS];
 
 
-CRGB current_led_color; //gebruikt?
 
 //voor R2D2sound
 #define speakerPin D5
@@ -116,6 +110,12 @@ unsigned long LaatstMotorsOfGeluid; // todo beter wijzigen in volgendR2d2geluid 
 #define LED_BRIGHTNESS_OFF HIGH
 
 #endif // ARDUINO_ARCH_ESP32
+
+#include <FastLED.h>
+
+#define LEDSTRIP_MAX_BRIGHTNESS 50
+#define NUMLEDPIXELS      4
+CRGB leds[NUMLEDPIXELS];
 
 #define USE_SOFTAP
 #define WIFI_SOFTAP_CHANNEL 1 // 1-13
