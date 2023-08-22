@@ -166,7 +166,7 @@ int currentSlider2 = 0;
 unsigned long vorigeMillisZ;
 
 int currentX = 0;
-float currentY = 0;
+int currentY = 0;
 bool gyroBeschikbaar = false;
 
 // todo: waarom staat volgende definitie hier van pfactor?? Die wordt nergens gebruikt: in update_motors staat ze correct lokaal gedefinieerd
@@ -340,8 +340,8 @@ void updateMotors()
 #endif
 
     // x en y omzetten naar motorsnelheden
-    float temp1 = currentY + regelX; // mix na gyro regeling
-    float temp2 = currentY - regelX; // mix na gyro regeling
+    float temp1 = (float)currentY + regelX; // mix na gyro regeling
+    float temp2 = (float)currentY - regelX; // mix na gyro regeling
     // todo bug : waarden temp1&temp2 moeten binnen range -180 180 dus constrain te gebruiken
     doel_motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
     doel_motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
