@@ -166,10 +166,6 @@ int currentSlider2 = 0;
 unsigned long vorigeMillisZ;
 
 int currentX = 0;
-
-// todo regelx staat als globale variabele, maar enkel lokaal gebruikt, dus beter lokaal definieren in update_motors
-float regelX = 0;
-
 float currentY = 0;
 bool gyroBeschikbaar = false;
 
@@ -245,6 +241,7 @@ void updateMotors()
   {
     // todo beter andere naam kiezen zoals werkelijke_draaisnelheid voor het geval gyro anders bevestigd is
     float gyroZ;
+    float regelX = 0;
 
     if (gyroBeschikbaar) {// gyro
       sensor.read();
