@@ -91,15 +91,12 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 
 // todo define erbij voor r2d2 effects?
 
-// todo beter PIN_2812 definieren, naast PIN_LEDCONNECTIE
+// WS2812 en led zit op zelfde pin !
+#define PIN_WS2812 2 
 #define PIN_LEDCONNECTIE 2 // jawel op zelfde bin als gewone LED, zou volgens WEMOS mini shield vbn moeten werken
-
-
 
 //voor R2D2sound
 #define speakerPin D5
-unsigned long LaatstMotorsOfGeluid; // todo beter wijzigen in volgendR2d2geluid (random slechts eenmaal uitvoeren)
-
 
 // Pas de voltagefactor aan, dat is bij elke chip hetzelfde. Calibreer bv. met USB stroom die 3.3V op de chip moet geven
 #define VOLTAGE_FACTOR 910.0f
@@ -116,6 +113,7 @@ unsigned long LaatstMotorsOfGeluid; // todo beter wijzigen in volgendR2d2geluid 
 #define LEDSTRIP_MAX_BRIGHTNESS 50
 #define NUMLEDPIXELS      4
 CRGB leds[NUMLEDPIXELS];
+unsigned long LaatstMotorsOfGeluid; // todo beter wijzigen in volgendR2d2geluid (random slechts eenmaal uitvoeren)
 
 #define USE_SOFTAP
 #define WIFI_SOFTAP_CHANNEL 1 // 1-13
@@ -412,15 +410,6 @@ void init_motors()
 
 void setup()
 {
-  // todo andere define voor ws2812
-  // maar waarom staat dit blok hier eigenlijk, want ietsje verder staat opnieuw de initialisatie, maar dan correct
-  setup_pin_mode_output(PIN_LEDCONNECTIE); // eerste en vooral WS2812 even testen bij opstart
-
-  fill_solid (leds, NUMLEDPIXELS, CRGB::DarkOrange);
-  FastLED.show();
-
-  FastLED.delay(2); // nodig? lijkt bedoeld voor geleidelijke overgangen?
-
   setup_pin_mode_output(PIN_1AMOTOR);
   setup_pin_mode_output(PIN_2AMOTOR);
   setup_pin_mode_output(PIN_1BMOTOR);
@@ -448,7 +437,8 @@ void setup()
   DEBUG_SERIAL.println(F("\nHover Browser setup started"));
 #endif
 
-  // De LEd flasht 2x om te tonen dat er een reboot is
+  // De LED flasht 2x om te tonen dat er een reboot is
+  setup_pin_mode_output(PIN_LEDCONNECTIE); 
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON);
   delay(10);
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
@@ -458,21 +448,12 @@ void setup()
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
   delay(10);
 
-  // todo: beter nieuwe define voor ws2812, zelfs al is deze gelijk aan led_connectie: voor platformen waar led en ws2812 verschillend zijn
-  pinMode(PIN_LEDCONNECTIE, OUTPUT);
-  FastLED.addLeds<NEOPIXEL, PIN_LEDCONNECTIE>(leds, NUMLEDPIXELS); //gewone LED en WS2812 op zelfde pin dus
+  FastLED.addLeds<NEOPIXEL, PIN_WS2812>(leds, NUMLEDPIXELS);
   FastLED.setBrightness(LEDSTRIP_MAX_BRIGHTNESS);
   FastLED.clear();
-  FastLED.show();
-  FastLED.delay(2); // nodig bij plotse overgangen?
-
-  //configdata.brightness = 128;//bepaalt max samen met LEDSTRIP_MAX_BRIGHTNESS
-  //configdata.hue = 10;
-
   fill_solid (leds, NUMLEDPIXELS, CRGB::DarkOrange);
   FastLED.show();
-
-  FastLED.delay(2); // nodig bij plotse overgangen?
+  FastLED.delay(2);
 
   // todo ifdef servopin
   // steering servo PWM             hier servo tegelijk met x input naar motoren
@@ -485,9 +466,10 @@ void setup()
 
   init_motors();
 
-  // todo code enkel als ws2812 anders dan led pin
-  //digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON ); uit om via die pin WS2812 aan te sturen
-
+#if (PIN_WS2812 != PIN_LEDCONNECTIE)
+  digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON );
+#endif
+   
   // setup gyro module
   Wire.begin();
 
@@ -745,9 +727,10 @@ void handle_message(websockets::WebsocketsMessage msg) {
   //  DEBUG_SERIAL.print(F(" param2 = "));
   //  DEBUG_SERIAL.println(param2);
 #endif
-  // todo enkel als led pin verschillend van ws2812 pin
-  //digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON); ; uit om via die pin WS2812 aan te sturen
-
+   
+#if (PIN_WS2812 != PIN_LEDCONNECTIE)
+  digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON);
+#endif
   last_activity_message = millis();
 
   switch (id)
@@ -776,9 +759,10 @@ void handle_message(websockets::WebsocketsMessage msg) {
 
 void onConnect()
 {
-  // todo enkel als led pin verschillend van ws2812 pin
-  //  digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);// te vervangen door WS2812
-
+#if (PIN_WS2812 != PIN_LEDCONNECTIE)
+  digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
+#endif
+   
 #ifdef DEBUG_SERIAL
   DEBUG_SERIAL.println(F("onConnect"));
 #endif
@@ -876,8 +860,9 @@ void loop()
 
   if (millis() > last_activity_message + TIMEOUT_MS_LED)
   {
-    // todo enkel als led pin en ws2812 pin verschillend zijn
-    //  digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);// te vervangen door WS2812
+#if (PIN_WS2812 != PIN_LEDCONNECTIE)
+    digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
+#endif
   }
 
   if (millis() > last_activity_message + TIMEOUT_MS_MOTORS)
