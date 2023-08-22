@@ -169,9 +169,6 @@ int currentX = 0;
 int currentY = 0;
 bool gyroBeschikbaar = false;
 
-// todo: waarom staat volgende definitie hier van pfactor?? Die wordt nergens gebruikt: in update_motors staat ze correct lokaal gedefinieerd
-float Pfactor;
-
 const float Cfactor = -2; // conversiefactor van gemeten gyroZ naar de arbitraire eenheden van currentX
 const float maxPfactor = 4; // maximum voor de proportionele regelfactor Pfactor, bepaald met slider
 
