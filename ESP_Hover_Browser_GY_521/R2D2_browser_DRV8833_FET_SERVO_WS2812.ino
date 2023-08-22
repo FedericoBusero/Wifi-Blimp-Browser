@@ -613,7 +613,10 @@ void handleSliderTrimServo(int value)
 void handleJoystick(int x, int y)
 {
 #ifdef DEBUG_SERIAL
-  //  todo code terugzetten
+  // DEBUG_SERIAL.print(F("handleJoystick x="));
+  // DEBUG_SERIAL.print(x);
+  // DEBUG_SERIAL.print(F(" y="));
+  // DEBUG_SERIAL.println(y);
 #endif
 
   currentX = x;
