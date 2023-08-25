@@ -112,7 +112,7 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 #define LEDSTRIP_MAX_BRIGHTNESS 50
 #define NUMLEDPIXELS      4
 CRGB leds[NUMLEDPIXELS];
-unsigned long LaatstMotorsOfGeluid; // todo beter wijzigen in volgendR2d2geluid (random slechts eenmaal uitvoeren)
+unsigned long volgendR2d2geluid;
 
 #define USE_SOFTAP
 #define WIFI_SOFTAP_CHANNEL 1 // 1-13
@@ -312,7 +312,7 @@ void update_lichten()
     FastLED.show();
   }
   else {
-    LaatstMotorsOfGeluid = millis(); // bijhouden hoe lang geleden motors nog aan.
+    volgendR2d2geluid = millis()+(unsigned long)random(3000, 30000);
     leds[0] = CRGB::Blue;
     leds[3] = CRGB::Yellow;
     FastLED.show();
@@ -498,6 +498,7 @@ void setup()
    
   fill_solid (leds, NUMLEDPIXELS, CRGB::Black); //WS2812 leds uit
   FastLED.show();
+  volgendR2d2geluid = millis()+10000UL;
 }
 
 void kalibreer_gyro(int num_iter, float kalib_factor)
@@ -851,11 +852,10 @@ void loop()
     is_connected = 1;
   }
 
-  // todo beter volgender2d2_show zodat random slechts 1 keer uitgevoerd wordt
-  if ((millis() - LaatstMotorsOfGeluid) >= (unsigned long)random(3000, 30000)) // langer dan 3 a 30 sec motors niet aan.
+  if (millis() >= volgendR2d2geluid ) // langer dan 3 a 30 sec motors niet aan.
   {
     R2D2sound();
-    LaatstMotorsOfGeluid = millis(); //weer even wachten
+    volgendR2d2geluid = millis()+(unsigned long)random(3000, 30000); 
   }
 
   if (!is_connected)
