@@ -95,7 +95,7 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 #define PIN_WS2812 2 
 #define PIN_LEDCONNECTIE 2 // jawel op zelfde bin als gewone LED, zou volgens WEMOS mini shield vbn moeten werken
 
-#define speakerPin D5 //voor R2D2sound
+#define PIN_SPEAKER D5 //voor R2D2sound
 
 // Pas de voltagefactor aan, dat is bij elke chip hetzelfde. Calibreer bv. met USB stroom die 3.3V op de chip moet geven
 #define VOLTAGE_FACTOR 910.0f
@@ -491,8 +491,10 @@ void setup()
   last_activity_message = millis();
 
   //R2D2sound
-  pinMode(speakerPin, OUTPUT);
-
+#ifdef PIN_SPEAKER 
+  pinMode(PIN_SPEAKER, OUTPUT);
+#endif
+   
   fill_solid (leds, NUMLEDPIXELS, CRGB::Black); //WS2812 leds uit
   FastLED.show();
 }
@@ -712,15 +714,18 @@ void phrase1() {
   for (int i = 0; i <=  random(100, 2000); i++) {
 
     delay(random(.9, 2));
-    tone(speakerPin, k + (-i * 2));
+#ifdef PIN_SPEAKER 
+    tone(PIN_SPEAKER, k + (-i * 2));
+#endif
     delay(random(.9, 2));
   }
   leds[1] = CRGB::Black;// uit
   FastLED.show();
   for (int i = 0; i <= random(100, 1000); i++) {
     delay(random(.9, 2));
-
-    tone(speakerPin, k + (i * 10));
+#ifdef PIN_SPEAKER 
+    tone(PIN_SPEAKER, k + (i * 10));
+#endif
     delay(random(.9, 2));
   }
 }
@@ -731,15 +736,17 @@ void phrase2() {
   leds[1] = CRGB::DarkGreen;
   FastLED.show();
   for (int i = 0; i <= -random(100, 2000); i--) {
-
-    tone(speakerPin, k + (i * 2));
+#ifdef PIN_SPEAKER 
+    tone(PIN_SPEAKER, k + (i * 2));
+#endif
     delay(random(.9, 2));
   }
   leds[1] = CRGB::Black;
   FastLED.show();
   for (int i = 0; i <= random(100, 1000); i++) {
-
-    tone(speakerPin, k + (-i * 10));
+#ifdef PIN_SPEAKER 
+    tone(PIN_SPEAKER, k + (-i * 10));
+#endif
     delay(random(.9, 2));
   }
 }
@@ -764,16 +771,21 @@ void R2D2sound() {
     FastLED.show();
     //duur = random(70, 170);
     frequency = K + random(-1700, 2000);
-    tone(speakerPin, frequency);
-    //delay(duur);
+#ifdef PIN_SPEAKER 
+    tone(PIN_SPEAKER, frequency);
+#endif
+     //delay(duur);
     delay(random(70, 170));
     leds[1] = CRGB::Black;
     FastLED.show();
-    noTone(speakerPin);
+#ifdef PIN_SPEAKER 
+    noTone(PIN_SPEAKER);
+#endif
     delay(random(0, 30));
   }
-  noTone(speakerPin);
-
+#ifdef PIN_SPEAKER 
+  noTone(PIN_SPEAKER);
+#endif
 }
 
 
