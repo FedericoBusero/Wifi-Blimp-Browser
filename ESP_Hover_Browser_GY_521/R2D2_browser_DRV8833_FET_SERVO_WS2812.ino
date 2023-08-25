@@ -230,7 +230,6 @@ void updateMotors()
 
     int doel_servohoek = map(constrain(regelX + ui_slider1,-360,360), -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
 
-    // todo ifdef servopin
     servo1.write(doel_servohoek);  // We verplaatsen de servo naar de nieuwe positie doel_servohoek
      
 #ifdef DEBUG_SERIAL
@@ -411,7 +410,8 @@ void setup()
     sensor.setThrottle();
     Serial.println("start...");
 
-    // todo set all calibration errors to zero
+    sensor.gxe = 0;
+    sensor.gye = 0;
     sensor.gze = 0;
   }
 
