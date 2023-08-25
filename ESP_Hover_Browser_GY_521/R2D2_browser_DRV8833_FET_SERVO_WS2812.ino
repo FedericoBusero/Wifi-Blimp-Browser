@@ -358,8 +358,9 @@ void setup()
   delay(10);
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
   delay(10);
-
+#ifdef PIN_WS2812
   FastLED.addLeds<NEOPIXEL, PIN_WS2812>(leds, NUMLEDPIXELS);
+#endif
   FastLED.setBrightness(LEDSTRIP_MAX_BRIGHTNESS);
   FastLED.clear();
   fill_solid (leds, NUMLEDPIXELS, CRGB::DarkOrange);
