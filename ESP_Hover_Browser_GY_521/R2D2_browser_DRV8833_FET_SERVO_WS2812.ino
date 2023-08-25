@@ -217,12 +217,6 @@ void updateMotors()
       regelX = (float)ui_joystick_x;
     }
 
-    int doel_servohoek = map(regelX + ui_slider1, -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
-
-    // todo ifdef servopin
-    // todo gyro corretie erin
-    servo1.write(doel_servohoek);  // We verplaatsen de servo naar de nieuwe positie doel_servohoek
-
     /*
       #ifdef DEBUG_SERIAL
       DEBUG_SERIAL.print(F("doel_motorsnelheid="));
@@ -236,6 +230,11 @@ void updateMotors()
       regelX = 0;
     }
 
+    int doel_servohoek = map(regelX + ui_slider1, -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
+
+    // todo ifdef servopin
+    servo1.write(doel_servohoek);  // We verplaatsen de servo naar de nieuwe positie doel_servohoek
+     
 #ifdef DEBUG_SERIAL
     //      DEBUG_SERIAL.print("  millis() ");
     //      DEBUG_SERIAL.println(millis());
