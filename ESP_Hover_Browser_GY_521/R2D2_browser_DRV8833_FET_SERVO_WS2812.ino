@@ -150,11 +150,11 @@ Servo servo1;
 #define SERVO_HOEK_MIN 0
 #define SERVO_HOEK_MAX 180
 
-int ui_slider1; // -180 .. 180
-int ui_slider2 = 0;
-
+int ui_slider1 = 0; // -180 .. 180
+int ui_slider2 = 0; // 0 .. 360
 int ui_joystick_x = 0;
 int ui_joystick_y = 0;
+
 bool gyroBeschikbaar = false;
 
 const float Cfactor = -2; // conversiefactor van gemeten werkelijke_draaisnelheid naar de arbitraire eenheden van ui_joystick_x
@@ -296,6 +296,10 @@ void motors_resume()
 void init_motors()
 {
   ui_slider1 = 0;
+  ui_slider2 = 0;
+
+  ui_joystick_x = 0;
+  ui_joystick_y = 0;
 
   max_motorsnelheid = PWM_RANGE; // komt van (300 * PWM_RANGE) / 360; als startwaarde toen 2e slider hierop werkte.
   motors_halt = false;
