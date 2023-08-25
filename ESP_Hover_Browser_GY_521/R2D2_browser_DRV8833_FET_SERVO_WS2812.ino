@@ -150,7 +150,6 @@ Servo servo1;
 #define SERVO_HOEK_MIN 0
 #define SERVO_HOEK_MAX 180
 
-int Servopositie_x;   // -180 .. 180 niet gebruikt in deze motorversie
 int ui_slider1; // -180 .. 180
 int doel_servohoek;
 int ui_slider2 = 0;
@@ -219,7 +218,7 @@ void updateMotors()
       regelX = (float)ui_joystick_x;
     }
 
-    doel_servohoek = map(Servopositie_x + ui_slider1, -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
+    doel_servohoek = map(ui_joystick_x + ui_slider1, -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
 
     // todo ifdef servopin
     // todo gyro corretie erin
@@ -298,7 +297,6 @@ void motors_resume()
 void init_motors()
 {
   ui_slider1 = 0;
-  Servopositie_x = 0;
   doel_servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
 
   max_motorsnelheid = PWM_RANGE; // komt van (300 * PWM_RANGE) / 360; als startwaarde toen 2e slider hierop werkte.
@@ -583,7 +581,6 @@ void handleJoystick(int x, int y)
 
   //      doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
   //
-  Servopositie_x = x; //dus X doet zowel servo als motoren in deze versie
   //  if (y <= 0)
   //  {
   //    doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
