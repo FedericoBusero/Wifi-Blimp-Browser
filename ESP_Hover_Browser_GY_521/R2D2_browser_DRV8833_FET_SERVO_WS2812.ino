@@ -159,7 +159,7 @@ int Servopositie_x;   // -180 .. 180 niet gebruikt in deze motorversie
 int ui_slider1; // -180 .. 180
 int servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2; // wel weer niet gebruikt in deze motorversie
 int doel_servohoek;
-int currentSlider2 = 0;
+int ui_slider2 = 0;
 
 int ui_joystick_x = 0;
 int ui_joystick_y = 0;
@@ -273,7 +273,7 @@ void updateMotors()
     */
     // motor_snelheid = min(doel_motorsnelheid, motor_snelheid + MAX_MOTOR_SPEED_STAP);
 
-    int z_motorsnelheid = map(currentSlider2, 0, 360, 0, PWM_RANGE);
+    int z_motorsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE);
 
     if (abs(ui_joystick_y * ui_joystick_x) < 5) { 
       z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
@@ -591,14 +591,14 @@ void updatestatusbar(boolean forceupdate)
 #endif
 }
 
-void handleSliderZSpeed(int value) // Z (zweef) motor besturing geworden
+void handleSlider2(int value) 
 {
 #ifdef DEBUG_SERIAL
-  DEBUG_SERIAL.print(F("handleSliderZSpeed value="));
+  DEBUG_SERIAL.print(F("handleSlider2 value="));
   DEBUG_SERIAL.println(value);
 #endif
   //max_motorsnelheid = map(value, 0, 360, PWM_RANGE / 2, PWM_RANGE);
-  currentSlider2 = value;
+  ui_slider2 = value;
 
   updateMotors();
 }
@@ -703,13 +703,13 @@ void handle_message(websockets::WebsocketsMessage msg) {
       break;
 
     case 1:
-      handleJoystick(param1, param2);
+      handleJoystick(param1, param2);  
       break;
 
-    case 2: handleSliderZSpeed(param1);
+    case 2: handleSlider2(param1); // Z (zweef) motor besturing 
       break;
 
-    case 3: handleSlider1(param1);
+    case 3: handleSlider1(param1); // p-control
       break;
 
     case 10: handleButton1(param1); 
