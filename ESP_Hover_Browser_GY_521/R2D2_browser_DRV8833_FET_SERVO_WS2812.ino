@@ -7,8 +7,9 @@
    Dan ga je naar de browser (chrome, firefox, safari, ..) naar de website 192.168.4.1 maar elke andere http-URL werkt ook bv. http://a.be
 
    De bovenste regel toont de connectie-status. Op ESP8266 wordt het voltage getoond tijdens de connectie, te calibreren met VOLTAGE_FACTOR
-   De bovenste slider wordt niet gebruikt voorlopig, was om de servo te trimmen.
+   De bovenste slider wordt gebruikt om de gevoeligheid van de gyro te regelen (p-factor)
    De slider eronder stelt de zweefmotor in.
+   De derde slider stelt de maximale draaisnelheid in
    Met de joystick worden 2 stuwmotoren bestuurd
 
 */
@@ -155,7 +156,7 @@ Servo servo1;
 #define SERVO_HOEK_STAP 2
 
 int Servopositie_x;   // -180 .. 180 niet gebruikt in deze motorversie
-int TrimServopositie; // -180 .. 180 //voorlopig niet hernoemd, maar dubbel gebruikt
+int ui_slider1; // -180 .. 180
 int servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2; // wel weer niet gebruikt in deze motorversie
 int doel_servohoek;
 int currentSlider2 = 0;
@@ -233,7 +234,7 @@ void updateMotors()
       gyroZ = sensor.getGyroZ();
 
       // "gyro"-regeling
-      float Pfactor = ((float)TrimServopositie + 180.0) * maxPfactor / 360.0; // aanpassen waarde -180 .. 180 naar maxPfactor
+      float Pfactor = ((float)ui_slider1 + 180.0) * maxPfactor / 360.0; // aanpassen waarde -180 .. 180 naar maxPfactor
 
       regelX = ((1 + (Pfactor)) * (float)ui_joystick_x) - (Pfactor * Cfactor * (gyroZ)); // bijgestuurde x in verhouding tot afwijking op gewenste draaisnelheid, X van joystick is de gewenste draaisnelheid
     }
@@ -243,10 +244,10 @@ void updateMotors()
     }
 
     /* We berekenen naar welke doelpositie we de servo willen krijgen:
-        we herschalen de som van de slider posities in de browser ( Servopositie_x (-180 .. 180) en TrimServopositie (-180 .. 180) )
+        we herschalen de som van de slider posities in de browser ( Servopositie_x (-180 .. 180) en ui_slider1 (-180 .. 180) )
         naar de minimum en maximum graden die de servo motor aankan (SERVO_HOEK_MIN .. SERVO_HOEK_MAX)
     */
-    doel_servohoek = map(Servopositie_x + TrimServopositie, -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
+    doel_servohoek = map(Servopositie_x + ui_slider1, -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
 
     /*
       We gaan de servo nog niet onmiddellijk naar zijn nieuwe positie doel_servohoek brengen, maar elke keer dat we hier passeren
@@ -341,7 +342,7 @@ void motors_resume()
 
 void init_motors()
 {
-  TrimServopositie = 0;
+  ui_slider1 = 0;
   Servopositie_x = 0;
   servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
   doel_servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
@@ -602,14 +603,14 @@ void handleSliderZSpeed(int value) // Z (zweef) motor besturing geworden
   updateMotors();
 }
 
-void handleSliderTrimServo(int value)
+void handleSlider1(int value)
 {
 #ifdef DEBUG_SERIAL
-  DEBUG_SERIAL.print(F("handleSliderTrimServo value="));
+  DEBUG_SERIAL.print(F("handleSlider1 value="));
   DEBUG_SERIAL.println(value);
 #endif
 
-  TrimServopositie = value;
+  ui_slider1 = value;
 
   updateMotors();
 }
@@ -708,7 +709,7 @@ void handle_message(websockets::WebsocketsMessage msg) {
     case 2: handleSliderZSpeed(param1);
       break;
 
-    case 3: handleSliderTrimServo(param1);
+    case 3: handleSlider1(param1);
       break;
 
     case 10: handleButton1(param1); 
