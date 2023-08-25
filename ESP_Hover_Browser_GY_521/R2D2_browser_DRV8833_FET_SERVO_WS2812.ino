@@ -150,14 +150,8 @@ Servo servo1;
 #define SERVO_HOEK_MIN 0
 #define SERVO_HOEK_MAX 180
 
-// We verplaatsen de servo in stapjes om geen al te bruuske bewegingen te maken
-// Pas dit gerust aan, 1=servo traag bewegen, 2=normaal en vanaf 4 gaat het heel snel.
-// De waarde is minimaal 1 en maximaal 180, dan is er geen vertraging meer
-#define SERVO_HOEK_STAP 2
-
 int Servopositie_x;   // -180 .. 180 niet gebruikt in deze motorversie
 int ui_slider1; // -180 .. 180
-int servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2; // wel weer niet gebruikt in deze motorversie
 int doel_servohoek;
 int ui_slider2 = 0;
 
@@ -167,15 +161,6 @@ bool gyroBeschikbaar = false;
 
 const float Cfactor = -2; // conversiefactor van gemeten werkelijke_draaisnelheid naar de arbitraire eenheden van ui_joystick_x
 const float maxPfactor = 4; // maximum voor de proportionele regelfactor Pfactor, bepaald met slider
-
-//In Deze versie NIET:
-// Bij het verhogen van de snelheid van de motor, doen we dat in stappen om niet te bruusk op te trekken
-// want dit kan de hovercraft onbestuurbaar maken of teveel stroom trekken waardoor de chip gaat resetten
-// Pas gerust aan, 1=traag optrekken, 5=snel optrekken
-// De waarde is minimaal 1 en maximaal 1023
-// #define MAX_MOTOR_SPEED_STAP 4
-
-//int motor_snelheid = 0; niet meer gebruikt, was voor 1 motorversie
 
 int max_motorsnelheid;
 bool motors_halt;
@@ -241,36 +226,18 @@ void updateMotors()
       regelX = (float)ui_joystick_x;
     }
 
-    /* We berekenen naar welke doelpositie we de servo willen krijgen:
-        we herschalen de som van de slider posities in de browser ( Servopositie_x (-180 .. 180) en ui_slider1 (-180 .. 180) )
-        naar de minimum en maximum graden die de servo motor aankan (SERVO_HOEK_MIN .. SERVO_HOEK_MAX)
-    */
     doel_servohoek = map(Servopositie_x + ui_slider1, -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
 
-    /*
-      We gaan de servo nog niet onmiddellijk naar zijn nieuwe positie doel_servohoek brengen, maar elke keer dat we hier passeren
-      gaan we ietsje dichter naar zijn doel. Daartoe beperken we de verplaatsing t.o.v. de oude servohoek tot maximum SERVO_HOEK_STAP stappen
-    */
-    servohoek = constrain(doel_servohoek, servohoek - SERVO_HOEK_STAP, servohoek + SERVO_HOEK_STAP);
-    servohoek = doel_servohoek;
     // todo ifdef servopin
-    // todo vertraagcode kan er beter uit en gyro corretie erin
-    servo1.write(servohoek);  // We verplaatsen de servo naar de nieuwe positie servohoek
+    // todo gyro corretie erin
+    servo1.write(doel_servohoek);  // We verplaatsen de servo naar de nieuwe positie doel_servohoek
 
-    /*
-      We gaan de motor nog niet onmiddellijk naar zijn snelheid doel_motorsnelheid brengen, maar elke keer dat we hier passeren
-      gaan we ietsje dichter naar zijn doel. Daartoe mag hij elke keer maximum MAX_MOTOR_SPEED_STAP verhogen in snelheid
-    */
     /*
       #ifdef DEBUG_SERIAL
       DEBUG_SERIAL.print(F("doel_motorsnelheid="));
       DEBUG_SERIAL.println(doel_motorsnelheid);
-      DEBUG_SERIAL.print(F("motor_snelheid="));
-      DEBUG_SERIAL.println(motor_snelheid);
       #endif
     */
-    // motor_snelheid = min(doel_motorsnelheid, motor_snelheid + MAX_MOTOR_SPEED_STAP);
-
     int z_motorsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE);
 
     if (abs(ui_joystick_y * ui_joystick_x) < 5) { 
@@ -310,7 +277,7 @@ void updateMotors()
     //   DEBUG_SERIAL.print(temp1);
     //   DEBUG_SERIAL.print(F("temp2 "));
     //   DEBUG_SERIAL.println(temp2);
-    DEBUG_SERIAL.print(F("motorsnelheid A="));
+    DEBUG_SERIAL.print(F("doel_motorsnelheid A="));
     DEBUG_SERIAL.print(doel_motorsnelheidA);
     DEBUG_SERIAL.print(F(" B="));
     DEBUG_SERIAL.println(doel_motorsnelheidB);
@@ -342,10 +309,7 @@ void init_motors()
 {
   ui_slider1 = 0;
   Servopositie_x = 0;
-  servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
   doel_servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
-
-  //  motor_snelheid = 0;
 
   max_motorsnelheid = PWM_RANGE; // komt van (300 * PWM_RANGE) / 360; als startwaarde toen 2e slider hierop werkte.
   motors_halt = false;
