@@ -160,11 +160,11 @@ int servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2; // wel weer niet gebruikt
 int doel_servohoek;
 int currentSlider2 = 0;
 
-int currentX = 0;
-int currentY = 0;
+int ui_joystick_x = 0;
+int ui_joystick_y = 0;
 bool gyroBeschikbaar = false;
 
-const float Cfactor = -2; // conversiefactor van gemeten gyroZ naar de arbitraire eenheden van currentX
+const float Cfactor = -2; // conversiefactor van gemeten gyroZ naar de arbitraire eenheden van ui_joystick_x
 const float maxPfactor = 4; // maximum voor de proportionele regelfactor Pfactor, bepaald met slider
 
 //In Deze versie NIET:
@@ -235,11 +235,11 @@ void updateMotors()
       // "gyro"-regeling
       float Pfactor = ((float)TrimServopositie + 180.0) * maxPfactor / 360.0; // aanpassen waarde -180 .. 180 naar maxPfactor
 
-      regelX = ((1 + (Pfactor)) * (float)currentX) - (Pfactor * Cfactor * (gyroZ)); // bijgestuurde x in verhouding tot afwijking op gewenste draaisnelheid, X van joystick is de gewenste draaisnelheid
+      regelX = ((1 + (Pfactor)) * (float)ui_joystick_x) - (Pfactor * Cfactor * (gyroZ)); // bijgestuurde x in verhouding tot afwijking op gewenste draaisnelheid, X van joystick is de gewenste draaisnelheid
     }
     else {
       gyroZ = 0;
-      regelX = (float)currentX;
+      regelX = (float)ui_joystick_x;
     }
 
     /* We berekenen naar welke doelpositie we de servo willen krijgen:
@@ -274,7 +274,7 @@ void updateMotors()
 
     int z_motorsnelheid = map(currentSlider2, 0, 360, 0, PWM_RANGE);
 
-    if (abs(currentY * currentX) < 5) { 
+    if (abs(ui_joystick_y * ui_joystick_x) < 5) { 
       z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
       regelX = 0;
     }
@@ -285,10 +285,10 @@ void updateMotors()
 #ifdef DEBUG_SERIAL
     //      DEBUG_SERIAL.print("  millis() ");
     //      DEBUG_SERIAL.println(millis());
-    DEBUG_SERIAL.print("  currentX ");
-    DEBUG_SERIAL.println(currentX);
-    //      DEBUG_SERIAL.print("  currentY ");
-    //      DEBUG_SERIAL.println(currentY);
+    DEBUG_SERIAL.print("  ui_joystick_x ");
+    DEBUG_SERIAL.println(ui_joystick_x);
+    //      DEBUG_SERIAL.print("  ui_joystick_y ");
+    //      DEBUG_SERIAL.println(ui_joystick_y);
     //      DEBUG_SERIAL.print("  Pfactor: ");
     //      DEBUG_SERIAL.print(Pfactor);
     DEBUG_SERIAL.print("  regelX: ");
@@ -296,8 +296,8 @@ void updateMotors()
 #endif
 
     // x en y omzetten naar motorsnelheden
-    float temp1 = constrain((float)currentY + regelX, -180, 180); 
-    float temp2 = constrain((float)currentY - regelX, -180, 180); 
+    float temp1 = constrain((float)ui_joystick_y + regelX, -180, 180); 
+    float temp2 = constrain((float)ui_joystick_y - regelX, -180, 180); 
      
     int doel_motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
     int doel_motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
@@ -356,7 +356,7 @@ void init_motors()
 
 void update_lichten()
 {
-  if (abs(currentY * currentX) < 5) {
+  if (abs(ui_joystick_y * ui_joystick_x) < 5) {
     leds[0] = CRGB::Red;
     leds[3] = CRGB::DarkGreen;
     FastLED.show();
@@ -623,8 +623,8 @@ void handleJoystick(int x, int y)
   // DEBUG_SERIAL.println(y);
 #endif
 
-  currentX = x;
-  currentY = y;
+  ui_joystick_x = x;
+  ui_joystick_y = y;
 
 
   //      doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
