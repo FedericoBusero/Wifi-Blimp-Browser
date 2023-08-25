@@ -152,12 +152,12 @@ Servo servo1;
 
 int ui_slider1 = 0; // -180 .. 180
 int ui_slider2 = 0; // 0 .. 360
+int ui_slider3 = 0; // 0 .. 200
 int ui_joystick_x = 0;
 int ui_joystick_y = 0;
 
 bool gyroBeschikbaar = false;
 
-const float Cfactor = -2; // conversiefactor van gemeten werkelijke_draaisnelheid naar de arbitraire eenheden van ui_joystick_x
 const float maxPfactor = 4; // maximum voor de proportionele regelfactor Pfactor, bepaald met slider
 
 int max_motorsnelheid;
@@ -201,17 +201,15 @@ void updateMotors()
   }
   else
   {
-    
     float regelX = 0;
+    float max_draai_factor = (float)ui_slider3 / 100.0; // ui_slider3 : 0 .. 200 
      
     if (gyroBeschikbaar) {// gyro
+      float Pfactor = ((float)ui_slider1 + 180.0) * maxPfactor / 360.0; // aanpassen waarde -180 .. 180 naar maxPfactor
       sensor.read();
       float werkelijke_draaisnelheid = sensor.getGyroZ();
-
-      // "gyro"-regeling
-      float Pfactor = ((float)ui_slider1 + 180.0) * maxPfactor / 360.0; // aanpassen waarde -180 .. 180 naar maxPfactor
-
-      regelX = ((1 + (Pfactor)) * (float)ui_joystick_x) - (Pfactor * Cfactor * (werkelijke_draaisnelheid)); // bijgestuurde x in verhouding tot afwijking op gewenste draaisnelheid, X van joystick is de gewenste draaisnelheid
+      float doel_draaisnelheid = (float)ui_joystick_x * (-1.0) * max_draai_factor; 
+      regelX = Pfactor * (werkelijke_draaisnelheid-doel_draaisnelheid); 
     }
     else {
       regelX = (float)ui_joystick_x;
@@ -296,7 +294,7 @@ void init_motors()
 {
   ui_slider1 = 0;
   ui_slider2 = 0;
-
+  ui_slider3 = 0;
   ui_joystick_x = 0;
   ui_joystick_y = 0;
 
@@ -567,6 +565,17 @@ void handleSlider1(int value)
   updateMotors();
 }
 
+void handleSlider3(int value)
+{
+#ifdef DEBUG_SERIAL
+  DEBUG_SERIAL.print(F("handleSlider3 value="));
+  DEBUG_SERIAL.println(value);
+#endif
+
+  ui_slider3 = value;
+  updateMotors();
+}
+
 void handleJoystick(int x, int y)
 {
 #ifdef DEBUG_SERIAL
@@ -661,6 +670,9 @@ void handle_message(websockets::WebsocketsMessage msg) {
       break;
 
     case 3: handleSlider1(param1); // p-control
+      break;
+
+     case 20: handleSlider3(param1); // draaisnelheid
       break;
 
     case 10: handleButton1(param1); 
