@@ -165,7 +165,7 @@ int ui_joystick_x = 0;
 int ui_joystick_y = 0;
 bool gyroBeschikbaar = false;
 
-const float Cfactor = -2; // conversiefactor van gemeten gyroZ naar de arbitraire eenheden van ui_joystick_x
+const float Cfactor = -2; // conversiefactor van gemeten werkelijke_draaisnelheid naar de arbitraire eenheden van ui_joystick_x
 const float maxPfactor = 4; // maximum voor de proportionele regelfactor Pfactor, bepaald met slider
 
 //In Deze versie NIET:
@@ -225,21 +225,19 @@ void updateMotors()
   }
   else
   {
-    // todo beter andere naam kiezen zoals werkelijke_draaisnelheid voor het geval gyro anders bevestigd is
-    float gyroZ;
+    
     float regelX = 0;
      
     if (gyroBeschikbaar) {// gyro
       sensor.read();
-      gyroZ = sensor.getGyroZ();
+      float werkelijke_draaisnelheid = sensor.getGyroZ();
 
       // "gyro"-regeling
       float Pfactor = ((float)ui_slider1 + 180.0) * maxPfactor / 360.0; // aanpassen waarde -180 .. 180 naar maxPfactor
 
-      regelX = ((1 + (Pfactor)) * (float)ui_joystick_x) - (Pfactor * Cfactor * (gyroZ)); // bijgestuurde x in verhouding tot afwijking op gewenste draaisnelheid, X van joystick is de gewenste draaisnelheid
+      regelX = ((1 + (Pfactor)) * (float)ui_joystick_x) - (Pfactor * Cfactor * (werkelijke_draaisnelheid)); // bijgestuurde x in verhouding tot afwijking op gewenste draaisnelheid, X van joystick is de gewenste draaisnelheid
     }
     else {
-      gyroZ = 0;
       regelX = (float)ui_joystick_x;
     }
 
