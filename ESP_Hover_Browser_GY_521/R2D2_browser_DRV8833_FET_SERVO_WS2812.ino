@@ -217,7 +217,7 @@ void updateMotors()
       regelX = (float)ui_joystick_x;
     }
 
-    int doel_servohoek = map(ui_joystick_x + ui_slider1, -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
+    int doel_servohoek = map(regelX + ui_slider1, -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
 
     // todo ifdef servopin
     // todo gyro corretie erin
