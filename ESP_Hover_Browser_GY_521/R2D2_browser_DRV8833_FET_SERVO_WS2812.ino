@@ -230,7 +230,7 @@ void updateMotors()
       regelX = 0;
     }
 
-    int doel_servohoek = map(regelX + ui_slider1, -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
+    int doel_servohoek = map(constrain(regelX + ui_slider1,-360,360), -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
 
     // todo ifdef servopin
     servo1.write(doel_servohoek);  // We verplaatsen de servo naar de nieuwe positie doel_servohoek
