@@ -366,14 +366,14 @@ void setup()
   FastLED.show();
   FastLED.delay(2);
 
-  // todo ifdef servopin
+#ifdef PIN_SERVO
   // steering servo PWM             hier servo tegelijk met x input naar motoren
   setup_pin_mode_output(PIN_SERVO);
   /* we verbinden de servo met de gekozen servopin PIN_SERVO en leggen de uiterste signalen vast:
      een blokgolf signaal van 544ms stemt overeen met de servo-arm op 0° en 2400ms met 180°).
   */
   servo1.attach(PIN_SERVO, 544, 2400);
-
+#endif
 
   init_motors();
 
