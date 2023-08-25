@@ -165,13 +165,6 @@ const float maxPfactor = 4; // maximum voor de proportionele regelfactor Pfactor
 int max_motorsnelheid;
 bool motors_halt;
 
-// void led_fill (long led_colour) // (nog) niet gebruikt
-// {
-//     //current_led_color = CHSV( configdata.hue, 255, configdata.brightness); // nog niet gebruikt
-//   fill_solid (leds, NUMLEDPIXELS, led_colour);
-//   FastLED.show();
-// }
-
 void setup_pin_mode_output(int pin)
 {
 #if defined(ESP8266)
