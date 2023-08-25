@@ -244,9 +244,6 @@ void updateMotors()
       z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
       regelX = 0;
     }
-    else {
-      LaatstMotorsOfGeluid = millis(); // bijhouden hoe lang geleden motors nog aan.
-    }
 
 #ifdef DEBUG_SERIAL
     //      DEBUG_SERIAL.print("  millis() ");
@@ -325,6 +322,7 @@ void update_lichten()
     FastLED.show();
   }
   else {
+    LaatstMotorsOfGeluid = millis(); // bijhouden hoe lang geleden motors nog aan.
     leds[0] = CRGB::Blue;
     leds[3] = CRGB::Yellow;
     FastLED.show();
