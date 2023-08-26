@@ -391,8 +391,11 @@ void setup()
   {
     if (sensor.wakeup() == false)
     {
-      Serial.print(millis());
-      Serial.println("\tCould not connect to GY521");
+
+#ifdef DEBUG_SERIAL
+      DEBUG_SERIAL.print(millis());
+      DEBUG_SERIAL.println("\tCould not connect to GY521");
+#endif
       delay(1000);
     }
     else
@@ -408,11 +411,13 @@ void setup()
     sensor.setGyroSensitivity(1);   // 500 degrees/s
 
     sensor.setThrottle();
-    Serial.println("start...");
-
+#ifdef DEBUG_SERIAL
+      DEBUG_SERIAL.println("start gyro ...")
+#endif
     sensor.gxe = 0;
     sensor.gye = 0;
     sensor.gze = 0;
+    sensor.read();
   }
 
   // Wifi instellingen
