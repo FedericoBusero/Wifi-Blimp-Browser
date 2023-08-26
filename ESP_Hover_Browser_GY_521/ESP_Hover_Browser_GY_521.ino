@@ -384,7 +384,7 @@ void setup()
   delay(100);
 
   gyroBeschikbaar = false;
-  for (int t = 0; t < 10; t++) // 10 keer proberen of gyro beschikbaar is
+  for (int t = 0; t < 3; t++) // 3 keer proberen of gyro beschikbaar is
   {
     if (sensor.wakeup() == false)
     {
