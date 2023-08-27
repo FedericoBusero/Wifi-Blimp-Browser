@@ -364,7 +364,7 @@ void setup()
 #endif
 
   delay(200); // 200 milliseconden wachten tot de stroom stabiel is
-
+#ifdef PIN_LEDCONNECTIE
   // De LED flasht 2x om te tonen dat er een reboot is
   setup_pin_mode_output(PIN_LEDCONNECTIE); 
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON);
@@ -375,7 +375,7 @@ void setup()
   delay(10);
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
   delay(10);
-
+#endif
 #ifdef DEBUG_SERIAL
   delay (1000);
   DEBUG_SERIAL.begin(115200);
@@ -393,7 +393,7 @@ void setup()
 
   init_motors();
 
-#if (PIN_WS2812 != PIN_LEDCONNECTIE)
+#if defined (PIN_LEDCONNECTIE) && (PIN_WS2812 != PIN_LEDCONNECTIE)
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON );
 #endif
    
@@ -602,7 +602,7 @@ void handle_message(websockets::WebsocketsMessage msg) {
   //  DEBUG_SERIAL.println(param2);
 #endif
    
-#if (PIN_WS2812 != PIN_LEDCONNECTIE)
+#if defined (PIN_LEDCONNECTIE) && (PIN_WS2812 != PIN_LEDCONNECTIE)
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON);
 #endif
   last_activity_message = millis();
@@ -650,7 +650,7 @@ void handle_message(websockets::WebsocketsMessage msg) {
 
 void onConnect()
 {
-#if (PIN_WS2812 != PIN_LEDCONNECTIE)
+#if defined (PIN_LEDCONNECTIE) && (PIN_WS2812 != PIN_LEDCONNECTIE)
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
 #endif
    
@@ -770,7 +770,7 @@ void loop()
 #if defined(USE_SOFTAP)
   dnsServer.processNextRequest();
 #endif
-#if (PIN_WS2812 != PIN_LEDCONNECTIE)
+#if defined (PIN_LEDCONNECTIE) && (PIN_WS2812 != PIN_LEDCONNECTIE)
   if (millis() > last_activity_message + TIMEOUT_MS_LED)
   {
     digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
@@ -829,11 +829,11 @@ void loop()
     R2D2sound();
     volgendR2d2geluid = millis()+(unsigned long)random(3000, 30000); 
   }
-
+#ifdef PIN_LEDCONNECTIE
   if (!is_connected)
   {
     digitalWrite(PIN_LEDCONNECTIE, (millis() % 1000) > 500 ? LOW : HIGH);
   }
-
+#endif
   // delay(2);
 }
