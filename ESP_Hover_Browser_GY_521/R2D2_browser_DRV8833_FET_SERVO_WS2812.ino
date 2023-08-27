@@ -93,7 +93,7 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 
 // WS2812 en led zit op zelfde pin !
 #define PIN_WS2812 2  // D4=GPIO2
-#define PIN_LEDCONNECTIE 2 // jawel op zelfde bin als gewone LED!
+#define PIN_LEDCONNECTIE 2 // jawel op zelfde pin als gewone LED!
 
 #define PIN_SPEAKER D5 //voor R2D2sound
 
