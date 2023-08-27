@@ -561,16 +561,6 @@ void updatestatusbar(boolean forceupdate)
 #endif
 }
 
-void handleSlider2(int value) 
-{
-#ifdef DEBUG_SERIAL
-  DEBUG_SERIAL.print(F("handleSlider2 value="));
-  DEBUG_SERIAL.println(value);
-#endif
-  ui_slider2 = value;
-  updateMotors();
-}
-
 void handleSlider1(int value)
 {
 #ifdef DEBUG_SERIAL
@@ -579,6 +569,16 @@ void handleSlider1(int value)
 #endif
 
   ui_slider1 = value;
+  updateMotors();
+}
+
+void handleSlider2(int value) 
+{
+#ifdef DEBUG_SERIAL
+  DEBUG_SERIAL.print(F("handleSlider2 value="));
+  DEBUG_SERIAL.println(value);
+#endif
+  ui_slider2 = value;
   updateMotors();
 }
 
