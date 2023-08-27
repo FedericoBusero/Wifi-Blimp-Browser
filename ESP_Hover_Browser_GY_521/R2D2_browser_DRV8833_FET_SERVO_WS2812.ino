@@ -339,13 +339,16 @@ void setup()
   analogWrite(PIN_1BMOTOR, 0);
   analogWrite(PIN_2BMOTOR, 0);
 
-  delay(200); // 200 milliseconden wachten tot de stroom stabiel is
-
-#ifdef DEBUG_SERIAL
-  delay (1000);
-  DEBUG_SERIAL.begin(115200);
-  DEBUG_SERIAL.println(F("\nHover Browser setup started"));
+#ifdef PIN_WS2812
+  FastLED.addLeds<NEOPIXEL, PIN_WS2812>(leds, NUMLEDPIXELS);
 #endif
+  FastLED.setBrightness(LEDSTRIP_MAX_BRIGHTNESS);
+  FastLED.clear();
+  fill_solid (leds, NUMLEDPIXELS, CRGB::DarkOrange);
+  FastLED.show();
+  FastLED.delay(2);
+
+  delay(200); // 200 milliseconden wachten tot de stroom stabiel is
 
   // De LED flasht 2x om te tonen dat er een reboot is
   setup_pin_mode_output(PIN_LEDCONNECTIE); 
@@ -357,14 +360,12 @@ void setup()
   delay(10);
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
   delay(10);
-#ifdef PIN_WS2812
-  FastLED.addLeds<NEOPIXEL, PIN_WS2812>(leds, NUMLEDPIXELS);
+
+#ifdef DEBUG_SERIAL
+  delay (1000);
+  DEBUG_SERIAL.begin(115200);
+  DEBUG_SERIAL.println(F("\nHover Browser setup started"));
 #endif
-  FastLED.setBrightness(LEDSTRIP_MAX_BRIGHTNESS);
-  FastLED.clear();
-  fill_solid (leds, NUMLEDPIXELS, CRGB::DarkOrange);
-  FastLED.show();
-  FastLED.delay(2);
 
 #ifdef PIN_SERVO
   // steering servo PWM             hier servo tegelijk met x input naar motoren
@@ -412,7 +413,7 @@ void setup()
 
     sensor.setThrottle();
 #ifdef DEBUG_SERIAL
-      DEBUG_SERIAL.println("start gyro ...")
+      DEBUG_SERIAL.println("start gyro ...");
 #endif
     sensor.gxe = 0;
     sensor.gye = 0;
@@ -503,6 +504,7 @@ void setup()
    
   fill_solid (leds, NUMLEDPIXELS, CRGB::Black); //WS2812 leds uit
   FastLED.show();
+  FastLED.delay(2);
   volgendR2d2geluid = millis()+10000UL;
 }
 
