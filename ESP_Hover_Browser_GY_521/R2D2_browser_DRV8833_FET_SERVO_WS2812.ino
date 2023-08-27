@@ -744,6 +744,7 @@ void phrase2() {
   int k = random(1000, 2000);
   leds[1] = CRGB::DarkGreen;
   FastLED.show();
+  FastLED.delay(2);
   for (int i = 0; i <= -random(100, 2000); i--) {
 #ifdef PIN_SPEAKER 
     tone(PIN_SPEAKER, k + (i * 2));
@@ -752,6 +753,7 @@ void phrase2() {
   }
   leds[1] = CRGB::Black;
   FastLED.show();
+  FastLED.delay(2);
   for (int i = 0; i <= random(100, 1000); i++) {
 #ifdef PIN_SPEAKER 
     tone(PIN_SPEAKER, k + (-i * 10));
@@ -778,6 +780,7 @@ void R2D2sound() {
 
     leds[1] = CRGB::DarkGreen;
     FastLED.show();
+    FastLED.delay(2);
     //duur = random(70, 170);
     frequency = K + random(-1700, 2000);
 #ifdef PIN_SPEAKER 
@@ -787,6 +790,7 @@ void R2D2sound() {
     delay(random(70, 170));
     leds[1] = CRGB::Black;
     FastLED.show();
+    FastLED.delay(2);
 #ifdef PIN_SPEAKER 
     noTone(PIN_SPEAKER);
 #endif
