@@ -107,11 +107,13 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 
 #endif // ARDUINO_ARCH_ESP32
 
+#ifdef PIN_WS2812
 #include <FastLED.h>
-
 #define LEDSTRIP_MAX_BRIGHTNESS 50
 #define NUMLEDPIXELS      4
 CRGB leds[NUMLEDPIXELS];
+#endif
+
 unsigned long volgendR2d2geluid;
 
 #define USE_SOFTAP
@@ -315,15 +317,19 @@ void init_motors()
 void update_lichten()
 {
   if (abs(ui_joystick_y * ui_joystick_x) < 5) {
+#ifdef PIN_WS2812
     leds[0] = CRGB::Red;
     leds[3] = CRGB::DarkGreen;
     FastLED.show();
+#endif     
   }
   else {
     volgendR2d2geluid = millis()+(unsigned long)random(3000, 30000);
+#ifdef PIN_WS2812
     leds[0] = CRGB::Blue;
     leds[3] = CRGB::Yellow;
     FastLED.show();
+#endif     
   }
 }
 
@@ -350,12 +356,12 @@ void setup()
 
 #ifdef PIN_WS2812
   FastLED.addLeds<NEOPIXEL, PIN_WS2812>(leds, NUMLEDPIXELS);
-#endif
   FastLED.setBrightness(LEDSTRIP_MAX_BRIGHTNESS);
   FastLED.clear();
   fill_solid (leds, NUMLEDPIXELS, CRGB::DarkOrange);
   FastLED.show();
   FastLED.delay(2);
+#endif
 
   delay(200); // 200 milliseconden wachten tot de stroom stabiel is
 
@@ -510,10 +516,11 @@ void setup()
 #ifdef PIN_SPEAKER 
   pinMode(PIN_SPEAKER, OUTPUT);
 #endif
-   
+#ifdef PIN_WS2812
   fill_solid (leds, NUMLEDPIXELS, CRGB::Black); //WS2812 leds uit
   FastLED.show();
   FastLED.delay(2);
+#endif
   volgendR2d2geluid = millis()+10000UL;
 }
 
@@ -662,50 +669,55 @@ void onDisconnect()
 }
 
 void phrase1() {
-
-  int k = random(1000, 2000);
+#ifdef PIN_WS2812
   leds[1] = CRGB::DarkGreen;
   FastLED.show();
-  for (int i = 0; i <=  random(100, 2000); i++) {
-
-    delay(random(.9, 2));
-#ifdef PIN_SPEAKER 
-    tone(PIN_SPEAKER, k + (-i * 2));
 #endif
+#ifdef PIN_SPEAKER 
+  int k = random(1000, 2000);
+  for (int i = 0; i <=  random(100, 2000); i++) {
+    delay(random(.9, 2));
+    tone(PIN_SPEAKER, k + (-i * 2));
     delay(random(.9, 2));
   }
+#endif
+#ifdef PIN_WS2812
   leds[1] = CRGB::Black;// uit
   FastLED.show();
+#endif
+#ifdef PIN_SPEAKER 
   for (int i = 0; i <= random(100, 1000); i++) {
     delay(random(.9, 2));
-#ifdef PIN_SPEAKER 
     tone(PIN_SPEAKER, k + (i * 10));
-#endif
     delay(random(.9, 2));
   }
+#endif
 }
 
 void phrase2() {
-
-  int k = random(1000, 2000);
+#ifdef PIN_WS2812
   leds[1] = CRGB::DarkGreen;
   FastLED.show();
   FastLED.delay(2);
-  for (int i = 0; i <= -random(100, 2000); i--) {
-#ifdef PIN_SPEAKER 
-    tone(PIN_SPEAKER, k + (i * 2));
 #endif
+#ifdef PIN_SPEAKER 
+  int k = random(1000, 2000);
+  for (int i = 0; i <= -random(100, 2000); i--) {
+    tone(PIN_SPEAKER, k + (i * 2));
     delay(random(.9, 2));
   }
+#endif
+#ifdef PIN_WS2812
   leds[1] = CRGB::Black;
   FastLED.show();
   FastLED.delay(2);
-  for (int i = 0; i <= random(100, 1000); i++) {
-#ifdef PIN_SPEAKER 
-    tone(PIN_SPEAKER, k + (-i * 10));
 #endif
+#ifdef PIN_SPEAKER 
+  for (int i = 0; i <= random(100, 1000); i++) {
+    tone(PIN_SPEAKER, k + (-i * 10));
     delay(random(.9, 2));
   }
+#endif
 }
 
 void R2D2sound() {
@@ -723,10 +735,11 @@ void R2D2sound() {
 
   }
   for (int i = 0; i <= random(3, 9); i++) {
-
+#ifdef PIN_WS2812
     leds[1] = CRGB::DarkGreen;
     FastLED.show();
     FastLED.delay(2);
+#endif
     //duur = random(70, 170);
     frequency = K + random(-1700, 2000);
 #ifdef PIN_SPEAKER 
@@ -734,9 +747,11 @@ void R2D2sound() {
 #endif
      //delay(duur);
     delay(random(70, 170));
+#ifdef PIN_WS2812
     leds[1] = CRGB::Black;
     FastLED.show();
     FastLED.delay(2);
+#endif
 #ifdef PIN_SPEAKER 
     noTone(PIN_SPEAKER);
 #endif
