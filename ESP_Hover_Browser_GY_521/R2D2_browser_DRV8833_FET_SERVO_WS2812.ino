@@ -216,11 +216,21 @@ void updateMotors()
     }
 
     /*
+      max_motorsnelheid = map(ui_slider2, 0, 360, PWM_RANGE / 2, PWM_RANGE);
+      if (y <= 0)
+      {
+        doel_motorsnelheid = map(-ui_joystick_y, 0, 180, 0, max_motorsnelheid);
+      }
+      else
+      {
+        doel_motorsnelheid = 0;
+      }      
       #ifdef DEBUG_SERIAL
       DEBUG_SERIAL.print(F("doel_motorsnelheid="));
       DEBUG_SERIAL.println(doel_motorsnelheid);
       #endif
     */
+
     int z_motorsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE);
 
     if (abs(ui_joystick_y * ui_joystick_x) < 5) { 
@@ -229,7 +239,6 @@ void updateMotors()
     }
 
     int doel_servohoek = map(constrain(regelX + ui_slider1,-360,360), -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
-
     servo1.write(doel_servohoek);  // We verplaatsen de servo naar de nieuwe positie doel_servohoek
      
 #ifdef DEBUG_SERIAL
@@ -558,9 +567,7 @@ void handleSlider2(int value)
   DEBUG_SERIAL.print(F("handleSlider2 value="));
   DEBUG_SERIAL.println(value);
 #endif
-  //max_motorsnelheid = map(value, 0, 360, PWM_RANGE / 2, PWM_RANGE);
   ui_slider2 = value;
-
   updateMotors();
 }
 
@@ -572,7 +579,6 @@ void handleSlider1(int value)
 #endif
 
   ui_slider1 = value;
-
   updateMotors();
 }
 
@@ -598,19 +604,6 @@ void handleJoystick(int x, int y)
 
   ui_joystick_x = x;
   ui_joystick_y = y;
-
-
-  //      doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
-  //
-  //  if (y <= 0)
-  //  {
-  //    doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
-  //  }
-  //  else
-  //  {
-  //    doel_motorsnelheid = 0;
-  //  }
-
   updateMotors();
 }
 
