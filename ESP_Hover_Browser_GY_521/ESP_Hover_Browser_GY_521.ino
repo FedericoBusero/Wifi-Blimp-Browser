@@ -4,7 +4,7 @@
    Hoe gebruiken?
    Voeg wifi netwerk hover-xxxx toe met paswoord 12345678
    Er is op dat netwerk uiteraard geen internet, dus "wifi behouden" aanvinken indien dat gevraagd wordt
-   Dan ga je naar de browser (chrome, firefox, safari, ..) naar de website 192.168.4.1 maar elke andere http-URL werkt ook bv. http://a.be
+   Dan ga je naar de browser (chrome, firefox, safari, ..) naar de website 192.168.4.1 of http://h.be
 
    De bovenste regel toont de connectie-status. Op ESP8266 wordt het voltage getoond tijdens de connectie, te calibreren met VOLTAGE_FACTOR
    De bovenste slider wordt gebruikt om de gevoeligheid van de gyro te regelen (p-factor)
@@ -33,20 +33,13 @@
 
 GY521 sensor(0x68);
 
-
-
-#ifdef ARDUINO_ARCH_ESP32
+#ifdef CONFIG_IDF_TARGET_ESP32S2
 #include <WiFi.h>
 #include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
-#include <ESP32Servo.h> // https://github.com/madhephaestus/ESP32Servo nodig voor AnalogWrite
 
 #define DEBUG_SERIAL Serial
 
-#define PWM_RANGE 255 // PWM range voor analogWrite (in ESP32Servo)
-
-//#define PIN_SERVO          // Geen servo, stond op 18
-//#define PIN_MOTOR          19
-//#define PIN_LEDCONNECTIE   LED_BUILTIN
+#define PWM_RANGE 255 // PWM range voor analogWrite
 
 // Lolin ESP32-S2
 #define PIN_1AMOTOR          12 // Positie D8 op Wemos D1 mini
@@ -64,28 +57,13 @@ GY521 sensor(0x68);
 ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 
 #include <ESP8266WiFi.h>
-#include <Servo.h>
 #include <ESPAsyncTCP.h> // https://github.com/me-no-dev/ESPAsyncTCP
 
 #define PWM_RANGE 1023 // PWM range voor analogWrite
 #define MOTOR_FREQ 400 // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
 
-// #define MODE_ESP01
-//
-#ifdef MODE_ESP01 //niet voor 3motorversie
-
-#define PIN_SERVO          0
-#define PIN_MOTOR          3
-#define PIN_LEDCONNECTIE   1
-
-// Pas de voltagefactor aan, dat is bij elke chip hetzelfde. Kalibreer bv. met USB stroom die 3.3V op de chip moet geven
-#define VOLTAGE_FACTOR 1060.0f
-#define VOLTAGE_THRESHOLD 2.4 // onder dit voltage valt de chip uit om de batterij te beschermen
-
-#else // Wemos D1 mini, NodeMCU, ...
 #define DEBUG_SERIAL Serial
 
-//#define PIN_SERVO          Geen servo D3 // STOND OP D2 = GPIO4  op NodeMCU & Wemos D1 mini
 #define PIN_1AMOTOR          D8 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
 #define PIN_2AMOTOR          D7 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
 #define PIN_1BMOTOR          D6 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
@@ -97,12 +75,10 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 #define VOLTAGE_FACTOR 910.0f
 #define VOLTAGE_THRESHOLD 2.4 // onder dit voltage valt de chip uit om de batterij te beschermen
 
-#endif // MODE_ESP01
-
 #define LED_BRIGHTNESS_ON  LOW
 #define LED_BRIGHTNESS_OFF HIGH
 
-#endif // ARDUINO_ARCH_ESP32
+#endif // CONFIG_IDF_TARGET_ESP32S2
 
 #define USE_SOFTAP
 #define WIFI_SOFTAP_CHANNEL 1 // 1-13
@@ -127,19 +103,6 @@ WebsocketsClient sclient;
 #define TIMEOUT_MS_VOLTAGE 10000L // Aantal milliseconden tussen update voltage
 
 unsigned long last_activity_message;
-
-// In deze versie geen servo
-// We maken een servo "object" aan om de servo aan te sturen.
-// Servo servo1;
-
-// De minimum en maximum hoek van de servo, pas dit gerust aan als de servo de uitersten niet kan halen
-// De waarden zijn minimaal 0, maximaal 180
-// #define SERVO_HOEK_MIN 0
-// #define SERVO_HOEK_MAX 180
-
-//int Servopositie_x;   // -180 .. 180 niet gebruikt in deze motorversie
-// int servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;  niet gebruikt in deze motorversie
-// int doel_servohoek;
 
 int ui_slider1; // -180 .. 180
 int ui_slider2 = 0; // 0 .. 360
@@ -225,22 +188,6 @@ void updateMotors()
        regelX = (1.0)*(float)(ui_joystick_x) * max_draai_factor;
     }
 
-    /* We berekenen naar welke doelpositie we de servo willen krijgen:
-        we herschalen de som van de slider posities in de browser ( Servopositie_x (-180 .. 180) en TrimServopositie (-180 .. 180) )
-        naar de minimum en maximum graden die de servo motor aankan (SERVO_HOEK_MIN .. SERVO_HOEK_MAX)
-    */
-    //  doel_servohoek = map(Servopositie_x + ui_slider1, -360, 360, SERVO_HOEK_MIN, SERVO_HOEK_MAX);
-    //  servohoek = doel_servohoek;
-
-    //  servo1.write(servohoek);  // We verplaatsen de servo naar de nieuwe positie servohoek
-
-    /*
-      #ifdef DEBUG_SERIAL
-      DEBUG_SERIAL.print(F("doel_motorsnelheid="));
-      DEBUG_SERIAL.println(doel_motorsnelheid);
-      #endif
-    */
-
     int z_motorsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE); // voor zweefmotor
     if (abs(ui_joystick_y * ui_joystick_x) < 5) {
       z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
@@ -306,10 +253,6 @@ void motors_resume()
 
 void init_motors()
 {
-
-  // Servopositie_x = 0;
-  // servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
-  // doel_servohoek = (SERVO_HOEK_MIN + SERVO_HOEK_MAX) / 2;
   ui_slider1 = 0;
   ui_slider2 = 0;
   ui_slider3 = 0;
@@ -363,14 +306,6 @@ void setup()
   delay(10);
   digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
 #endif
-
-  // steering servo PWM             HIER GEEN
-  //  setup_pin_mode_output(PIN_SERVO);
-  /* we verbinden de servo met de gekozen servopin PIN_SERVO en leggen de uiterste signalen vast:
-     een blokgolf signaal van 544ms stemt overeen met de servo-arm op 0° en 2400ms met 180°).
-  */
-  // servo1.attach(PIN_SERVO, 544, 2400);
-
 
   init_motors();
 
@@ -586,18 +521,6 @@ void handleJoystick(int x, int y)
 
   ui_joystick_x = x;
   ui_joystick_y = y;
-
-  //      doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
-  //
-  //      Servopositie_x = x;
-  //  if (y <= 0)
-  //  {
-  //    doel_motorsnelheid = map(-y, 0, 180, 0, max_motorsnelheid);
-  //  }
-  //  else
-  //  {
-  //    doel_motorsnelheid = 0;
-  //  }
 
   updateMotors();
 }
