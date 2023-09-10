@@ -45,7 +45,7 @@ GY521 sensor(0x68);
 #define PIN_1AMOTOR          12 // Positie D8 op Wemos D1 mini
 #define PIN_2AMOTOR          11 // Positie D7 op Wemos D1 mini
 #define PIN_1BMOTOR          9  // Positie D6 op Wemos D1 mini
-#define PIN_2BMOTOR          7  // Positie D5 op Wemos D1 mini
+#define PIN_2BMOTOR          5  // Positie D0 op Wemos D1 mini
 #define PIN_ZMOTOR           18 // Positie D3 op Wemos D1 mini
 #define PIN_LEDCONNECTIE     15 // De ingebouwde LED 
 
@@ -67,7 +67,7 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 #define PIN_1AMOTOR          D8 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
 #define PIN_2AMOTOR          D7 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
 #define PIN_1BMOTOR          D6 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
-#define PIN_2BMOTOR          D5 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
+#define PIN_2BMOTOR          D0 // D0 = GPIO16 op NodeMCU & Wemos D1 mini
 #define PIN_ZMOTOR           D3 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
 #define PIN_LEDCONNECTIE     2 // De ingebouwde LED zit op GPIO2 of GPIO16, dus aanpassen naar 16 als de LED niet werkt
 
