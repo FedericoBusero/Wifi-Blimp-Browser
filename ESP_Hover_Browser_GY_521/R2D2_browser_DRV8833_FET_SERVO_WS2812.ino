@@ -524,22 +524,6 @@ void setup()
   volgendR2d2geluid = millis()+10000UL;
 }
 
-void kalibreer_gyro(int num_iter, float kalib_factor)
-{
-  float gz = 0;
-  for (int i = 0; i < num_iter; i++)
-  {
-    sensor.read();
-    gz -= sensor.getGyroZ();
-  }
-  sensor.gze += gz * kalib_factor;
-  sensor.read();
-#ifdef DEBUG_SERIAL
-  //   DEBUG_SERIAL.print(F("sensor.gze   "));
-  //   DEBUG_SERIAL.println(sensor.gze);
-#endif
-}
-
 void updatestatusbar(boolean forceupdate)
 {
 #ifdef ESP8266
@@ -554,7 +538,7 @@ void updatestatusbar(boolean forceupdate)
 
     if (gyroBeschikbaar)
     {
-      snprintf(statusstr, sizeof(statusstr), "%4.2f V gze:%4.2f gz:%4.2f", voltage,sensor.gze,sensor.getGyroZ());
+      snprintf(statusstr, sizeof(statusstr), "%4.2f V gz:%4.2f", voltage,sensor.getGyroZ());
     } else
     {
       snprintf(statusstr, sizeof(statusstr), "%4.2f V", voltage);
@@ -630,15 +614,6 @@ void handle_message(websockets::WebsocketsMessage msg) {
     case 1:
       ui_joystick_x = param1;
       ui_joystick_y = param2;
-      updateMotors();
-      break;
-
-    case 10: // kalibratieknop
-      if (gyroBeschikbaar)
-      {
-        kalibreer_gyro(20, 0.05);
-        updatestatusbar(true);
-      }
       updateMotors();
       break;
   }
