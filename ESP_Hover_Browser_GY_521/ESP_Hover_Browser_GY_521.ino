@@ -125,22 +125,6 @@ void setup_pin_mode_output(int pin)
   pinMode(pin, OUTPUT);
 }
 
-void kalibreer_gyro(int num_iter, float kalib_factor)
-{
-  float gz = 0;
-  for (int i = 0; i < num_iter; i++)
-  {
-    sensor.read();
-    gz -= sensor.getGyroZ();
-  }
-  sensor.gze += gz * kalib_factor;
-  sensor.read();
-#ifdef DEBUG_SERIAL
-  //   DEBUG_SERIAL.print(F("sensor.gze   "));
-  //   DEBUG_SERIAL.println(sensor.gze);
-#endif
-}
-
 void hbridge_setspeed(int pin1, int pin2, long motorspeed)
 {
   if (motorspeed >= 0)
@@ -446,7 +430,7 @@ void updatestatusbar(boolean forceupdate)
     {
       if (gyroBeschikbaar)
       {
-        snprintf(statusstr, sizeof(statusstr), "%4.2f V gze:%4.2f gz:%4.2f", voltage,sensor.gze,sensor.getGyroZ());
+        snprintf(statusstr, sizeof(statusstr), "%4.2f V gz:%4.2f", sensor.getGyroZ());
       } else
       {
         snprintf(statusstr, sizeof(statusstr), "%4.2f V", voltage);
@@ -525,22 +509,6 @@ void handleJoystick(int x, int y)
   updateMotors();
 }
 
-void handleButton1(int value)
-{
-#ifdef DEBUG_SERIAL
-  DEBUG_SERIAL.print(F("handleButton1 value="));
-  DEBUG_SERIAL.println(value);
-#endif
-
-  if (gyroBeschikbaar)
-  {
-    kalibreer_gyro(20, 0.05);
-    updatestatusbar(true);
-  }
-
-  updateMotors();
-}
-
 void handle_message(websockets::WebsocketsMessage msg) {
   const char *msgstr = msg.c_str();
   const char *p;
@@ -597,9 +565,6 @@ void handle_message(websockets::WebsocketsMessage msg) {
       break;
      
     case 20: handleSlider3(param1); // draaisnelheid
-      break;
-
-    case 10: handleButton1(param1); 
       break;
   }
   if (motors_halt)
