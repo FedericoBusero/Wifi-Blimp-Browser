@@ -430,7 +430,7 @@ void updatestatusbar(boolean forceupdate)
     {
       if (gyroBeschikbaar)
       {
-        snprintf(statusstr, sizeof(statusstr), "%4.2f V gz:%4.2f", sensor.getGyroZ());
+        snprintf(statusstr, sizeof(statusstr), "%4.2f V gz:%4.2f", voltage, sensor.getGyroZ());
       } else
       {
         snprintf(statusstr, sizeof(statusstr), "%4.2f V", voltage);
