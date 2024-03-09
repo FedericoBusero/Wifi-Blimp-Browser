@@ -144,7 +144,7 @@ void hbridge_setspeed(int pin1, int pin2, long motorspeed)
 
 void updateMotors()
 {
-  static unsigned long last_activity_joystick=millis();
+  static unsigned long last_activity_joystick=0;
    
   if (motors_halt)
   {
