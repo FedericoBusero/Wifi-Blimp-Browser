@@ -98,7 +98,9 @@ AsyncWebServer webserver(80);
 WebsocketsClient sclient;
 
 // timeoutes
-#define TIMEOUT_MS_MOTORS 2500L // Timeout om motoren uit veiligheid stil te leggen, na x milliseconden niks te hebben ontvangen
+// Timeout om motoren uit veiligheid stil te leggen, na x milliseconden niks te hebben ontvangen.
+// Dat moet hoger zijn dan timeout interval in html functie ws_onopen_ping
+#define TIMEOUT_MS_MOTORS 1200L 
 #define TIMEOUT_MS_LED 1L        // Aantal milliseconden dat LED blijft branden na het ontvangen van een boodschap
 #define TIMEOUT_MS_VOLTAGE 10000L // Aantal milliseconden tussen update voltage
 
