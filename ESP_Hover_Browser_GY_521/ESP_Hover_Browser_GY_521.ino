@@ -103,6 +103,7 @@ WebsocketsClient sclient;
 #define TIMEOUT_MS_MOTORS 1200L 
 #define TIMEOUT_MS_LED 1L        // Aantal milliseconden dat LED blijft branden na het ontvangen van een boodschap
 #define TIMEOUT_MS_VOLTAGE 10000L // Aantal milliseconden tussen update voltage
+#define TIMEOUT_MS_JOYSTICK 4000L // Aantal milliseconden nadat joystick voor laatste maal gebruikt werd, L&R motoren uit
 
 unsigned long last_activity_message;
 
@@ -143,6 +144,8 @@ void hbridge_setspeed(int pin1, int pin2, long motorspeed)
 
 void updateMotors()
 {
+  static unsigned long last_activity_joystick=millis();
+   
   if (motors_halt)
   {
     analogWrite(PIN_ZMOTOR, 0);
@@ -175,8 +178,12 @@ void updateMotors()
     }
 
     int z_motorsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE); // voor zweefmotor
-    if (abs(ui_joystick_y * ui_joystick_x) < 5) {
+    if (abs(ui_joystick_y * ui_joystick_x) >= 5) {
+      last_activity_joystick=millis();
+    } else {
       z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
+    }
+    if (millis()>last_activity_joystick+TIMEOUT_MS_JOYSTICK) {
       regelX = 0; 
     }
 
