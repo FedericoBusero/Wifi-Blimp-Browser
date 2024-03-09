@@ -103,7 +103,7 @@ WebsocketsClient sclient;
 #define TIMEOUT_MS_MOTORS 1200L 
 #define TIMEOUT_MS_LED 1L        // Aantal milliseconden dat LED blijft branden na het ontvangen van een boodschap
 #define TIMEOUT_MS_VOLTAGE 10000L // Aantal milliseconden tussen update voltage
-#define TIMEOUT_MS_JOYSTICK 4000L // Aantal milliseconden nadat joystick voor laatste maal gebruikt werd, L&R motoren uit
+#define TIMEOUT_MS_JOYSTICK 2000L // Aantal milliseconden nadat joystick voor laatste maal gebruikt werd, L&R motoren uit
 
 unsigned long last_activity_message;
 
