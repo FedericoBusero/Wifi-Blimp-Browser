@@ -453,7 +453,24 @@ void updatestatusbar(boolean forceupdate)
       sclient.send(statusstr);
       motors_pause();
       delay(20000); // boodschap wordt 20 seconden getoond in browser alvorens hij disconnecteert
-      ESP.deepSleep(0);
+#ifdef ESP8266
+      WiFi.mode(WIFI_OFF);
+      WiFi.forceSleepBegin();
+      delay(1);
+#else
+       // TODO ESP32
+#endif 
+      while (1)
+      {
+#ifdef PIN_LEDCONNECTIE
+        digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON);
+#endif
+        delay(10);
+#ifdef PIN_LEDCONNECTIE
+        digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
+#endif
+        delay(5000);
+      }
     }
   }
 #endif
