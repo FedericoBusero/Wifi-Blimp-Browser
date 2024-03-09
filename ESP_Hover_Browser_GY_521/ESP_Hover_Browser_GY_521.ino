@@ -181,14 +181,14 @@ void updateMotors()
 #ifdef DEBUG_SERIAL
     //      DEBUG_SERIAL.print("  millis() ");
     //      DEBUG_SERIAL.println(millis());
-    DEBUG_SERIAL.print("  ui_joystick_x ");
-    DEBUG_SERIAL.println(ui_joystick_x);
+    // DEBUG_SERIAL.print("  ui_joystick_x ");
+    // DEBUG_SERIAL.println(ui_joystick_x);
     //      DEBUG_SERIAL.print("  ui_joystick_x ");
     //      DEBUG_SERIAL.println(ui_joystick_x);
     //      DEBUG_SERIAL.print("  Pfactor: ");
     //      DEBUG_SERIAL.print(Pfactor);
-    DEBUG_SERIAL.print("  regelX: ");
-    DEBUG_SERIAL.println(regelX);
+    // DEBUG_SERIAL.print("  regelX: ");
+    // DEBUG_SERIAL.println(regelX);
 #endif
 
     // x en y omzetten naar motorsnelheden
@@ -207,10 +207,10 @@ void updateMotors()
     //   DEBUG_SERIAL.print(temp1);
     //   DEBUG_SERIAL.print(F("temp2 "));
     //   DEBUG_SERIAL.println(temp2);
-    DEBUG_SERIAL.print(F("motorsnelheid A="));
-    DEBUG_SERIAL.print(motorsnelheidA);
-    DEBUG_SERIAL.print(F(" B="));
-    DEBUG_SERIAL.println(motorsnelheidB);
+    // DEBUG_SERIAL.print(F("motorsnelheid A="));
+    // DEBUG_SERIAL.print(motorsnelheidA);
+    // DEBUG_SERIAL.print(F(" B="));
+    // DEBUG_SERIAL.println(motorsnelheidB);
 #endif
 
   }
