@@ -149,10 +149,8 @@ void updateMotors()
   if (motors_halt)
   {
     analogWrite(PIN_ZMOTOR, 0);
-    analogWrite(PIN_1AMOTOR, 0);
-    analogWrite(PIN_2AMOTOR, 0);
-    analogWrite(PIN_1BMOTOR, 0);
-    analogWrite(PIN_2BMOTOR, 0);
+    hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, 0);
+    hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, 0);
   }
   else
   {
@@ -274,11 +272,8 @@ void setup()
   analogWriteFreq(MOTOR_FREQ);
 #endif
   analogWrite(PIN_ZMOTOR, 0);
-  analogWrite(PIN_1AMOTOR, 0);
-  analogWrite(PIN_2AMOTOR, 0);
-  analogWrite(PIN_1BMOTOR, 0);
-  analogWrite(PIN_2BMOTOR, 0);
-
+  hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, 0);
+  hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, 0);
   delay(200); // 200 milliseconden wachten tot de stroom stabiel is
 
 #ifdef DEBUG_SERIAL
