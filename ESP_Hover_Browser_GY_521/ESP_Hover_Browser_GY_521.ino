@@ -15,8 +15,6 @@
 */
 
 #include <ArduinoWebsockets.h> // uit arduino library manager : "ArduinoWebsockets" by Gil Maimon, https://github.com/gilmaimon/ArduinoWebsockets
-#include <ESPAsyncWebServer.h> // https://github.com/me-no-dev/ESPAsyncWebServer
-// ESP8266: https://github.com/me-no-dev/ESPAsyncTCP installeren
 
 #include "GY521.h" // library; https://github.com/RobTillaart/GY521/
 /*
@@ -34,6 +32,7 @@
 GY521 sensor(0x68);
 
 #ifdef CONFIG_IDF_TARGET_ESP32S2
+#include <ESPAsyncWebServer.h> // https://github.com/me-no-dev/ESPAsyncWebServer
 #include <WiFi.h>
 #include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
 
@@ -52,7 +51,31 @@ GY521 sensor(0x68);
 #define LED_BRIGHTNESS_ON  HIGH
 #define LED_BRIGHTNESS_OFF LOW
 
+#elif defined(CONFIG_IDF_TARGET_ESP32C3)
+#include <ESPAsyncWebSrv.h> // ESPAsyncWebSrv, version 1.2.6 by dvarrel : https://github.com/dvarrel/ESPAsyncWebSrv/
+#include <WiFi.h>
+#include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
+
+#define DEBUG_SERIAL Serial
+
+#define PWM_RANGE 255 // PWM range voor analogWrite
+
+// MakerGO Nologo ESP32-C3
+#define PIN_1AMOTOR          0
+#define PIN_2AMOTOR          1 
+#define PIN_1BMOTOR          2  
+#define PIN_2BMOTOR          3  
+#define PIN_ZMOTOR           4
+#define PIN_LEDCONNECTIE     8
+
+#define PIN_SDA              9  // Positie SDA op XIAO reeks
+#define PIN_SCL              10 // Positie SCL op XIAO reeks
+
+#define LED_BRIGHTNESS_ON  LOW
+#define LED_BRIGHTNESS_OFF HIGH
+
 #else // ESP8266
+#include <ESPAsyncWebServer.h> // https://github.com/me-no-dev/ESPAsyncWebServer op ESP8266: https://github.com/me-no-dev/ESPAsyncTCP installeren
 
 ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 
@@ -302,7 +325,11 @@ void setup()
 #endif
 
   // setup gyro module
+#ifdef PIN_SDA
+  Wire.begin(PIN_SDA,PIN_SCL);
+#else
   Wire.begin();
+#endif
 
   delay(100);
 
