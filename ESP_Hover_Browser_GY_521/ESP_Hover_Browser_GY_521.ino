@@ -278,6 +278,19 @@ void init_motors()
   updateMotors();
 }
 
+void led_init()
+{
+#ifdef PIN_LEDCONNECTIE
+  setup_pin_mode_output(PIN_LEDCONNECTIE);
+#endif
+}
+
+void led_set(int ledmode)
+{
+#ifdef PIN_LEDCONNECTIE
+  digitalWrite(PIN_LEDCONNECTIE, ledmode);
+#endif
+}
 
 void setup()
 {
@@ -305,24 +318,20 @@ void setup()
   DEBUG_SERIAL.println(F("\nHover Browser setup started"));
 #endif
 
-#ifdef PIN_LEDCONNECTIE
-  setup_pin_mode_output(PIN_LEDCONNECTIE);
+  led_init();
 
   // De LED flasht 2x om te tonen dat er een reboot is
-  digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON);
+  led_set(LED_BRIGHTNESS_ON);
   delay(10);
-  digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
+  led_set(LED_BRIGHTNESS_OFF);
   delay(100);
-  digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON);
+  led_set(LED_BRIGHTNESS_ON);
   delay(10);
-  digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
-#endif
+  led_set(LED_BRIGHTNESS_OFF);
 
   init_motors();
 
-#ifdef PIN_LEDCONNECTIE
-  digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON );
-#endif
+  led_set(LED_BRIGHTNESS_ON);
 
   // setup gyro module
 #ifdef PIN_SDA
@@ -491,13 +500,9 @@ void updatestatusbar(boolean forceupdate)
 #endif 
       while (1)
       {
-#ifdef PIN_LEDCONNECTIE
-        digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON);
-#endif
+        led_set(LED_BRIGHTNESS_ON);
         delay(10);
-#ifdef PIN_LEDCONNECTIE
-        digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
-#endif
+        led_set(LED_BRIGHTNESS_OFF);
         delay(5000);
       }
     }
@@ -590,11 +595,7 @@ void handle_message(websockets::WebsocketsMessage msg) {
   //  DEBUG_SERIAL.print(F(" param2 = "));
   //  DEBUG_SERIAL.println(param2);
 #endif
-
-#ifdef PIN_LEDCONNECTIE
-  digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_ON);
-#endif
-
+  led_set(LED_BRIGHTNESS_ON);
   last_activity_message = millis();
 
   switch (id)
@@ -623,9 +624,7 @@ void handle_message(websockets::WebsocketsMessage msg) {
 
 void onConnect()
 {
-#ifdef PIN_LEDCONNECTIE
-  digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
-#endif
+  led_set(LED_BRIGHTNESS_OFF);
 
 #ifdef DEBUG_SERIAL
   DEBUG_SERIAL.println(F("onConnect"));
@@ -651,9 +650,7 @@ void loop()
 
   if (millis() > last_activity_message + TIMEOUT_MS_LED)
   {
-#ifdef PIN_LEDCONNECTIE
-    digitalWrite(PIN_LEDCONNECTIE, LED_BRIGHTNESS_OFF);
-#endif
+    led_set(LED_BRIGHTNESS_OFF);
   }
 
   if (millis() > last_activity_message + TIMEOUT_MS_MOTORS)
@@ -706,9 +703,7 @@ void loop()
 
   if (!is_connected)
   {
-#ifdef PIN_LEDCONNECTIE
-    digitalWrite(PIN_LEDCONNECTIE, (millis() % 1000) > 500 ? LOW : HIGH);
-#endif
+    led_set((millis() % 1000) > 500 ? LED_BRIGHTNESS_OFF  : LED_BRIGHTNESS_ON );
   }
 
   // delay(2);
