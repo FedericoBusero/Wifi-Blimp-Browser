@@ -48,6 +48,9 @@ GY521 sensor(0x68);
 #define PIN_ZMOTOR           18 // Positie D3 op Wemos D1 mini
 #define PIN_LEDCONNECTIE     15 // De ingebouwde LED 
 
+#define PIN_SDA              33
+#define PIN_SCL              35
+
 #define LED_BRIGHTNESS_ON  HIGH
 #define LED_BRIGHTNESS_OFF LOW
 
