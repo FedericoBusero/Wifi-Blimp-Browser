@@ -367,6 +367,7 @@ void setup()
   {
     sensor.setAccelSensitivity(2);  // 8g
     sensor.setGyroSensitivity(1);   // 500 degrees/s
+    sensor.setDLPFMode(6); // 5 Hz low pass filter
 
     sensor.setThrottle();
 #ifdef DEBUG_SERIAL
