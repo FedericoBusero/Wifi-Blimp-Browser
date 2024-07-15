@@ -50,6 +50,7 @@ GY521 sensor(0x68);
 #define DEBUG_SERIAL Serial
 
 #define PWM_RANGE 255 // PWM range voor analogWrite
+#define MOTOR_FREQ 400 // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
 
 // Lolin ESP32-S2
 #define PIN_1AMOTOR          12 // Positie D8 op Wemos D1 mini
@@ -73,6 +74,7 @@ GY521 sensor(0x68);
 #define DEBUG_SERIAL Serial
 
 #define PWM_RANGE 255 // PWM range voor analogWrite
+#define MOTOR_FREQ 400 // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
 
 // MakerGO Nologo ESP32-C3
 #define PIN_1AMOTOR          0
@@ -149,8 +151,6 @@ int ui_slider2 = 0; // 0 .. 360
 int ui_slider3 = 0; // 0 .. 200
 int ui_joystick_x = 0;
 int ui_joystick_y = 0;
-
-#define MOTOR_FREQ 400 // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
 
 int max_motorsnelheid;
 bool motors_halt;
