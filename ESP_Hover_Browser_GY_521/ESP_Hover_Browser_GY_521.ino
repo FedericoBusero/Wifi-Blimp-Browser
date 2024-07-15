@@ -613,23 +613,23 @@ void handle_message(websockets::WebsocketsMessage msg) {
     case 0:       // ping
       break;
 
-    case 1:
+    case 1: // joystick
       ui_joystick_x = param1;
       ui_joystick_y = param2;
       updateMotors();
       break;
 
-    case 2: // z-speed
+    case 2: // slider2
       ui_slider2 = param1;
       updateMotors();
       break;
 
-    case 3: // p-control
+    case 3: // slider1
       ui_slider1 = param1;
       updateMotors();
       break;
      
-    case 20: // draaisnelheid
+    case 20: // slider3
       ui_slider3 = param1;
       updateMotors();
       break;
