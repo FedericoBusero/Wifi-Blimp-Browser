@@ -688,7 +688,7 @@ void loop()
     if (sclient.available()) { // als return non-nul, dan is er een client geconnecteerd
       sclient.poll(); // als return non-nul, dan is er iets ontvangen
 
-      updatestatusbar(false);
+      updatestatusbar();
 
       static unsigned long lastupdate_motors = 0;
       unsigned long currentmillis = millis();
