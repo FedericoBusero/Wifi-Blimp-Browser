@@ -466,14 +466,14 @@ void setup()
 }
 
 
-void updatestatusbar(boolean forceupdate)
+void updatestatusbar()
 {
 #ifdef ESP8266
   static unsigned long lastupdate_voltage = 0;
   unsigned long currentmillis = millis();
   char statusstr[80];
 
-  if (forceupdate || (currentmillis > lastupdate_voltage + TIMEOUT_MS_VOLTAGE))
+  if (currentmillis > lastupdate_voltage + TIMEOUT_MS_VOLTAGE)
   {
     lastupdate_voltage = currentmillis;
     float voltage = ESP.getVcc() / VOLTAGE_FACTOR;
