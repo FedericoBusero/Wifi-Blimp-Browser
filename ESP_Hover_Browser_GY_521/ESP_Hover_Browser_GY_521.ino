@@ -572,58 +572,6 @@ void updatestatusbar()
 #endif
 }
 
-
-void handleSlider2(int value) // Z (zweef) motor besturing geworden
-{
-#ifdef DEBUG_SERIAL
-  DEBUG_SERIAL.print(F("handleSlider2 value="));
-  DEBUG_SERIAL.println(value);
-#endif
-  //max_motorsnelheid = map(value, 0, 360, PWM_RANGE / 2, PWM_RANGE);
-  ui_slider2 = value;
-
-  updateMotors();
-}
-
-void handleSlider1(int value)
-{
-#ifdef DEBUG_SERIAL
-  DEBUG_SERIAL.print(F("handleSlider1 value="));
-  DEBUG_SERIAL.println(value);
-#endif
-
-  ui_slider1 = value;
-
-  updateMotors();
-}
-
-void handleSlider3(int value)
-{
-#ifdef DEBUG_SERIAL
-  DEBUG_SERIAL.print(F("handleSlider3 value="));
-  DEBUG_SERIAL.println(value);
-#endif
-
-  ui_slider3 = value;
-  updateMotors();
-}
-
-
-void handleJoystick(int x, int y)
-{
-#ifdef DEBUG_SERIAL
-  // DEBUG_SERIAL.print(F("handleJoystick x="));
-  // DEBUG_SERIAL.print(x);
-  // DEBUG_SERIAL.print(F(" y="));
-  // DEBUG_SERIAL.println(y);
-#endif
-
-  ui_joystick_x = x;
-  ui_joystick_y = y;
-
-  updateMotors();
-}
-
 void handle_message(websockets::WebsocketsMessage msg) {
   const char *msgstr = msg.c_str();
   const char *p;
@@ -666,16 +614,24 @@ void handle_message(websockets::WebsocketsMessage msg) {
       break;
 
     case 1:
-      handleJoystick(param1, param2);
+      ui_joystick_x = param1;
+      ui_joystick_y = param2;
+      updateMotors();
       break;
 
-    case 2: handleSlider2(param1); // z-speed
+    case 2: // z-speed
+      ui_slider2 = param1;
+      updateMotors();
       break;
 
-    case 3: handleSlider1(param1); // p-control
+    case 3: // p-control
+      ui_slider1 = param1;
+      updateMotors();
       break;
      
-    case 20: handleSlider3(param1); // draaisnelheid
+    case 20: // draaisnelheid
+      ui_slider3 = param1;
+      updateMotors();
       break;
   }
   if (motors_halt)
