@@ -220,11 +220,12 @@ void updateMotors()
   }
   else
   {
-    float regelX;
+    float regelX=0.0;
     float max_draai_factor = (float)ui_slider3 / 100.0; // ui_slider3 : 0 .. 200 
 
     if (gyroBeschikbaar) // gyro
     {
+#ifdef USE_GY521
       // "gyro"-regeling
       float Pfactor = ((float)ui_slider1 + 180.0) / 150.0; // aanpassen waarde -180 .. 180 naar 0 .. 2.4
 
@@ -235,6 +236,7 @@ void updateMotors()
       
       float doel_draaisnelheid = (float)ui_joystick_x * (-1.0) * max_draai_factor; 
       regelX = Pfactor * (werkelijke_draaisnelheid-doel_draaisnelheid); 
+#endif
     }
     else
     {
