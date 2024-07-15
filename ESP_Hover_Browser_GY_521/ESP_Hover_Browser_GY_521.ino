@@ -385,6 +385,10 @@ void setup()
     sensor.read();
   }
 
+#ifdef PIN_LED_DUALUSE
+   led_init();
+#endif
+   
   // Wifi instellingen
   WiFi.persistent(true);
 
@@ -637,7 +641,6 @@ void onConnect()
 #else
   led_set(LED_BRIGHTNESS_OFF,false);
 #endif
-
 #ifdef DEBUG_SERIAL
   DEBUG_SERIAL.println(F("onConnect"));
 #endif
@@ -650,6 +653,9 @@ void onDisconnect()
   DEBUG_SERIAL.println(F("onDisconnect"));
 #endif
   init_motors();
+#ifdef PIN_LED_DUALUSE
+  led_init();
+#endif
 }
 
 void loop()
