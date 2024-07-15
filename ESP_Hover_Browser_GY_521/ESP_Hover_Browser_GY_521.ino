@@ -156,7 +156,7 @@ void setup_pin_mode_output(int pin)
 
 void hbridge_setspeed(int pin1, int pin2, long motorspeed)
 {
-  if (motorspeed >= 0)
+  if (motorspeed > 0)
   {
     digitalWrite(pin1, HIGH);
     analogWrite(pin2, PWM_RANGE - motorspeed);
