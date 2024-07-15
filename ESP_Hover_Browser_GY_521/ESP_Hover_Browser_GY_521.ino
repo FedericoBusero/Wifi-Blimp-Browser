@@ -15,8 +15,20 @@
 */
 
 #include <ArduinoWebsockets.h> // uit arduino library manager : "ArduinoWebsockets" by Gil Maimon, https://github.com/gilmaimon/ArduinoWebsockets
+enum 
+{
+    GYRO_DIRECTION_X,
+    GYRO_DIRECTION_Y,
+    GYRO_DIRECTION_Z,
+};
+#define USE_GY521
+#define GYRO_DIRECTION GYRO_DIRECTION_Z
 
+#ifdef USE_GY521
 #include "GY521.h" // library; https://github.com/RobTillaart/GY521/
+GY521 sensor(0x68);
+#endif
+
 /*
    Wemos D1 mini:
    SCL: D1
@@ -29,7 +41,6 @@
    GND: uiteraard
 */
 
-GY521 sensor(0x68);
 
 #ifdef CONFIG_IDF_TARGET_ESP32S2
 #include <ESPAsyncWebServer.h> // https://github.com/me-no-dev/ESPAsyncWebServer
@@ -154,6 +165,32 @@ void setup_pin_mode_output(int pin)
   pinMode(pin, OUTPUT);
 }
 
+#ifdef USE_GY521
+float getGyro()
+{
+  float measured_value = 0.0;
+  sensor.read();
+  switch (GYRO_DIRECTION)
+  {
+    case GYRO_DIRECTION_X:
+      measured_value = sensor.getGyroX();
+      break;
+
+    case GYRO_DIRECTION_Y:
+      measured_value = sensor.getGyroY();
+      break;
+
+    case GYRO_DIRECTION_Z:
+      measured_value = sensor.getGyroZ();
+      break;
+  }
+#ifdef GYRO_FLIP
+  measured_value=-measured_value;
+#endif
+  return measured_value;
+}
+#endif
+
 void hbridge_setspeed(int pin1, int pin2, long motorspeed)
 {
   if (motorspeed > 0)
@@ -189,7 +226,7 @@ void updateMotors()
       float Pfactor = ((float)ui_slider1 + 180.0) / 150.0; // aanpassen waarde -180 .. 180 naar 0 .. 2.4
 
       sensor.read();
-      float werkelijke_draaisnelheid = sensor.getGyroZ(); // getGyroX, getGyroY zijn ook mogelijk afhankelijk van positie sensor
+      float werkelijke_draaisnelheid = getGyro();
 
       // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
       
@@ -471,7 +508,7 @@ void updatestatusbar()
 #ifdef ESP8266
   static unsigned long lastupdate_voltage = 0;
   unsigned long currentmillis = millis();
-  char statusstr[80];
+  char statusstr[50];
 
   if (currentmillis > lastupdate_voltage + TIMEOUT_MS_VOLTAGE)
   {
@@ -482,7 +519,9 @@ void updatestatusbar()
     {
       if (gyroBeschikbaar)
       {
-        snprintf(statusstr, sizeof(statusstr), "%4.2f V gz:%4.2f", voltage, sensor.getGyroZ());
+#ifdef USE_GY521
+        snprintf(statusstr, sizeof(statusstr), "%4.2f V gz:%4.2f", voltage, getGyro());
+#endif
       } else
       {
         snprintf(statusstr, sizeof(statusstr), "%4.2f V", voltage);
