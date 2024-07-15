@@ -150,9 +150,12 @@ int ui_slider3 = 0; // 0 .. 200
 int ui_joystick_x = 0;
 int ui_joystick_y = 0;
 
-bool gyroBeschikbaar = false;
+#define MOTOR_FREQ 400 // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
+
 int max_motorsnelheid;
 bool motors_halt;
+
+bool gyroBeschikbaar = false;
 
 void setup_pin_mode_output(int pin)
 {
@@ -350,10 +353,19 @@ void setup()
 
   // Verander de frequentie van analogWrite van 1000 Hz naar 400 Hz voor een aangenamer geluid
   analogWriteFreq(MOTOR_FREQ);
+#if ARDUINO_ESP8266_MAJOR>=3
+  // workaround extreeme trage servo write vanaf Arduino 3: https://github.com/esp8266/Arduino/issues/8081
+  enablePhaseLockedWaveform();
+#endif
+#elif defined (ESP32)
+  // Verander de frequentie van analogWrite van 1000 Hz naar 400 Hz voor een aangenamer geluid
+  analogWriteFrequency(MOTOR_FREQ);
 #endif
   analogWrite(PIN_ZMOTOR, 0);
+   
   hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, 0);
   hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, 0);
+
   delay(200); // 200 milliseconden wachten tot de stroom stabiel is
 
 #ifdef DEBUG_SERIAL
@@ -377,16 +389,16 @@ void setup()
 
   led_set(LED_BRIGHTNESS_ON,false);
 
+  gyroBeschikbaar = false;
+
+#ifdef USE_GY521
   // setup gyro module
 #ifdef PIN_SDA
   Wire.begin(PIN_SDA,PIN_SCL);
 #else
   Wire.begin();
 #endif
-
   delay(100);
-
-  gyroBeschikbaar = false;
   for (int t = 0; t < 3; t++) // 3 keer proberen of gyro beschikbaar is
   {
     if (sensor.wakeup() == false)
@@ -410,7 +422,6 @@ void setup()
     sensor.setGyroSensitivity(1);   // 500 degrees/s
     sensor.setDLPFMode(6); // 5 Hz low pass filter
 
-    sensor.setThrottle();
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.println("start...");
 #endif
@@ -421,7 +432,7 @@ void setup()
     sensor.gze = 0;
     sensor.read();
   }
-
+#endif // USE_GY521
 #ifdef PIN_LED_DUALUSE
    led_init();
 #endif
