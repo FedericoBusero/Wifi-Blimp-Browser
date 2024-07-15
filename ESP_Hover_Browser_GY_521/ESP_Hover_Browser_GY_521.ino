@@ -288,12 +288,16 @@ void led_init()
 #endif
 }
 
-void led_set(int ledmode)
+void led_set(int ledmode, boolean except_when_dual_use)
 {
+#ifdef PIN_LED_DUALUSE
+  if (except_when_dual_use) return;
+#endif
 #ifdef PIN_LEDCONNECTIE
   digitalWrite(PIN_LEDCONNECTIE, ledmode);
 #endif
 }
+
 
 void setup()
 {
@@ -324,17 +328,17 @@ void setup()
   led_init();
 
   // De LED flasht 2x om te tonen dat er een reboot is
-  led_set(LED_BRIGHTNESS_ON);
+  led_set(LED_BRIGHTNESS_ON,false);
   delay(10);
-  led_set(LED_BRIGHTNESS_OFF);
+  led_set(LED_BRIGHTNESS_OFF,false);
   delay(100);
-  led_set(LED_BRIGHTNESS_ON);
+  led_set(LED_BRIGHTNESS_ON,false);
   delay(10);
-  led_set(LED_BRIGHTNESS_OFF);
+  led_set(LED_BRIGHTNESS_OFF,false);
 
   init_motors();
 
-  led_set(LED_BRIGHTNESS_ON);
+  led_set(LED_BRIGHTNESS_ON,false);
 
   // setup gyro module
 #ifdef PIN_SDA
@@ -504,9 +508,9 @@ void updatestatusbar(boolean forceupdate)
 #endif 
       while (1)
       {
-        led_set(LED_BRIGHTNESS_ON);
+        led_set(LED_BRIGHTNESS_ON,false);
         delay(10);
-        led_set(LED_BRIGHTNESS_OFF);
+        led_set(LED_BRIGHTNESS_OFF,false);
         delay(5000);
       }
     }
@@ -599,7 +603,7 @@ void handle_message(websockets::WebsocketsMessage msg) {
   //  DEBUG_SERIAL.print(F(" param2 = "));
   //  DEBUG_SERIAL.println(param2);
 #endif
-  led_set(LED_BRIGHTNESS_ON);
+  led_set(LED_BRIGHTNESS_ON,true);
   last_activity_message = millis();
 
   switch (id)
@@ -628,7 +632,11 @@ void handle_message(websockets::WebsocketsMessage msg) {
 
 void onConnect()
 {
-  led_set(LED_BRIGHTNESS_OFF);
+#ifdef PIN_LED_DUALUSE
+  digitalWrite(PIN_LEDCONNECTIE,LOW);
+#else
+  led_set(LED_BRIGHTNESS_OFF,false);
+#endif
 
 #ifdef DEBUG_SERIAL
   DEBUG_SERIAL.println(F("onConnect"));
@@ -654,7 +662,7 @@ void loop()
 
   if (millis() > last_activity_message + TIMEOUT_MS_LED)
   {
-    led_set(LED_BRIGHTNESS_OFF);
+    led_set(LED_BRIGHTNESS_OFF,true);
   }
 
   if (millis() > last_activity_message + TIMEOUT_MS_MOTORS)
@@ -707,7 +715,7 @@ void loop()
 
   if (!is_connected)
   {
-    led_set((millis() % 1000) > 500 ? LED_BRIGHTNESS_OFF  : LED_BRIGHTNESS_ON );
+    led_set((millis() % 1000) > 500 ? LED_BRIGHTNESS_OFF  : LED_BRIGHTNESS_ON,false);
   }
 
   // delay(2);
