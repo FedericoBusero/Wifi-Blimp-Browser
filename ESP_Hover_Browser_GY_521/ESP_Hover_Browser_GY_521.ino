@@ -81,6 +81,8 @@ int ui_slider3 = 0; // 0 .. 200
 int ui_joystick_x = 0;
 int ui_joystick_y = 0;
 
+#define MOTOR_FREQ 400 // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
+
 int max_motorsnelheid;
 bool motors_halt;
 
