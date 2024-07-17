@@ -66,7 +66,7 @@ enum
 #define VOLTAGE_THRESHOLD 2.7 // onder dit voltage valt de ESP8266-chip uit om de batterij te beschermen
 
 #define USE_GY521
-#define GYRO_DIRECTION GYRO_DIRECTION_X
+#define GYRO_DIRECTION GYRO_DIRECTION_Z
 #define GYRO_REGELING_P         4.0
 #define GYRO_REGELING_MAX_DRAAI 0.5
 #define GYRO_REGELING_BIAS      1.0
