@@ -23,6 +23,7 @@ GY521 sensor(0x68);
 
 #endif
 
+// Architectuur afhankelijke settings
 #if defined(CONFIG_IDF_TARGET_ESP32C3)
 
 #include <ESPAsyncWebSrv.h> // ESPAsyncWebSrv, version 1.2.6 by dvarrel : https://github.com/dvarrel/ESPAsyncWebSrv/
@@ -41,10 +42,9 @@ GY521 sensor(0x68);
 #define MOTOR_MINSPEED 0
 
 #else // ESP8266
-#include <ESPAsyncWebServer.h> // https://github.com/me-no-dev/ESPAsyncWebServer op ESP8266: https://github.com/me-no-dev/ESPAsyncTCP installeren
-
 ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 
+#include <ESPAsyncWebServer.h> // https://github.com/me-no-dev/ESPAsyncWebServer op ESP8266: https://github.com/me-no-dev/ESPAsyncTCP installeren
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h> // https://github.com/me-no-dev/ESPAsyncTCP
 
@@ -459,63 +459,6 @@ void setup()
 }
 
 
-void updatestatusbar()
-{
-#ifdef ESP8266
-  static unsigned long lastupdate_voltage = 0;
-  unsigned long currentmillis = millis();
-  char statusstr[50];
-
-  if (currentmillis > lastupdate_voltage + TIMEOUT_MS_VOLTAGE)
-  {
-    lastupdate_voltage = currentmillis;
-    float voltage = ESP.getVcc() / VOLTAGE_FACTOR;
-
-    if (voltage >= VOLTAGE_THRESHOLD)
-    {
-      if (gyroBeschikbaar)
-      {
-#ifdef USE_GY521
-        snprintf(statusstr, sizeof(statusstr), "%4.2f V gz:%4.2f", voltage, getGyro());
-#endif
-      } else
-      {
-        snprintf(statusstr, sizeof(statusstr), "%4.2f V", voltage);
-      }       
-#ifdef DEBUG_SERIAL
-      // DEBUG_SERIAL.print("Sending status: ");
-      // DEBUG_SERIAL.println(statusstr);
-#endif
-      sclient.send(statusstr);
-    }
-    else
-    {
-      snprintf(statusstr, sizeof(statusstr), "Battery low: %4.2f V. Shutting down", voltage);
-#ifdef DEBUG_SERIAL
-      DEBUG_SERIAL.print("Sending status: ");
-      DEBUG_SERIAL.println(statusstr);
-#endif
-      sclient.send(statusstr);
-      motors_pause();
-      delay(20000); // boodschap wordt 20 seconden getoond in browser alvorens hij disconnecteert
-#ifdef ESP8266
-      WiFi.mode(WIFI_OFF);
-      WiFi.forceSleepBegin();
-      delay(1);
-#else
-       // TODO ESP32
-#endif 
-      while (1)
-      {
-        led_set(LED_BRIGHTNESS_ON,false);
-        delay(10);
-        led_set(LED_BRIGHTNESS_OFF,false);
-        delay(5000);
-      }
-    }
-  }
-#endif
-}
 
 void handle_message(websockets::WebsocketsMessage msg) {
   const char *msgstr = msg.c_str();
@@ -606,6 +549,64 @@ void onDisconnect()
   init_motors();
 #ifdef PIN_LED_DUALUSE
   led_init();
+#endif
+}
+
+void updatestatusbar()
+{
+#ifdef ESP8266
+  static unsigned long lastupdate_voltage = 0;
+  unsigned long currentmillis = millis();
+  char statusstr[50];
+
+  if (currentmillis > lastupdate_voltage + TIMEOUT_MS_VOLTAGE)
+  {
+    lastupdate_voltage = currentmillis;
+    float voltage = ESP.getVcc() / VOLTAGE_FACTOR;
+
+    if (voltage >= VOLTAGE_THRESHOLD)
+    {
+      if (gyroBeschikbaar)
+      {
+#ifdef USE_GY521
+        snprintf(statusstr, sizeof(statusstr), "%4.2f V gz:%4.2f", voltage, getGyro());
+#endif
+      } else
+      {
+        snprintf(statusstr, sizeof(statusstr), "%4.2f V", voltage);
+      }       
+#ifdef DEBUG_SERIAL
+      // DEBUG_SERIAL.print("Sending status: ");
+      // DEBUG_SERIAL.println(statusstr);
+#endif
+      sclient.send(statusstr);
+    }
+    else
+    {
+      snprintf(statusstr, sizeof(statusstr), "Battery low: %4.2f V. Shutting down", voltage);
+#ifdef DEBUG_SERIAL
+      DEBUG_SERIAL.print("Sending status: ");
+      DEBUG_SERIAL.println(statusstr);
+#endif
+      sclient.send(statusstr);
+      motors_pause();
+      delay(20000); // boodschap wordt 20 seconden getoond in browser alvorens hij disconnecteert
+#ifdef ESP8266
+      WiFi.mode(WIFI_OFF);
+      WiFi.forceSleepBegin();
+      delay(1);
+#else
+       // TODO ESP32
+#endif 
+      while (1)
+      {
+        led_set(LED_BRIGHTNESS_ON,false);
+        delay(10);
+        led_set(LED_BRIGHTNESS_OFF,false);
+        delay(5000);
+      }
+    }
+  }
 #endif
 }
 
