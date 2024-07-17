@@ -79,6 +79,8 @@ WebsocketsClient sclient;
 
 unsigned long last_activity_message;
 
+#include "Easer.h"
+
 int ui_slider1; // -180 .. 180
 int ui_slider2 = 0; // 0 .. 360
 int ui_slider3 = 0; // 0 .. 200
@@ -86,8 +88,10 @@ int ui_joystick_x = 0;
 int ui_joystick_y = 0;
 
 #define MOTOR_FREQ 400 // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
+#define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor 
 
 int max_motorsnelheid;
+Easer motorZ_snelheid;
 bool motors_halt;
 
 bool gyroBeschikbaar = false;
@@ -186,11 +190,11 @@ void updateMotors()
        regelX = (1.0)*(float)(ui_joystick_x) * max_draai_factor;
     }
 
-    int z_motorsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE); // voor zweefmotor
+    int doel_motorZsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE); // voor zweefmotor
     if (abs(ui_joystick_y * ui_joystick_x) >= 5) {
       last_activity_joystick=millis();
     } else {
-      z_motorsnelheid = 0; // bij joystick los ook zweefmotor uit
+      doel_motorZsnelheid = 0; // bij joystick los ook zweefmotor uit
     }
     if (millis()>last_activity_joystick+TIMEOUT_MS_JOYSTICK) {
       regelX = 0; 
@@ -218,7 +222,10 @@ void updateMotors()
 
     hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, (long)motorsnelheidA,MOTOR_MINSPEED);
     hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, (long)motorsnelheidB,MOTOR_MINSPEED);
-    analogWrite(PIN_ZMOTOR, z_motorsnelheid); // zweefmotor/ z-as motor naar zijn snelheid z_motorsnelheid
+     
+    motorZ_snelheid.easeTo(doel_motorZsnelheid);
+    motorZ_snelheid.update();
+    analogWrite(PIN_ZMOTOR, motorZ_snelheid.getCurrentValue()); // We passen de snelheid van de motor aan naar zijn nieuwe snelheid motorZ_snelheid
 
 #ifdef DEBUG_SERIAL
     //   DEBUG_SERIAL.print(F("temp1 "));
@@ -260,6 +267,7 @@ void init_motors()
   ui_slider3 = 0;
   ui_joystick_x = 0;
   ui_joystick_y = 0;
+  motorZ_snelheid.setValue(0);
   max_motorsnelheid = PWM_RANGE;
   motors_halt = false;
 
@@ -333,6 +341,9 @@ void setup()
   init_motors();
 
   led_set(LED_BRIGHTNESS_ON,false);
+
+  motorZ_snelheid.begin(0, false);
+  motorZ_snelheid.set_speed((float)MOTORZ_TIME_UP / (float)PWM_RANGE);
 
   gyroBeschikbaar = false;
 
