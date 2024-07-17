@@ -213,11 +213,11 @@ void updateMotors()
     float temp1 = constrain((float)ui_joystick_y + regelX, -180, 180); 
     float temp2 = constrain((float)ui_joystick_y - regelX, -180, 180); 
 
-    float motorsnelheidA = map(-temp2, -180.0, 180.0, -(float)max_motorsnelheid, (float)max_motorsnelheid);
-    float motorsnelheidB = map(-temp1, -180.0, 180.0, -(float)max_motorsnelheid, (float)max_motorsnelheid);
+    float motorsnelheidA = mapFloat(-temp2, -180.0, 180.0, -(float)max_motorsnelheid, (float)max_motorsnelheid);
+    float motorsnelheidB = mapFloat(-temp1, -180.0, 180.0, -(float)max_motorsnelheid, (float)max_motorsnelheid);
 
-    hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, motorsnelheidA,MOTOR_MINSPEED);
-    hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, motorsnelheidB,MOTOR_MINSPEED);
+    hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, (long)motorsnelheidA,MOTOR_MINSPEED);
+    hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, (long)motorsnelheidB,MOTOR_MINSPEED);
     analogWrite(PIN_ZMOTOR, z_motorsnelheid); // zweefmotor/ z-as motor naar zijn snelheid z_motorsnelheid
 
 #ifdef DEBUG_SERIAL
