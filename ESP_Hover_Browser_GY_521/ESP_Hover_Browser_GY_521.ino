@@ -15,80 +15,28 @@
 */
 
 #include <ArduinoWebsockets.h> // uit arduino library manager : "ArduinoWebsockets" by Gil Maimon, https://github.com/gilmaimon/ArduinoWebsockets
-enum 
-{
-    GYRO_DIRECTION_X,
-    GYRO_DIRECTION_Y,
-    GYRO_DIRECTION_Z,
-};
-#define USE_GY521
-#define GYRO_DIRECTION GYRO_DIRECTION_Z
+#include "config.h"
 
 #ifdef USE_GY521
 #include "GY521.h" // library; https://github.com/RobTillaart/GY521/
 GY521 sensor(0x68);
+
 #endif
 
-/*
-   Wemos D1 mini:
-   SCL: D1
-   SDA: D2
-   XDA: niet aangesloten
-   XCL: niet aangesloten
-   AD0: niet aangesloten  . De vice heeft 0x68 als I2C adres, waarschijnlijk wordt het 0x69 als je dit naar 3.3V verhoogt
-   INT: niet aangesloten
-   VCC: 3V
-   GND: uiteraard
-*/
+#if defined(CONFIG_IDF_TARGET_ESP32C3)
 
-
-#ifdef CONFIG_IDF_TARGET_ESP32S2
-#include <ESPAsyncWebServer.h> // https://github.com/me-no-dev/ESPAsyncWebServer
-#include <WiFi.h>
-#include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
-
-#define DEBUG_SERIAL Serial
-
-#define PWM_RANGE 255 // PWM range voor analogWrite
-#define MOTOR_FREQ 400 // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
-
-// Lolin ESP32-S2
-#define PIN_1AMOTOR          12 // Positie D8 op Wemos D1 mini
-#define PIN_2AMOTOR          11 // Positie D7 op Wemos D1 mini
-#define PIN_1BMOTOR          9  // Positie D6 op Wemos D1 mini
-#define PIN_2BMOTOR          5  // Positie D0 op Wemos D1 mini
-#define PIN_ZMOTOR           18 // Positie D3 op Wemos D1 mini
-#define PIN_LEDCONNECTIE     15 // De ingebouwde LED 
-
-#define PIN_SDA              33
-#define PIN_SCL              35
-
-#define LED_BRIGHTNESS_ON  HIGH
-#define LED_BRIGHTNESS_OFF LOW
-
-#elif defined(CONFIG_IDF_TARGET_ESP32C3)
 #include <ESPAsyncWebSrv.h> // ESPAsyncWebSrv, version 1.2.6 by dvarrel : https://github.com/dvarrel/ESPAsyncWebSrv/
 #include <WiFi.h>
 #include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
 
-#define DEBUG_SERIAL Serial
+#define PWM_RANGE 255 // PWM range voor analogWrite
+
+#elif defined(ARDUINO_ARCH_ESP32)
+#include <ESPAsyncWebServer.h> // https://github.com/me-no-dev/ESPAsyncWebServer
+#include <WiFi.h>
+#include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
 
 #define PWM_RANGE 255 // PWM range voor analogWrite
-#define MOTOR_FREQ 400 // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
-
-// MakerGO Nologo ESP32-C3
-#define PIN_1AMOTOR          0
-#define PIN_2AMOTOR          1 
-#define PIN_1BMOTOR          2  
-#define PIN_2BMOTOR          3  
-#define PIN_ZMOTOR           4
-#define PIN_LEDCONNECTIE     8
-
-#define PIN_SDA              9  // Positie SDA op XIAO reeks
-#define PIN_SCL              10 // Positie SCL op XIAO reeks
-
-#define LED_BRIGHTNESS_ON  LOW
-#define LED_BRIGHTNESS_OFF HIGH
 
 #else // ESP8266
 #include <ESPAsyncWebServer.h> // https://github.com/me-no-dev/ESPAsyncWebServer op ESP8266: https://github.com/me-no-dev/ESPAsyncTCP installeren
@@ -99,30 +47,11 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 #include <ESPAsyncTCP.h> // https://github.com/me-no-dev/ESPAsyncTCP
 
 #define PWM_RANGE 1023 // PWM range voor analogWrite
-#define MOTOR_FREQ 400 // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
-
-#define DEBUG_SERIAL Serial
-
-#define PIN_1AMOTOR          D8 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
-#define PIN_2AMOTOR          D7 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
-#define PIN_1BMOTOR          D6 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
-#define PIN_2BMOTOR          D0 // D0 = GPIO16 op NodeMCU & Wemos D1 mini
-#define PIN_ZMOTOR           D3 // D8 = GPIO15 op NodeMCU & Wemos D1 mini
-#define PIN_LEDCONNECTIE     2 // De ingebouwde LED zit op GPIO2 of GPIO16, dus aanpassen naar 16 als de LED niet werkt
-
-// Pas de voltagefactor aan, dat is bij elke chip hetzelfde. Kalibreer bv. met USB stroom die 3.3V op de chip moet geven
-#define VOLTAGE_FACTOR 910.0f
-#define VOLTAGE_THRESHOLD 2.4 // onder dit voltage valt de chip uit om de batterij te beschermen
-
-#define LED_BRIGHTNESS_ON  LOW
-#define LED_BRIGHTNESS_OFF HIGH
-
-#endif // CONFIG_IDF_TARGET_ESP32S2
+#endif 
 
 #define USE_SOFTAP
-#define WIFI_SOFTAP_CHANNEL 1 // 1-13
-const char ssid[] = "HoverG-";
-const char password[] = "12345678";
+const char ssid[] = WIFI_SOFTAP_SSID_PREFIX;
+const char password[] = WIFI_SOFTAP_PASSWORD;
 
 #ifdef USE_SOFTAP
 #include <DNSServer.h>
