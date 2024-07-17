@@ -30,6 +30,7 @@ GY521 sensor(0x68);
 #include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
 
 #define PWM_RANGE 255 // PWM range voor analogWrite
+#define MOTOR_MINSPEED 2 
 
 #elif defined(ARDUINO_ARCH_ESP32)
 #include <ESPAsyncWebServer.h> // https://github.com/me-no-dev/ESPAsyncWebServer
@@ -37,6 +38,7 @@ GY521 sensor(0x68);
 #include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
 
 #define PWM_RANGE 255 // PWM range voor analogWrite
+#define MOTOR_MINSPEED 0
 
 #else // ESP8266
 #include <ESPAsyncWebServer.h> // https://github.com/me-no-dev/ESPAsyncWebServer op ESP8266: https://github.com/me-no-dev/ESPAsyncTCP installeren
@@ -47,6 +49,8 @@ ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
 #include <ESPAsyncTCP.h> // https://github.com/me-no-dev/ESPAsyncTCP
 
 #define PWM_RANGE 1023 // PWM range voor analogWrite
+#define MOTOR_MINSPEED 0
+
 #endif 
 
 #define USE_SOFTAP
@@ -125,8 +129,12 @@ float getGyro()
 }
 #endif
 
-void hbridge_setspeed(int pin1, int pin2, long motorspeed)
+void hbridge_setspeed(int pin1, int pin2, long motorspeed,long min_speed=0)
 {
+  if (abs(motorspeed)<min_speed)
+  {
+    motorspeed=0;
+  }
   if (motorspeed > 0)
   {
     digitalWrite(pin1, HIGH);
@@ -137,6 +145,10 @@ void hbridge_setspeed(int pin1, int pin2, long motorspeed)
     digitalWrite(pin1, LOW);
     analogWrite(pin2, -motorspeed);
   }
+}
+
+float mapFloat(float value, float fromLow, float fromHigh, float toLow, float toHigh) {
+  return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
 }
 
 void updateMotors()
@@ -201,11 +213,11 @@ void updateMotors()
     float temp1 = constrain((float)ui_joystick_y + regelX, -180, 180); 
     float temp2 = constrain((float)ui_joystick_y - regelX, -180, 180); 
 
-    int motorsnelheidA = map(-temp2, -180, 180, -max_motorsnelheid, max_motorsnelheid);
-    int motorsnelheidB = map(-temp1, -180, 180, -max_motorsnelheid, max_motorsnelheid);
+    float motorsnelheidA = map(-temp2, -180.0, 180.0, -(float)max_motorsnelheid, (float)max_motorsnelheid);
+    float motorsnelheidB = map(-temp1, -180.0, 180.0, -(float)max_motorsnelheid, (float)max_motorsnelheid);
 
-    hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, motorsnelheidA);
-    hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, motorsnelheidB);
+    hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, motorsnelheidA,MOTOR_MINSPEED);
+    hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, motorsnelheidB,MOTOR_MINSPEED);
     analogWrite(PIN_ZMOTOR, z_motorsnelheid); // zweefmotor/ z-as motor naar zijn snelheid z_motorsnelheid
 
 #ifdef DEBUG_SERIAL
