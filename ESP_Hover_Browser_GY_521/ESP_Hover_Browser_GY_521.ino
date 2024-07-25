@@ -83,7 +83,6 @@ unsigned long last_activity_message;
 
 int ui_slider1; // -180 .. 180
 int ui_slider2 = 0; // 0 .. 360
-int ui_slider3 = 0; // 0 .. 200
 int ui_joystick_x = 0;
 int ui_joystick_y = 0;
 
@@ -168,13 +167,14 @@ void updateMotors()
   else
   {
     float regelX=0.0;
-    float max_draai_factor = (float)ui_slider3 / 100.0; // ui_slider3 : 0 .. 200 
+    const float max_draai_factor = GYRO_REGELING_MAX_DRAAI;
 
     if (gyroBeschikbaar) // gyro
     {
 #ifdef USE_GY521
       // "gyro"-regeling
-      float Pfactor = ((float)ui_slider1 + 180.0) / 150.0; // aanpassen waarde -180 .. 180 naar 0 .. 2.4
+      float Pfactor = mapFloat ((float)ui_slider1,-180.0,180.0,0.0,GYRO_REGELING_MAX_P);
+      const float bias = GYRO_REGELING_BIAS;
 
       sensor.read();
       float werkelijke_draaisnelheid = getGyro();
@@ -182,7 +182,8 @@ void updateMotors()
       // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
       
       float doel_draaisnelheid = (float)ui_joystick_x * (-1.0) * max_draai_factor; 
-      regelX = Pfactor * (werkelijke_draaisnelheid-doel_draaisnelheid); 
+      regelX = Pfactor * (werkelijke_draaisnelheid-doel_draaisnelheid)-bias*doel_draaisnelheid; 
+      regelX = constrain(regelX,-180.0,180.0);
 #endif
     }
     else
@@ -264,7 +265,6 @@ void init_motors()
 {
   ui_slider1 = 0;
   ui_slider2 = 0;
-  ui_slider3 = 0;
   ui_joystick_x = 0;
   ui_joystick_y = 0;
   motorZ_snelheid.setValue(0);
@@ -525,11 +525,6 @@ void handle_message(websockets::WebsocketsMessage msg) {
 
     case 3: // slider1
       ui_slider1 = param1;
-      updateMotors();
-      break;
-     
-    case 20: // slider3
-      ui_slider3 = param1;
       updateMotors();
       break;
   }
