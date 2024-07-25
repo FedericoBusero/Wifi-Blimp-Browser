@@ -14,7 +14,7 @@
 /*
 Als je een ander board wenst te definiëren, zijn volgende defines nodig:
 * De wifi instellingen WIFI_SOFTAP_SSID_PREFIX, WIFI_SOFTAP_PASSWORD, WIFI_SOFTAP_CHANNEL
-* - USE_CONFIG HOVERSERVO, USE_CONFIG_HOVER3M of USE_CONFIG-BLIMP 
+* - USE_CONFIG_HOVERSERVO, USE_CONFIG_HOVER3M of USE_CONFIG_BLIMP 
     volgens de motorsetup respectievelijk 
     - een hover met servo en 1 Z-motor
     - een hover met 1 Z-motor en 2 bidirectionele motoren
@@ -65,11 +65,6 @@ enum
 
 #define VOLTAGE_THRESHOLD 2.7 // onder dit voltage valt de ESP8266-chip uit om de batterij te beschermen
 
-#define USE_GY521
-#define GYRO_DIRECTION GYRO_DIRECTION_Z
-#define GYRO_REGELING_MAX_P     2.4
-#define GYRO_REGELING_MAX_DRAAI 0.5
-#define GYRO_REGELING_BIAS      1.0
 
 #endif
 
@@ -108,8 +103,6 @@ enum
 #define LED_BRIGHTNESS_ON  LOW
 #define LED_BRIGHTNESS_OFF HIGH
 
-
-
 #elif defined(ENV_HOVER3MGYRO_ESP32C3_SUPERMINI)
 
 #define USE_CONFIG_HOVER3M
@@ -131,7 +124,6 @@ enum
 #define LED_BRIGHTNESS_OFF HIGH
 
 
-
 #elif defined(ENV_HOVER3MGYRO_ESP32S2_LOLIN_S2_MINI)
 
 #define USE_CONFIG_HOVER3M
@@ -151,6 +143,24 @@ enum
 #define LED_BRIGHTNESS_ON  HIGH
 #define LED_BRIGHTNESS_OFF LOW
 
+#elif defined(ENV_BLIMP_ESP32C3_SUPERMINI_V0)
+#define USE_CONFIG_BLIMP
+
+// #define DEBUG_SERIAL Serial
+
+#define PIN_1AMOTOR          ??
+#define PIN_2AMOTOR          ??
+#define PIN_1BMOTOR          ??
+#define PIN_2BMOTOR          ??
+#define PIN_ZMOTOR           6
+#define PIN_LEDCONNECTIE     8 
+// #define PIN_LED_DUALUSE
+
+#define PIN_SDA            3            
+#define PIN_SCL            4
+
+#define LED_BRIGHTNESS_ON  LOW
+#define LED_BRIGHTNESS_OFF HIGH
 
 #elif defined ENV_USER_DEFINED
 // defines staan buiten de code
@@ -159,12 +169,38 @@ enum
 // Geen ENV_XX geselecteerd
 #error "Defineer één van bovenstaande defines"
 
+
+#endif
+
+#ifndef ENV_USER_DEFINED
+
 #if defined(USE_CONFIG HOVERSERVO)
+
 #define WIFI_SOFTAP_SSID_PREFIX "hover-"
+
 #elif defined (USE_CONFIG_HOVER3M)
+
 #define WIFI_SOFTAP_SSID_PREFIX "hover3m-"
+
+// gyro instellingen voor Hover3M
+#define USE_GY521
+#define GYRO_DIRECTION GYRO_DIRECTION_Z
+#define GYRO_REGELING_MAX_P     2.4
+#define GYRO_REGELING_MAX_DRAAI 0.5
+#define GYRO_REGELING_BIAS      1.0
+
+
 #elif defined (USE_CONFIG-BLIMP)
+
+// Gyro instellingen voor Blimp
+#define USE_GY521
+#define GYRO_DIRECTION GYRO_DIRECTION_Z
+#define GYRO_REGELING_MAX_P     2.4
+#define GYRO_REGELING_MAX_DRAAI 0.5
+#define GYRO_REGELING_BIAS      1.0
+
 #define WIFI_SOFTAP_SSID_PREFIX "Blimp-"
+
 #endif
 
 #endif
