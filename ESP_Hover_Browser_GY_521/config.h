@@ -148,16 +148,16 @@ enum
 
 // #define DEBUG_SERIAL Serial
 
-#define PIN_1AMOTOR          ??
-#define PIN_2AMOTOR          ??
-#define PIN_1BMOTOR          ??
-#define PIN_2BMOTOR          ??
-#define PIN_ZMOTOR           6
+#define PIN_1AMOTOR          0
+#define PIN_2AMOTOR          1
+#define PIN_1BMOTOR          2
+#define PIN_2BMOTOR          3
+#define PIN_ZMOTOR           4 // 6
 #define PIN_LEDCONNECTIE     8 
 // #define PIN_LED_DUALUSE
 
-#define PIN_SDA            3            
-#define PIN_SCL            4
+#define PIN_SDA            9 // 3            
+#define PIN_SCL            10 // 4
 
 #define LED_BRIGHTNESS_ON  LOW
 #define LED_BRIGHTNESS_OFF HIGH
