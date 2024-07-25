@@ -80,15 +80,14 @@ unsigned long last_activity_message;
 
 #include "Easer.h"
 
-int ui_slider1; // -180 .. 180
-int ui_slider2 = 0; // 0 .. 360
 int ui_joystick_x = 0;
 int ui_joystick_y = 0;
+int ui_slider1; // -180 .. 180
+int ui_slider2 = 0; // 0 .. 360
 
 #define MOTOR_FREQ 400 // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
 #define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor 
 
-int max_motorsnelheid;
 Easer motorZ_snelheid;
 bool motors_halt;
 
@@ -217,8 +216,8 @@ void updateMotors()
     float temp1 = constrain((float)ui_joystick_y + regelX, -180, 180); 
     float temp2 = constrain((float)ui_joystick_y - regelX, -180, 180); 
 
-    float motorsnelheidA = mapFloat(-temp2, -180.0, 180.0, -(float)max_motorsnelheid, (float)max_motorsnelheid);
-    float motorsnelheidB = mapFloat(-temp1, -180.0, 180.0, -(float)max_motorsnelheid, (float)max_motorsnelheid);
+    float motorsnelheidA = mapFloat(-temp2, -180.0, 180.0, -(float)PWM_RANGE, (float)PWM_RANGE);
+    float motorsnelheidB = mapFloat(-temp1, -180.0, 180.0, -(float)PWM_RANGE, (float)PWM_RANGE);
 
     hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, (long)motorsnelheidA,MOTOR_MINSPEED);
     hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, (long)motorsnelheidB,MOTOR_MINSPEED);
@@ -267,7 +266,6 @@ void init_motors()
   ui_joystick_x = 0;
   ui_joystick_y = 0;
   motorZ_snelheid.setValue(0);
-  max_motorsnelheid = PWM_RANGE;
   motors_halt = false;
 
   updateMotors();
