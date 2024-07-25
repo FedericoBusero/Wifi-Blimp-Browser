@@ -13,6 +13,13 @@
 
 /*
 Als je een ander board wenst te definiëren, zijn volgende defines nodig:
+* De wifi instellingen WIFI_SOFTAP_SSID_PREFIX, WIFI_SOFTAP_PASSWORD, WIFI_SOFTAP_CHANNEL
+* - USE_CONFIG HOVERSERVO, USE_CONFIG_HOVER3M of USE_CONFIG-BLIMP 
+    volgens de motorsetup respectievelijk 
+    - een hover met servo en 1 Z-motor
+    - een hover met 1 Z-motor en 2 bidirectionele motoren
+    - een blimp (zeppelin) met 1 Z-motor en 2 bidirectionele motoren
+    
 * Als een gyro gebruikt wordt, zijn volgende defines nodig:
 - USE_GY521
 - GYRO_REGELING_P
@@ -53,13 +60,6 @@ enum
 
 #ifndef ENV_USER_DEFINED
 
-// Volgende defines zijn op alle borden van toepassing
-#define WIFI_SOFTAP_SSID_PREFIX_HOVER   "hover-"
-#define WIFI_SOFTAP_SSID_PREFIX_HOVER3M "hover3m-"
-#define WIFI_SOFTAP_SSID_PREFIX_BLIMP   "Blimp-"
-
-
-
 #define WIFI_SOFTAP_PASSWORD "12345678"
 #define WIFI_SOFTAP_CHANNEL 1 // 1-13
 
@@ -74,7 +74,6 @@ enum
 #endif
 
 #if defined(ENV_HOVER3MGYRO_ESP8266_LOLIND1MINILITE)
-#define WIFI_SOFTAP_SSID_PREFIX WIFI_SOFTAP_SSID_PREFIX_HOVER3M
 
 /*
    Wemos D1 mini:
@@ -87,6 +86,7 @@ enum
    VCC: 3V
    GND: uiteraard
 */
+#define USE_CONFIG_HOVER3M
 
 #define DEBUG_SERIAL Serial
 
@@ -111,7 +111,8 @@ enum
 
 
 #elif defined(ENV_HOVER3MGYRO_ESP32C3_SUPERMINI)
-#define WIFI_SOFTAP_SSID_PREFIX WIFI_SOFTAP_SSID_PREFIX_HOVER3M
+
+#define USE_CONFIG_HOVER3M
 
 #define DEBUG_SERIAL Serial
 
@@ -132,7 +133,8 @@ enum
 
 
 #elif defined(ENV_HOVER3MGYRO_ESP32S2_LOLIN_S2_MINI)
-#define WIFI_SOFTAP_SSID_PREFIX WIFI_SOFTAP_SSID_PREFIX_HOVER3M
+
+#define USE_CONFIG_HOVER3M
 
 #define DEBUG_SERIAL Serial
 
@@ -150,13 +152,19 @@ enum
 #define LED_BRIGHTNESS_OFF LOW
 
 
-
-
 #elif defined ENV_USER_DEFINED
 // defines staan buiten de code
 
 #else
 // Geen ENV_XX geselecteerd
 #error "Defineer één van bovenstaande defines"
+
+#if defined(USE_CONFIG HOVERSERVO)
+#define WIFI_SOFTAP_SSID_PREFIX "hover-"
+#elif defined (USE_CONFIG_HOVER3M)
+#define WIFI_SOFTAP_SSID_PREFIX "hover3m-"
+#elif defined (USE_CONFIG-BLIMP)
+#define WIFI_SOFTAP_SSID_PREFIX "Blimp-"
+#endif
 
 #endif
