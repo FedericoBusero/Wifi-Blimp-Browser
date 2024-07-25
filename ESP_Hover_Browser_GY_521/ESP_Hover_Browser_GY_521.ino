@@ -9,7 +9,6 @@
    De bovenste regel toont de connectie-status. Op ESP8266 wordt het voltage getoond tijdens de connectie, te calibreren met VOLTAGE_FACTOR
    De bovenste slider wordt gebruikt om de gevoeligheid van de gyro te regelen (p-factor)
    De slider eronder stelt de zweefmotor in.
-   De derde slider stelt de maximale draaisnelheid in
    Met de joystick worden 2 stuwmotoren bestuurd
 
 */
