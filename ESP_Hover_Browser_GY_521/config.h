@@ -83,7 +83,7 @@ enum
 */
 #define USE_CONFIG_HOVER3M
 
-#define DEBUG_SERIAL Serial
+// #define DEBUG_SERIAL Serial
 
 #define PIN_1AMOTOR          D8 // D8 = GPIO15 op D1 mini lite
 #define PIN_2AMOTOR          D7 // D8 = GPIO15 op D1 mini lite
@@ -161,6 +161,41 @@ enum
 
 #define LED_BRIGHTNESS_ON  LOW
 #define LED_BRIGHTNESS_OFF HIGH
+
+#if defined(ENV_HOVER3MGYRO_ESP8266_LOLIND1MINILITE_WS2812FX)
+
+#define USE_CONFIG_HOVER3M
+
+// #define DEBUG_SERIAL Serial
+
+#define PIN_1AMOTOR          D8 // D8 = GPIO15 op D1 mini lite
+#define PIN_2AMOTOR          D7 // D8 = GPIO15 op D1 mini lite
+#define PIN_1BMOTOR          D6 // D8 = GPIO15 op D1 mini lite
+#define PIN_2BMOTOR          D0 // D0 = GPIO16 op D1 mini lite
+#define PIN_ZMOTOR           D3 // D8 = GPIO15 op D1 mini lite
+
+// De ingebouwde LED zit meestal op GPIO2 of GPIO16
+#define PIN_LEDCONNECTIE   2 
+#define PIN_LED_DUALUSE
+
+#define USE_WS2812FX
+#define PIN_WS2812FX       D4 // =GPIO2 dual use led
+#define WS2812FX_NUMLEDS    5
+#define WS2812FX_RGB_ORDER  NEO_GRB
+#define WS2812FX_BRIGHTNESS 35 // 0 .. 255
+#define WS2812FX_SPEED 1000 // in ms
+#define WS2812FX_COLOR 0x007BFF
+#define WS2812FX_MODE FX_MODE_FADE // Volledige lijst op https://github.com/kitesurfer1404/WS2812FX/blob/master/src/modes_arduino.h
+
+#define PIN_SDA           4 // D2 = GPIO4 op Wemos D1 mini lite
+#define PIN_SCL            5 // D1 = GPIO5 op Wemos D1 mini lite
+
+// Pas de voltagefactor aan, dat is bij elke chip verschillend. Calibreer bv. met USB stroom die 3.3V op de chip moet geven
+#define VOLTAGE_FACTOR 910.0f 
+
+#define LED_BRIGHTNESS_ON  LOW
+#define LED_BRIGHTNESS_OFF HIGH
+
 
 #elif defined ENV_USER_DEFINED
 // defines staan buiten de code
