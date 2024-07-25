@@ -17,7 +17,7 @@
 #include "config.h"
 
 #ifdef USE_GY521
-#include "GY521.h" // library; https://github.com/RobTillaart/GY521/
+#include "GY521.h" // library; https://github.com/RobTillaart/GY521/ minimum versie 0.5.3
 GY521 sensor(0x68);
 
 #endif
@@ -27,15 +27,16 @@ GY521 sensor(0x68);
 
 #include <ESPAsyncWebSrv.h> // ESPAsyncWebSrv, version 1.2.6 by dvarrel : https://github.com/dvarrel/ESPAsyncWebSrv/
 #include <WiFi.h>
-#include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
+#include <AsyncTCP.h>   // https://github.com/me-no-dev/AsyncTCP
 
 #define PWM_RANGE 255 // PWM range voor analogWrite
 #define MOTOR_MINSPEED 2
 
 #elif defined(ARDUINO_ARCH_ESP32)
+
 #include <ESPAsyncWebServer.h> // https://github.com/me-no-dev/ESPAsyncWebServer
 #include <WiFi.h>
-#include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
+#include <AsyncTCP.h>   // https://github.com/me-no-dev/AsyncTCP
 
 #define PWM_RANGE 255 // PWM range voor analogWrite
 #define MOTOR_MINSPEED 0
@@ -82,7 +83,7 @@ unsigned long last_activity_message;
 
 int ui_joystick_x = 0;
 int ui_joystick_y = 0;
-int ui_slider1;     // -180 .. 180
+int ui_slider1 = 0; // -180 .. 180
 int ui_slider2 = 0; // 0 .. 360
 
 #define MOTOR_FREQ 400     // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
@@ -95,7 +96,7 @@ bool gyroBeschikbaar = false;
 
 void setup_pin_mode_output(int pin)
 {
-#if defined(ESP8266)
+#ifdef ESP8266
   if ((pin == 1) || (pin == 3)) // RX & TX
   {
     pinMode(pin, FUNCTION_3);
