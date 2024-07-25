@@ -198,7 +198,9 @@ void updateMotors()
     }
     else
     {
+#ifdef USE_CONFIG_HOVER3M
       doel_motorZsnelheid = 0; // bij joystick los ook zweefmotor uit
+#endif
     }
     if (millis() > last_activity_joystick + TIMEOUT_MS_JOYSTICK)
     {
