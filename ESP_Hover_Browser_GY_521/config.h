@@ -174,7 +174,7 @@ enum
 
 #ifndef ENV_USER_DEFINED
 
-#if defined(USE_CONFIG HOVERSERVO)
+#if defined(USE_CONFIG_HOVERSERVO)
 
 #define WIFI_SOFTAP_SSID_PREFIX "hover-"
 
@@ -190,7 +190,7 @@ enum
 #define GYRO_REGELING_BIAS      1.0
 
 
-#elif defined (USE_CONFIG-BLIMP)
+#elif defined (USE_CONFIG_BLIMP)
 
 // Gyro instellingen voor Blimp
 #define USE_GY521
