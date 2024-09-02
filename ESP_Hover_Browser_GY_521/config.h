@@ -41,9 +41,12 @@ Volgende pinnen worden gedefinieerd:
 - PIN_ZMOTOR    
 - (optioneel) PIN_LEDCONNECTIE   
 
+
 Daarnaast zijn volgende defines verplicht (maar kunnen omgewisseld worden)
 #define LED_BRIGHTNESS_ON  HIGH
 #define LED_BRIGHTNESS_OFF LOW
+
+- MOTORZ_TIME_UP
 
 Op ESP8266-chips wordt het voltage gemeten, voeg volgende define toe. Pas de voltagefactor aan, dat is bij elke chip verschillend. 
 Calibreer bv. met USB stroom die 3.3V op de chip moet geven
