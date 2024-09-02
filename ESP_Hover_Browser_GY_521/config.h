@@ -102,6 +102,8 @@ enum
 #define PIN_SDA           4 // D2 = GPIO4 op Wemos D1 mini lite
 #define PIN_SCL            5 // D1 = GPIO5 op Wemos D1 mini lite
 
+#define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
+
 // Pas de voltagefactor aan, dat is bij elke chip verschillend. Calibreer bv. met USB stroom die 3.3V op de chip moet geven
 #define VOLTAGE_FACTOR 910.0f 
 
@@ -125,6 +127,8 @@ enum
 #define PIN_SDA            9 // Positie SDA op XIAO reeks
 #define PIN_SCL            10 // Positie SCL op XIAO reeks
 
+#define MOTORZ_TIME_UP 2000 // ms to go to ease to full power of a motor
+
 #define LED_BRIGHTNESS_ON  LOW
 #define LED_BRIGHTNESS_OFF HIGH
 
@@ -145,6 +149,8 @@ enum
 #define PIN_SDA              33
 #define PIN_SCL              35
 
+#define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
+
 #define LED_BRIGHTNESS_ON  HIGH
 #define LED_BRIGHTNESS_OFF LOW
 
@@ -164,6 +170,8 @@ enum
 #define PIN_SDA            9 // 3            
 #define PIN_SCL            10 // 4
 
+#define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
+
 #define LED_BRIGHTNESS_ON  LOW
 #define LED_BRIGHTNESS_OFF HIGH
 
@@ -182,6 +190,8 @@ enum
 // De ingebouwde LED zit meestal op GPIO2 of GPIO16
 #define PIN_LEDCONNECTIE   2 
 #define PIN_LED_DUALUSE
+
+#define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
 
 #define USE_WS2812FX
 #define PIN_WS2812FX       D4 // =GPIO2 dual use led
