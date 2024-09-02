@@ -18,7 +18,7 @@
 
 #ifdef USE_GY521
 #include "GY521.h" // library; https://github.com/RobTillaart/GY521/ minimum versie 0.5.3
-GY521 sensor(0x68);
+GY521 sensor(GY521_I2C_ADDRESS);
 
 #endif
 
