@@ -87,7 +87,6 @@ int ui_slider1 = 0; // -180 .. 180
 int ui_slider2 = 0; // 0 .. 360
 
 #define MOTOR_FREQ 400     // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
-#define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
 
 Easer motorZ_snelheid;
 bool motors_halt;
