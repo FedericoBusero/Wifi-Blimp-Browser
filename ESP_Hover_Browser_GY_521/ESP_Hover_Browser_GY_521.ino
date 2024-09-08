@@ -141,7 +141,8 @@ void hbridge_setspeed(int pin1, int pin2, long motorspeed, long min_speed = 0)
   {
     motorspeed = 0;
   }
-  if (motorspeed > 0)
+  // if (motorspeed > 0)
+  if (motorspeed >= 0)
   {
     digitalWrite(pin1, HIGH);
     analogWrite(pin2, PWM_RANGE - motorspeed);
@@ -164,7 +165,11 @@ void updateMotors()
 
   if (motors_halt)
   {
+  #ifdef USE_CONFIG_BLIMP2Z
+    hbridge_setspeed(PIN_1ZMOTOR, PIN_2ZMOTOR, 0);
+  #else
     analogWrite(PIN_ZMOTOR, 0);
+  #endif
     hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, 0);
     hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, 0);
   }
@@ -195,7 +200,11 @@ void updateMotors()
       regelX = (1.0) * (float)(ui_joystick_x)*max_draai_factor;
     }
 
+  #ifdef USE_CONFIG_BLIMP2Z
+    int doel_motorZsnelheid = map(ui_slider2, 0, 360, -PWM_RANGE, PWM_RANGE); 
+  #else
     int doel_motorZsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE); // voor zweefmotor
+  #endif
     if (abs(ui_joystick_y * ui_joystick_x) >= 5)
     {
       last_activity_joystick = millis();
@@ -236,7 +245,11 @@ void updateMotors()
 
     motorZ_snelheid.easeTo(doel_motorZsnelheid);
     motorZ_snelheid.update();
+#ifdef USE_CONFIG_BLIMP2Z
+    hbridge_setspeed(PIN_1ZMOTOR, PIN_2ZMOTOR, motorZ_snelheid.getCurrentValue(), MOTORZ_MINSPEED);
+#else
     analogWrite(PIN_ZMOTOR, motorZ_snelheid.getCurrentValue()); // We passen de snelheid van de motor aan naar zijn nieuwe snelheid motorZ_snelheid
+#endif
 
 #ifdef DEBUG_SERIAL
     //   DEBUG_SERIAL.print(F("temp1 "));
@@ -324,7 +337,12 @@ void setup()
   setup_pin_mode_output(PIN_2AMOTOR);
   setup_pin_mode_output(PIN_1BMOTOR);
   setup_pin_mode_output(PIN_2BMOTOR);
+#ifdef USE_CONFIG_BLIMP2Z
+  setup_pin_mode_output(PIN_1ZMOTOR);
+  setup_pin_mode_output(PIN_2ZMOTOR);
+#else
   setup_pin_mode_output(PIN_ZMOTOR);
+#endif
 
 #ifdef ESP8266
   // Aangezien de PWM range van analogWrite afhankelijk van de Arduino ESP8266 versie 255 ofwel 1023 is, stellen we de range vast in op 1023
@@ -340,7 +358,11 @@ void setup()
   // Verander de frequentie van analogWrite van 1000 Hz naar 400 Hz voor een aangenamer geluid
   analogWriteFrequency(MOTOR_FREQ);
 #endif
+#ifdef USE_CONFIG_BLIMP2Z
+  hbridge_setspeed(PIN_1ZMOTOR, PIN_2ZMOTOR, 0);
+#else
   analogWrite(PIN_ZMOTOR, 0);
+#endif
 
   hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, 0);
   hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, 0);
@@ -368,7 +390,11 @@ void setup()
 
   led_set(LED_BRIGHTNESS_ON, false);
 
+#ifdef USE_CONFIG_BLIMP2Z
+  motorZ_snelheid.begin(0, true);
+#else
   motorZ_snelheid.begin(0, false);
+#endif
   motorZ_snelheid.set_speed((float)MOTORZ_TIME_UP / (float)PWM_RANGE);
 
   gyroBeschikbaar = false;
