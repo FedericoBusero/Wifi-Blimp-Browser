@@ -7,6 +7,7 @@
 // #define ENV_HOVER3MGYRO_ESP8266_LOLIND1MINILITE
 // #define ENV_HOVER3MGYRO_ESP32C3_SUPERMINI
 // #define ENV_HOVER3MGYRO_ESP32S2_LOLIN_S2_MINI
+// #define ENV_HOVER3MGYRO_ESP32C3_SUPERMINI
 
 // Als de defines in platformio.ini gedefinieerd zijn:
 // #define ENV_USER_DEFINED
