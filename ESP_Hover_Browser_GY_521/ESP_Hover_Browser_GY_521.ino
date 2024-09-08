@@ -389,8 +389,6 @@ void setup()
   delay(10);
   led_set(LED_BRIGHTNESS_OFF, false);
 
-  led_set(LED_BRIGHTNESS_ON, false);
-
 #ifdef USE_CONFIG_BLIMP2Z
   motorZ_snelheid.begin(0, true);
 #else
