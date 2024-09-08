@@ -385,8 +385,6 @@ void setup()
   delay(10);
   led_set(LED_BRIGHTNESS_OFF, false);
 
-  init_motors();
-
   led_set(LED_BRIGHTNESS_ON, false);
 
 #ifdef USE_CONFIG_BLIMP2Z
@@ -395,6 +393,8 @@ void setup()
   motorZ_snelheid.begin(0, false);
 #endif
   motorZ_snelheid.set_speed((float)MOTORZ_TIME_UP / (float)PWM_RANGE);
+
+  init_motors();
 
   gyroBeschikbaar = false;
 
