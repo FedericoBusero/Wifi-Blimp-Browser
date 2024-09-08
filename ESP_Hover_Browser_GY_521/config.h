@@ -155,6 +155,16 @@ enum
 #define PIN_SDA              33
 #define PIN_SCL              35
 
+#define USE_WS2812FX
+#define PIN_WS2812FX       16 // dual use led
+#define WS2812FX_NUMLEDS    5
+#define WS2812FX_RGB_ORDER  NEO_GRB
+#define WS2812FX_BRIGHTNESS 35 // 0 .. 255
+#define WS2812FX_SPEED 1000 // in ms
+#define WS2812FX_COLOR 0x007BFF // blauw
+#define WS2812FX_COLLISION 0xFF0000 // rood
+#define WS2812FX_MODE FX_MODE_FADE // Volledige lijst op https://github.com/kitesurfer1404/WS2812FX/blob/master/src/modes_arduino.h
+
 #define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
 
 #define LED_BRIGHTNESS_ON  HIGH
