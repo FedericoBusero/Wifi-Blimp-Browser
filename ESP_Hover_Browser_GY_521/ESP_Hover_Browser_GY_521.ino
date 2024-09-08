@@ -92,6 +92,7 @@ Easer motorZ_snelheid;
 bool motors_halt;
 
 bool gyroBeschikbaar = false;
+bool collision = false; // VOOR BOTSDETECTIE
 
 #ifdef USE_WS2812FX
 #include <WS2812FX.h> // https://github.com/kitesurfer1404/WS2812FX
@@ -130,6 +131,20 @@ float getGyro()
   }
 #ifdef GYRO_FLIP
   measured_value = -measured_value;
+
+  // VOOR BOTSDETECTIE
+  collision =
+
+      (sq(sensor.getAccelX()) +
+       sq(sensor.getAccelY()) +
+       sq(abs(sensor.getAccelZ() + 1))) > ACCELERATION_THRESHOLD;
+#else
+  // VOOR BOTSDETECTIE
+  collision =
+
+      (sq(sensor.getAccelX()) +
+       sq(sensor.getAccelY()) +
+       sq(abs(sensor.getAccelZ() - 1))) > ACCELERATION_THRESHOLD;
 #endif
   return measured_value;
 }
@@ -332,6 +347,28 @@ float getVoltage()
 #else
   return (float)0;
 #endif
+}
+
+void collision_effect() // VOOR BOTSDETECTIE
+{
+#ifdef USE_WS2812FX
+  static unsigned long last_collision_effect = 0;
+  unsigned long currentmillis = millis();
+
+  if (collision)
+  {
+    ws2812fx.setColor(WS2812FX_COLLISION);
+    last_collision_effect = currentmillis;
+  }
+  else
+  {
+    if (currentmillis > last_collision_effect + TIMEOUT_MS_COLLISION) // langer dan TIMEOUT_MS_COLLISION geleden dat er een botsingb gedetecteerd werdws2812fx.setColor(WS2812FX_COLOR);
+    {
+      ws2812fx.setColor(WS2812FX_COLOR);
+    }
+  }
+#endif
+  // eventueel nog botseffect zonder WS2812 toe te voegen
 }
 
 void setup()
@@ -721,6 +758,7 @@ void loop()
       {
         lastupdate_motors = currentmillis;
         updateMotors();
+        collision_effect();
       }
     }
     else
