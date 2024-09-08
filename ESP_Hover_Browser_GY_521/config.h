@@ -74,6 +74,9 @@ enum
 #define VOLTAGE_THRESHOLD 2.7 // onder dit voltage uit, om de batterij te beschermen, gemeten na de spanningsregelaar bij ESP8266.
 #endif
 
+#define ACCELERATION_THRESHOLD 0.1 // boven de som van kwadraten van de acceleraties boven deze waarde wordt als botsing beschouwd. VOOR BOTSDETECTIE
+#define TIMEOUT_MS_COLLISION 3000L // Aantal milliseconden kleurverandering blijven tonen bij botsing VOOR BOTSDETECTIE
+
 #endif
 
 #if defined(ENV_HOVER3MGYRO_ESP8266_LOLIND1MINILITE)
@@ -264,6 +267,7 @@ enum
 // Gyro instellingen voor Blimp
 #define USE_GY521
 #define GYRO_DIRECTION GYRO_DIRECTION_Z
+#define GYRO_FLIP
 #define GYRO_REGELING_MAX_P     2.4
 #define GYRO_REGELING_MAX_DRAAI 0.5
 #define GYRO_REGELING_BIAS      1.0
@@ -275,6 +279,7 @@ enum
 // Gyro instellingen voor Blimp
 #define USE_GY521
 #define GYRO_DIRECTION GYRO_DIRECTION_Z
+#define GYRO_FLIP
 #define GYRO_REGELING_MAX_P     2.4
 #define GYRO_REGELING_MAX_DRAAI 0.5
 #define GYRO_REGELING_BIAS      1.0
