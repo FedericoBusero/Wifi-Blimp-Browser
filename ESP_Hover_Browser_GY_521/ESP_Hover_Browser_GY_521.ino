@@ -86,7 +86,7 @@ int ui_joystick_y = 0;
 int ui_slider1 = 0; // -180 .. 180
 int ui_slider2 = 0; // 0 .. 360
 
-#define MOTOR_FREQ 400     // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
+#define MOTOR_FREQ 512     // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
 
 Easer motorZ_snelheid;
 bool motors_halt;
