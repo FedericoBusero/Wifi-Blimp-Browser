@@ -30,7 +30,7 @@ GY521 sensor(GY521_I2C_ADDRESS);
 #include <AsyncTCP.h>   // https://github.com/me-no-dev/AsyncTCP
 
 #define PWM_RANGE 255 // PWM range voor analogWrite
-#define MOTOR_MINSPEED 2
+#define MOTOR_MINSPEED 0
 
 #elif defined(ARDUINO_ARCH_ESP32)
 
