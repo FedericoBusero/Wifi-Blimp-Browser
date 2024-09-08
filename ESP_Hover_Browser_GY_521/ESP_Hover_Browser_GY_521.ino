@@ -285,7 +285,11 @@ void motors_resume()
 void init_motors()
 {
   ui_slider1 = 0;
+#ifdef USE_CONFIG_BLIMP2Z
+  ui_slider2 = 180;
+#else
   ui_slider2 = 0;
+#endif   
   ui_joystick_x = 0;
   ui_joystick_y = 0;
   motorZ_snelheid.setValue(0);
