@@ -74,7 +74,7 @@ WebsocketsClient sclient;
 // Dat moet hoger zijn dan timeout interval in html functie ws_onopen_ping
 #define TIMEOUT_MS_MOTORS 1200L
 #define TIMEOUT_MS_LED 1L         // Aantal milliseconden dat LED blijft branden na het ontvangen van een boodschap
-#define TIMEOUT_MS_VOLTAGE 10000L // Aantal milliseconden tussen update voltage
+#define TIMEOUT_MS_STATUS 10000L  // Aantal milliseconden tussen update status&voltage
 #define TIMEOUT_MS_JOYSTICK 2000L // Aantal milliseconden nadat joystick voor laatste maal gebruikt werd, L&R motoren uit
 
 unsigned long last_activity_message;
@@ -670,7 +670,7 @@ void updatestatusbar()
   unsigned long currentmillis = millis();
   char statusstr[50];
 
-  if (currentmillis > lastupdate_voltage + TIMEOUT_MS_VOLTAGE)
+  if (currentmillis > lastupdate_voltage + TIMEOUT_MS_STATUS)
   {
     lastupdate_voltage = currentmillis;
     float voltage = getVoltage();
@@ -680,7 +680,7 @@ void updatestatusbar()
       if (gyroBeschikbaar)
       {
 #ifdef USE_GY521
-        snprintf(statusstr, sizeof(statusstr), "%4.2f V gz:%4.2f", voltage, getGyro());
+        snprintf(statusstr, sizeof(statusstr), "%4.2f V gyro:%4.2f", voltage, getGyro());
 #endif
       }
       else
@@ -715,6 +715,25 @@ void updatestatusbar()
         led_set(LED_BRIGHTNESS_OFF, false);
         delay(5000);
       }
+    }
+  }
+#elif defined(USE_GY521)
+  static unsigned long lastupdate_status = 0;
+  unsigned long currentmillis = millis();
+  char statusstr[50];
+
+  if (currentmillis > lastupdate_status + TIMEOUT_MS_STATUS)
+  {
+    lastupdate_status = currentmillis;
+
+    if (gyroBeschikbaar)
+    {
+      snprintf(statusstr, sizeof(statusstr), "gyro:%4.2f", getGyro());
+#ifdef DEBUG_SERIAL
+      // DEBUG_SERIAL.print("Sending status: ");
+      // DEBUG_SERIAL.println(statusstr);
+#endif
+      sclient.send(statusstr);
     }
   }
 #endif
