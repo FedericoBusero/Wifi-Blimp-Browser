@@ -141,7 +141,6 @@ void hbridge_setspeed(int pin1, int pin2, long motorspeed, long min_speed = 0)
   {
     motorspeed = 0;
   }
-  // if (motorspeed > 0)
   if (motorspeed >= 0)
   {
     digitalWrite(pin1, HIGH);
