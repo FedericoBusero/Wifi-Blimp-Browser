@@ -7,6 +7,8 @@
 // #define ENV_HOVER3MGYRO_ESP8266_LOLIND1MINILITE
 // #define ENV_HOVER3MGYRO_ESP32C3_SUPERMINI
 // #define ENV_HOVER3MGYRO_ESP32S2_LOLIN_S2_MINI
+// #define ENV_HOVER3MGYRO_ESP8266_LOLIND1MINILITE_WS2812FX
+#define ENV_BLIMP_ESP32C3_SUPERMINI_V0
 
 // Als de defines in platformio.ini gedefinieerd zijn:
 // #define ENV_USER_DEFINED
@@ -41,12 +43,9 @@ Volgende pinnen worden gedefinieerd:
 - PIN_ZMOTOR    
 - (optioneel) PIN_LEDCONNECTIE   
 
-
 Daarnaast zijn volgende defines verplicht (maar kunnen omgewisseld worden)
 #define LED_BRIGHTNESS_ON  HIGH
 #define LED_BRIGHTNESS_OFF LOW
-
-- MOTORZ_TIME_UP
 
 Op ESP8266-chips wordt het voltage gemeten, voeg volgende define toe. Pas de voltagefactor aan, dat is bij elke chip verschillend. 
 Calibreer bv. met USB stroom die 3.3V op de chip moet geven
@@ -66,17 +65,14 @@ enum
 #define WIFI_SOFTAP_PASSWORD "12345678"
 #define WIFI_SOFTAP_CHANNEL 1 // 1-13
 
-#define GY521_I2C_ADDRESS 0x68 // alternatief 0x69
-
-#if defined(CONFIG_IDF_TARGET_ESP32C3)
-#define VOLTAGE_THRESHOLD 3.1 // onder dit voltage uit, om op hol slaan te vermijden op ESP32C3. Gemeten op batterij zelf.
-#else
-#define VOLTAGE_THRESHOLD 2.7 // onder dit voltage uit, om de batterij te beschermen, gemeten na de spanningsregelaar bij ESP8266.
-#endif
+#define ACCELERATION_THRESHOLD 0.1 // boven de som van kwadraten van de acceleraties boven deze waarde wordt als botsing beschouwd. VOOR BOTSDETECTIE
+#define TIMEOUT_MS_COLLISION 3000L // Aantal milliseconden kleurverandering blijven tonen bij botsing VOOR BOTSDETECTIE
 
 #endif
 
 #if defined(ENV_HOVER3MGYRO_ESP8266_LOLIND1MINILITE)
+
+#define VOLTAGE_THRESHOLD 2.7 // onder dit voltage valt de ESP8266-chip uit om de batterij te beschermen
 
 /*
    Wemos D1 mini:
@@ -105,8 +101,6 @@ enum
 #define PIN_SDA           4 // D2 = GPIO4 op Wemos D1 mini lite
 #define PIN_SCL            5 // D1 = GPIO5 op Wemos D1 mini lite
 
-#define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
-
 // Pas de voltagefactor aan, dat is bij elke chip verschillend. Calibreer bv. met USB stroom die 3.3V op de chip moet geven
 #define VOLTAGE_FACTOR 910.0f 
 
@@ -114,6 +108,9 @@ enum
 #define LED_BRIGHTNESS_OFF HIGH
 
 #elif defined(ENV_HOVER3MGYRO_ESP32C3_SUPERMINI)
+
+#define VOLTAGE_THRESHOLD 3.1 // onder dit voltage uit, om op hol slaan te vermijden op ESP32. Gemeten op batterij zelf.
+#define PIN_BATMONITOR     1
 
 #define USE_CONFIG_HOVER3M
 
@@ -130,13 +127,14 @@ enum
 #define PIN_SDA            9 // Positie SDA op XIAO reeks
 #define PIN_SCL            10 // Positie SCL op XIAO reeks
 
-#define MOTORZ_TIME_UP 2000 // ms to go to ease to full power of a motor
-
 #define LED_BRIGHTNESS_ON  LOW
 #define LED_BRIGHTNESS_OFF HIGH
 
 
 #elif defined(ENV_HOVER3MGYRO_ESP32S2_LOLIN_S2_MINI)
+
+#define VOLTAGE_THRESHOLD 3.1 // onder dit voltage uit, om op hol slaan te vermijden op ESP32. Gemeten op batterij zelf.
+#define PIN_BATMONITOR     1
 
 #define USE_CONFIG_HOVER3M
 
@@ -152,58 +150,79 @@ enum
 #define PIN_SDA              33
 #define PIN_SCL              35
 
-#define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
-
 #define LED_BRIGHTNESS_ON  HIGH
 #define LED_BRIGHTNESS_OFF LOW
 
 #elif defined(ENV_BLIMP_ESP32C3_SUPERMINI_V0)
+
+#define VOLTAGE_THRESHOLD 3.1 // onder dit voltage uit, om op hol slaan te vermijden op ESP32. Gemeten op batterij zelf.
+#define PIN_BATMONITOR     1
+
 #define USE_CONFIG_BLIMP
 
 // #define DEBUG_SERIAL Serial
 
-#define PIN_1AMOTOR          0
-#define PIN_2AMOTOR          1
-#define PIN_1BMOTOR          2
-#define PIN_2BMOTOR          3
-#define PIN_ZMOTOR           4 // 6
+#define PIN_1AMOTOR          5
+#define PIN_2AMOTOR          6
+#define PIN_1BMOTOR          20 //7
+#define PIN_2BMOTOR          21 //10
+#define PIN_ZMOTOR           7 //20
+#define PIN_2ZMOTOR          10 //21
 #define PIN_LEDCONNECTIE     8 
-// #define PIN_LED_DUALUSE
+#define PIN_LED_DUALUSE
 
-#define PIN_SDA            9 // 3            
-#define PIN_SCL            10 // 4
+#define PIN_SDA           3
+#define PIN_SCL            4
 
-#define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
+#define USE_WS2812FX
+#define PIN_WS2812FX       8 // =GPIO2 dual use led
+#define WS2812FX_NUMLEDS    5
+#define WS2812FX_RGB_ORDER  NEO_GRB
+#define WS2812FX_BRIGHTNESS 35 // 0 .. 255
+#define WS2812FX_SPEED 1000 // in ms
+#define WS2812FX_COLOR 0x007BFF // blauw.
+#define WS2812FX_COLLISION 0xFF0000 // rood
+#define WS2812FX_MODE FX_MODE_FADE // Volledige lijst op https://github.com/kitesurfer1404/WS2812FX/blob/master/src/modes_arduino.h
+//#define WS2812FX_MODE FX_MODE_BLINK
+//#define WS2812FX_MODE FX_MODE_SCAN
+//#define WS2812FX_MODE FX_MODE_LARSON_SCANNER
+
+// Pas de voltagefactor aan, dat is bij elke chip verschillend. Calibreer bv. met USB stroom die 5V op de chip moet geven
+#define VOLTAGE_FACTOR 850.0f 
 
 #define LED_BRIGHTNESS_ON  LOW
 #define LED_BRIGHTNESS_OFF HIGH
 
 #elif defined(ENV_HOVER3MGYRO_ESP8266_LOLIND1MINILITE_WS2812FX)
 
+#define VOLTAGE_THRESHOLD 2.7 // onder dit voltage valt de ESP8266-chip uit om de batterij te beschermen
+
 #define USE_CONFIG_HOVER3M
 
 // #define DEBUG_SERIAL Serial
 
-#define PIN_1AMOTOR          D8 // D8 = GPIO15 op D1 mini lite
-#define PIN_2AMOTOR          D7 // D8 = GPIO15 op D1 mini lite
-#define PIN_1BMOTOR          D6 // D8 = GPIO15 op D1 mini lite
-#define PIN_2BMOTOR          D0 // D0 = GPIO16 op D1 mini lite
-#define PIN_ZMOTOR           D3 // D8 = GPIO15 op D1 mini lite
+#define PIN_1AMOTOR          D3 // D8 = GPIO0 op D1 mini lite
+#define PIN_2AMOTOR          D7 // D7 = GPIO13 op D1 mini lite
+#define PIN_1BMOTOR          D5 // D5 = GPIO14 op D1 mini lite
+#define PIN_2BMOTOR          D6 // D0 = GPIO12 op D1 mini lite
+#define PIN_ZMOTOR           D0 // D0 = GPIO16 op D1 mini lite
 
 // De ingebouwde LED zit meestal op GPIO2 of GPIO16
-#define PIN_LEDCONNECTIE   2 
+#define PIN_LEDCONNECTIE   2 // GPIO2 = D4 dual use led
 #define PIN_LED_DUALUSE
-
-#define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
 
 #define USE_WS2812FX
 #define PIN_WS2812FX       D4 // =GPIO2 dual use led
 #define WS2812FX_NUMLEDS    5
 #define WS2812FX_RGB_ORDER  NEO_GRB
 #define WS2812FX_BRIGHTNESS 35 // 0 .. 255
-#define WS2812FX_SPEED 1000 // in ms
-#define WS2812FX_COLOR 0x007BFF
-#define WS2812FX_MODE FX_MODE_FADE // Volledige lijst op https://github.com/kitesurfer1404/WS2812FX/blob/master/src/modes_arduino.h
+#define WS2812FX_SPEED 800 // in ms
+#define WS2812FX_COLOR 0x007BFF // blauw.
+#define WS2812FX_COLLISION 0xFF0000 // rood
+//#define WS2812FX_MODE FX_MODE_FADE // Volledige lijst op https://github.com/kitesurfer1404/WS2812FX/blob/master/src/modes_arduino.h
+//#define WS2812FX_MODE FX_MODE_BLINK
+#define WS2812FX_MODE FX_MODE_SCAN
+//#define WS2812FX_MODE FX_MODE_LARSON_SCANNER
 
 #define PIN_SDA           4 // D2 = GPIO4 op Wemos D1 mini lite
 #define PIN_SCL            5 // D1 = GPIO5 op Wemos D1 mini lite
@@ -233,13 +252,13 @@ enum
 
 #elif defined (USE_CONFIG_HOVER3M)
 
-#define WIFI_SOFTAP_SSID_PREFIX "hover3m-"
+#define WIFI_SOFTAP_SSID_PREFIX "mm-" //"hover3m-"
 
 // gyro instellingen voor Hover3M
 #define USE_GY521
 #define GYRO_DIRECTION GYRO_DIRECTION_Z
 #define GYRO_REGELING_MAX_P     2.4
-#define GYRO_REGELING_MAX_DRAAI 0.5
+#define GYRO_REGELING_MAX_DRAAI 0.75
 #define GYRO_REGELING_BIAS      1.0
 
 
@@ -248,6 +267,7 @@ enum
 // Gyro instellingen voor Blimp
 #define USE_GY521
 #define GYRO_DIRECTION GYRO_DIRECTION_Z
+#define GYRO_FLIP
 #define GYRO_REGELING_MAX_P     2.4
 #define GYRO_REGELING_MAX_DRAAI 0.5
 #define GYRO_REGELING_BIAS      1.0

@@ -18,7 +18,7 @@
 
 #ifdef USE_GY521
 #include "GY521.h" // library; https://github.com/RobTillaart/GY521/ minimum versie 0.5.3
-GY521 sensor(GY521_I2C_ADDRESS);
+GY521 sensor(0x68);
 
 #endif
 
@@ -77,6 +77,7 @@ WebsocketsClient sclient;
 #define TIMEOUT_MS_VOLTAGE 10000L // Aantal milliseconden tussen update voltage
 #define TIMEOUT_MS_JOYSTICK 2000L // Aantal milliseconden nadat joystick voor laatste maal gebruikt werd, L&R motoren uit
 
+
 unsigned long last_activity_message;
 
 #include "Easer.h"
@@ -86,12 +87,18 @@ int ui_joystick_y = 0;
 int ui_slider1 = 0; // -180 .. 180
 int ui_slider2 = 0; // 0 .. 360
 
-#define MOTOR_FREQ 400     // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
+float doel_motorZsnelheid =0;
+float regelX = 0.0;
 
-Easer motorZ_snelheid;
+#define MOTOR_FREQ 400     // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
+#define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
+
+//Easer motorZ_snelheid;
 bool motors_halt;
 
 bool gyroBeschikbaar = false;
+
+bool collision = false; //VOOR BOTSDETECTIE
 
 #ifdef USE_WS2812FX
 #include <WS2812FX.h> // https://github.com/kitesurfer1404/WS2812FX
@@ -110,6 +117,28 @@ void setup_pin_mode_output(int pin)
 }
 
 #ifdef USE_GY521
+void collision_effect() // VOOR BOTSDETECTIE
+{
+  #ifdef USE_WS2812FX
+  static unsigned long last_collision_effect = 0;
+  unsigned long currentmillis = millis();
+  
+  if (collision)
+  {
+      ws2812fx.setColor(WS2812FX_COLLISION);
+        last_collision_effect = currentmillis;
+  }
+  else
+  {
+     if (currentmillis > last_collision_effect + TIMEOUT_MS_COLLISION) //langer dan TIMEOUT_MS_COLLISION geleden dat er een botsingb gedetecteerd werdws2812fx.setColor(WS2812FX_COLOR);
+    {
+      ws2812fx.setColor(WS2812FX_COLOR);
+    }
+  }
+  #endif
+// eventueel nog botseffect zonder WS2812 toe te voegen
+}
+
 float getGyro()
 {
   float measured_value = 0.0;
@@ -130,7 +159,27 @@ float getGyro()
   }
 #ifdef GYRO_FLIP
   measured_value = -measured_value;
+  // VOOR BOTSDETECTIE
+  collision = 
+  
+      (
+        sq(sensor.getAccelX()) +
+        sq(sensor.getAccelY()) +
+        sq( abs(sensor.getAccelZ() + 1) )
+      )
+    > ACCELERATION_THRESHOLD; 
+#elif
+  // VOOR BOTSDETECTIE
+    collision = 
+  
+      (
+        sq(sensor.getAccelX()) +
+        sq(sensor.getAccelY()) +
+        sq( abs(sensor.getAccelZ() - 1) )
+      )
+    > ACCELERATION_THRESHOLD; 
 #endif
+ 
   return measured_value;
 }
 #endif
@@ -153,6 +202,33 @@ void hbridge_setspeed(int pin1, int pin2, long motorspeed, long min_speed = 0)
   }
 }
 
+void hbridge_setZspeed(int pin1, int pin2, long motorspeed, long min_speed = 0)
+{
+  //char statusstr[50];
+  //  snprintf(statusstr, sizeof(statusstr), "%4.2f V gz:%4.2f", (float)motorspeed, (float)collision);
+  //  sclient.send(statusstr);
+  if (abs(motorspeed) < 50)
+  {
+    motorspeed = 0;
+    digitalWrite(pin1, LOW);
+    digitalWrite(pin2, LOW);
+  }
+  else
+  {
+    if (motorspeed > 0)
+    {
+      digitalWrite(pin1, LOW);
+      analogWrite(pin2, motorspeed);
+    }
+    else
+    {
+    digitalWrite(pin2, LOW);
+    analogWrite(pin1, abs(motorspeed));
+    }
+  }
+}
+
+
 float mapFloat(float value, float fromLow, float fromHigh, float toLow, float toHigh)
 {
   return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
@@ -164,7 +240,7 @@ void updateMotors()
 
   if (motors_halt)
   {
-    analogWrite(PIN_ZMOTOR, 0);
+    hbridge_setZspeed(PIN_ZMOTOR, PIN_2ZMOTOR, 0);//analogWrite(PIN_ZMOTOR, 0);
     hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, 0);
     hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, 0);
   }
@@ -183,6 +259,8 @@ void updateMotors()
       sensor.read();
       float werkelijke_draaisnelheid = getGyro();
 
+      collision_effect(); // VOOR BOTSDETECTIE
+
       // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
 
       float doel_draaisnelheid = (float)ui_joystick_x * (-1.0) * max_draai_factor;
@@ -195,7 +273,8 @@ void updateMotors()
       regelX = (1.0) * (float)(ui_joystick_x)*max_draai_factor;
     }
 
-    int doel_motorZsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE); // voor zweefmotor
+    //int doel_motorZsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE); // voor zweefmotor
+    //float doel_motorZsnelheid = mapFloat(ui_slider2, -180.0, 180.0, -(float)PWM_RANGE, (float)PWM_RANGE);
     if (abs(ui_joystick_y * ui_joystick_x) >= 5)
     {
       last_activity_joystick = millis();
@@ -224,7 +303,7 @@ void updateMotors()
     // DEBUG_SERIAL.println(regelX);
 #endif
 
-    // x en y omzetten naar motorsnelheden
+    // x en y en z omzetten naar motorsnelheden
     float temp1 = constrain((float)ui_joystick_y + regelX, -180, 180);
     float temp2 = constrain((float)ui_joystick_y - regelX, -180, 180);
 
@@ -234,10 +313,13 @@ void updateMotors()
     hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, (long)motorsnelheidA, MOTOR_MINSPEED);
     hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, (long)motorsnelheidB, MOTOR_MINSPEED);
 
-    motorZ_snelheid.easeTo(doel_motorZsnelheid);
-    motorZ_snelheid.update();
-    analogWrite(PIN_ZMOTOR, motorZ_snelheid.getCurrentValue()); // We passen de snelheid van de motor aan naar zijn nieuwe snelheid motorZ_snelheid
-
+    //motorZ_snelheid.easeTo(doel_motorZsnelheid);
+    //motorZ_snelheid.update();
+    //analogWrite(PIN_ZMOTOR, motorZ_snelheid.getCurrentValue()); // We passen de snelheid van de motor aan naar zijn nieuwe snelheid motorZ_snelheid
+    //hbridge_setspeed(PIN_ZMOTOR, PIN_2ZMOTOR, motorZ_snelheid.getCurrentValue(), MOTOR_MINSPEED);
+    float motorsnelheidZ = mapFloat(ui_slider2, -180.0, 180.0, -(float)PWM_RANGE, (float)PWM_RANGE);
+    hbridge_setZspeed(PIN_ZMOTOR, PIN_2ZMOTOR, (long)motorsnelheidZ, 50);
+ 
 #ifdef DEBUG_SERIAL
     //   DEBUG_SERIAL.print(F("temp1 "));
     //   DEBUG_SERIAL.print(temp1);
@@ -276,7 +358,7 @@ void init_motors()
   ui_slider2 = 0;
   ui_joystick_x = 0;
   ui_joystick_y = 0;
-  motorZ_snelheid.setValue(0);
+  //motorZ_snelheid.setValue(0);
   motors_halt = false;
 
   updateMotors();
@@ -300,31 +382,18 @@ void led_set(int ledmode, boolean except_when_dual_use)
 #endif
 }
 
-void init_voltage_monitor()
-{
-#if defined(ESP32) && defined(PIN_BATMONITOR)
-  analogSetAttenuation(ADC_0db); // op de ESP32 varianten gebruiken we een externe weerstandbrug om het batterijvoltage te meten en zetten we de interne weerstandsbrug op "geen spanningsdeling"
-#endif
-}
-
-float getVoltage()
-{
-#ifdef ESP8266
-  return (float)ESP.getVcc() / (float)VOLTAGE_FACTOR; // op ESP8266 modules is VCC met de ene ADC pin verbonden
-#elif defined(ESP32) && defined(PIN_BATMONITOR) && defined(VOLTAGE_FACTOR)
-  return (float)analogRead(PIN_BATMONITOR) / (float)VOLTAGE_FACTOR; // op ESP32 modules is VBAT zelf via spanningsdeler met een ADC1 pin te verbinden (ADC2 niet gebruiken)
-#else
-  return (float)0;
-#endif
-}
-
 void setup()
 {
+#if defined(CONFIG_IDF_TARGET_ESP32C3)
+  analogSetAttenuation(ADC_0db); // op de C3 supermini gebruiken we een externe weerstandbrug om het batterijvoltage te meten en zetten we de interne weerstandsbrug op geen spanningsdeling
+#endif
+
   setup_pin_mode_output(PIN_1AMOTOR);
   setup_pin_mode_output(PIN_2AMOTOR);
   setup_pin_mode_output(PIN_1BMOTOR);
   setup_pin_mode_output(PIN_2BMOTOR);
   setup_pin_mode_output(PIN_ZMOTOR);
+  setup_pin_mode_output(PIN_2ZMOTOR);
 
 #ifdef ESP8266
   // Aangezien de PWM range van analogWrite afhankelijk van de Arduino ESP8266 versie 255 ofwel 1023 is, stellen we de range vast in op 1023
@@ -340,8 +409,8 @@ void setup()
   // Verander de frequentie van analogWrite van 1000 Hz naar 400 Hz voor een aangenamer geluid
   analogWriteFrequency(MOTOR_FREQ);
 #endif
-  analogWrite(PIN_ZMOTOR, 0);
-
+  //analogWrite(PIN_ZMOTOR, 0);
+  hbridge_setZspeed(PIN_ZMOTOR, PIN_2ZMOTOR, 0);
   hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, 0);
   hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, 0);
 
@@ -368,8 +437,8 @@ void setup()
 
   led_set(LED_BRIGHTNESS_ON, false);
 
-  motorZ_snelheid.begin(0, false);
-  motorZ_snelheid.set_speed((float)MOTORZ_TIME_UP / (float)PWM_RANGE);
+  //motorZ_snelheid.begin(0, false);
+  //motorZ_snelheid.set_speed((float)MOTORZ_TIME_UP / (float)PWM_RANGE);
 
   gyroBeschikbaar = false;
 
@@ -409,6 +478,9 @@ void setup()
 #endif
 
     // set all calibration errors to zero
+    sensor.axe = 0;
+    sensor.aye = 0;
+    sensor.aze = 0;
     sensor.gxe = 0;
     sensor.gye = 0;
     sensor.gze = 0;
@@ -502,8 +574,6 @@ void setup()
   ws2812fx.setMode(WS2812FX_MODE);
   ws2812fx.start();
 #endif
-   
-  init_voltage_monitor();
 
   last_activity_message = millis();
 }
@@ -598,7 +668,7 @@ void onDisconnect()
 
 void updatestatusbar()
 {
-#if defined(ESP8266) or ((defined(ESP32)) && defined(PIN_BATMONITOR))
+//#ifdef ESP8266
   static unsigned long lastupdate_voltage = 0;
   unsigned long currentmillis = millis();
   char statusstr[50];
@@ -606,8 +676,11 @@ void updatestatusbar()
   if (currentmillis > lastupdate_voltage + TIMEOUT_MS_VOLTAGE)
   {
     lastupdate_voltage = currentmillis;
-    float voltage = getVoltage();
-
+    #ifdef ESP8266
+     float voltage = ESP.getVcc() / VOLTAGE_FACTOR; //op ESP8266 modules is VCC met de ene ADC pin verbonden
+    #else 
+      float voltage = analogRead(PIN_BATMONITOR) / VOLTAGE_FACTOR; // op ESP32 modules is VBAT zelf via spanningsdeler met een ADC1 pin te verbinden (ADC2 niet gebruiken)
+    #endif
     if (voltage >= VOLTAGE_THRESHOLD)
     {
       if (gyroBeschikbaar)
@@ -636,11 +709,13 @@ void updatestatusbar()
       sclient.send(statusstr);
       motors_pause();
       delay(20000); // boodschap wordt 20 seconden getoond in browser alvorens hij disconnecteert
-      WiFi.mode(WIFI_OFF);
 #ifdef ESP8266
+      WiFi.mode(WIFI_OFF);
       WiFi.forceSleepBegin();
-#endif
       delay(1);
+#else
+                    // TODO ESP32
+#endif
       while (1)
       {
         led_set(LED_BRIGHTNESS_ON, false);
@@ -650,7 +725,7 @@ void updatestatusbar()
       }
     }
   }
-#endif
+//#endif
 }
 
 void loop()
