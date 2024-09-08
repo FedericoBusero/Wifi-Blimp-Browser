@@ -436,6 +436,9 @@ void setup()
 #endif
 
     // set all calibration errors to zero
+    sensor.axe = 0;
+    sensor.aye = 0;
+    sensor.aze = 0;
     sensor.gxe = 0;
     sensor.gye = 0;
     sensor.gze = 0;
