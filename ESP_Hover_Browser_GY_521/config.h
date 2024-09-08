@@ -222,6 +222,7 @@ enum
 #define WS2812FX_BRIGHTNESS 35 // 0 .. 255
 #define WS2812FX_SPEED 1000 // in ms
 #define WS2812FX_COLOR 0x007BFF
+#define WS2812FX_COLLISION 0xFF0000 // rood
 #define WS2812FX_MODE FX_MODE_FADE // Volledige lijst op https://github.com/kitesurfer1404/WS2812FX/blob/master/src/modes_arduino.h
 
 #define PIN_SDA           4 // D2 = GPIO4 op Wemos D1 mini lite
