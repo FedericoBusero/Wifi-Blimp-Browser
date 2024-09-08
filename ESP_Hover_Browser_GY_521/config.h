@@ -186,7 +186,7 @@ enum
 #define WS2812FX_MODE FX_MODE_FADE // Volledige lijst op https://github.com/kitesurfer1404/WS2812FX/blob/master/src/modes_arduino.h
 
 #define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
-#define MOTORZ_MINSPEED (PWM_RANGE/5)
+#define MOTORZ_MINSPEED (PWM_RANGE/8)
 
 // Pas de voltagefactor aan, dat is bij elke chip verschillend. Calibreer bv. met USB stroom die 3.3V op de chip moet geven
 #define VOLTAGE_FACTOR 850.0f 
