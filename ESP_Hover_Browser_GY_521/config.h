@@ -172,43 +172,6 @@ enum
 #define LED_BRIGHTNESS_ON  HIGH
 #define LED_BRIGHTNESS_OFF LOW
 
-#elif defined(ENV_BLIMP_ESP32C3_SUPERMINI_V0)
-#define USE_CONFIG_BLIMP2Z
-
-// No DEBUG_SERIAL Serial : pin 20 & 21 in use
-
-#define PIN_1AMOTOR          5
-#define PIN_2AMOTOR          6
-#define PIN_1BMOTOR          20
-#define PIN_2BMOTOR          21
-#define PIN_1ZMOTOR          7
-#define PIN_2ZMOTOR          10
-#define PIN_LEDCONNECTIE     8 
-#define PIN_LED_DUALUSE
-#define PIN_BATMONITOR     1
-
-#define PIN_SDA            3           
-#define PIN_SCL            4
-
-#define USE_WS2812FX
-#define PIN_WS2812FX       8 // dual use led
-#define WS2812FX_NUMLEDS    5
-#define WS2812FX_RGB_ORDER  NEO_GRB
-#define WS2812FX_BRIGHTNESS 35 // 0 .. 255
-#define WS2812FX_SPEED 1000 // in ms
-#define WS2812FX_COLOR 0x007BFF // blauw
-#define WS2812FX_COLLISION 0xFF0000 // rood
-#define WS2812FX_MODE FX_MODE_FADE // Volledige lijst op https://github.com/kitesurfer1404/WS2812FX/blob/master/src/modes_arduino.h
-
-#define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
-#define MOTORZ_MINSPEED (PWM_RANGE/8)
-
-// Pas de voltagefactor aan, dat is bij elke chip verschillend. Calibreer bv. met USB stroom die 3.3V op de chip moet geven
-#define VOLTAGE_FACTOR 850.0f 
-
-#define LED_BRIGHTNESS_ON  LOW
-#define LED_BRIGHTNESS_OFF HIGH
-
 #elif defined(ENV_HOVER3MGYRO_ESP8266_LOLIND1MINILITE_WS2812FX)
 
 #define USE_CONFIG_HOVER3M
@@ -246,6 +209,42 @@ enum
 #define LED_BRIGHTNESS_ON  LOW
 #define LED_BRIGHTNESS_OFF HIGH
 
+#elif defined(ENV_BLIMP_ESP32C3_SUPERMINI_V0)
+#define USE_CONFIG_BLIMP2Z
+
+// No DEBUG_SERIAL Serial : pin 20 & 21 in use
+
+#define PIN_1AMOTOR          5
+#define PIN_2AMOTOR          6
+#define PIN_1BMOTOR          20
+#define PIN_2BMOTOR          21
+#define PIN_1ZMOTOR          7
+#define PIN_2ZMOTOR          10
+#define PIN_LEDCONNECTIE     8 
+#define PIN_LED_DUALUSE
+#define PIN_BATMONITOR     1
+
+#define PIN_SDA            3           
+#define PIN_SCL            4
+
+#define USE_WS2812FX
+#define PIN_WS2812FX       8 // dual use led
+#define WS2812FX_NUMLEDS    5
+#define WS2812FX_RGB_ORDER  NEO_GRB
+#define WS2812FX_BRIGHTNESS 35 // 0 .. 255
+#define WS2812FX_SPEED 1000 // in ms
+#define WS2812FX_COLOR 0x007BFF // blauw
+#define WS2812FX_COLLISION 0xFF0000 // rood
+#define WS2812FX_MODE FX_MODE_FADE // Volledige lijst op https://github.com/kitesurfer1404/WS2812FX/blob/master/src/modes_arduino.h
+
+#define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
+#define MOTORZ_MINSPEED (PWM_RANGE/8)
+
+// Pas de voltagefactor aan, dat is bij elke chip verschillend. Calibreer bv. met USB stroom die 3.3V op de chip moet geven
+#define VOLTAGE_FACTOR 850.0f 
+
+#define LED_BRIGHTNESS_ON  LOW
+#define LED_BRIGHTNESS_OFF HIGH
 
 #elif defined ENV_USER_DEFINED
 // defines staan buiten de code
