@@ -109,7 +109,6 @@ public:
     if (motorspeed == currentspeed) return;
 
     if (motorspeed >= 0)
-    // if (motorspeed > 0)
     {
       digitalWrite(pin1, HIGH);
       analogWrite(pin2, PWM_RANGE - motorspeed);
