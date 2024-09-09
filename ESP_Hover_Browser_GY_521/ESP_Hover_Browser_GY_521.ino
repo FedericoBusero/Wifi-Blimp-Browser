@@ -27,16 +27,16 @@ GY521 sensor(GY521_I2C_ADDRESS);
 
 #include <ESPAsyncWebSrv.h> // ESPAsyncWebSrv, version 1.2.6 by dvarrel : https://github.com/dvarrel/ESPAsyncWebSrv/
 #include <WiFi.h>
-#include <AsyncTCP.h>   // https://github.com/me-no-dev/AsyncTCP
+#include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
 
 #define PWM_RANGE 255 // PWM range voor analogWrite
-#define MOTOR_MINSPEED 0
+#define MOTOR_MINSPEED 2
 
 #elif defined(ARDUINO_ARCH_ESP32)
 
 #include <ESPAsyncWebServer.h> // https://github.com/me-no-dev/ESPAsyncWebServer
 #include <WiFi.h>
-#include <AsyncTCP.h>   // https://github.com/me-no-dev/AsyncTCP
+#include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
 
 #define PWM_RANGE 255 // PWM range voor analogWrite
 #define MOTOR_MINSPEED 0
@@ -86,10 +86,59 @@ int ui_joystick_y = 0;
 int ui_slider1 = 0; // -180 .. 180
 int ui_slider2 = 0; // 0 .. 360
 
-#define MOTOR_FREQ 512     // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
+#define MOTOR_FREQ 512 // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
 
 Easer motorZ_snelheid;
 bool motors_halt;
+
+class hbridge
+{
+public:
+  hbridge(int _pin1, int _pin2)
+      : pin1(_pin1), pin2(_pin2), currentspeed(0)
+  {
+  }
+
+  void setSpeed(long motorspeed, long min_speed = 0)
+  {
+    if (abs(motorspeed) < min_speed)
+    {
+      motorspeed = 0;
+    }
+
+    if (motorspeed == currentspeed) return;
+
+    if (motorspeed >= 0)
+    // if (motorspeed > 0)
+    {
+      digitalWrite(pin1, HIGH);
+      analogWrite(pin2, PWM_RANGE - motorspeed);
+    }
+    else
+    {
+      digitalWrite(pin1, LOW);
+      analogWrite(pin2, -motorspeed);
+    }
+    currentspeed = motorspeed;
+  }
+
+  void halt()
+  {
+    digitalWrite(pin1, HIGH);
+    analogWrite(pin2, PWM_RANGE);
+    currentspeed = 0;
+  }
+
+private:
+  int pin1, pin2;
+  int currentspeed;
+};
+
+#ifdef USE_CONFIG_BLIMP2Z
+hbridge motorZ(PIN_1ZMOTOR, PIN_2ZMOTOR);
+#endif
+hbridge motorA(PIN_1AMOTOR, PIN_2AMOTOR);
+hbridge motorB(PIN_1BMOTOR, PIN_2BMOTOR);
 
 bool gyroBeschikbaar = false;
 bool collision = false; // VOOR BOTSDETECTIE
@@ -150,24 +199,6 @@ float getGyro()
 }
 #endif
 
-void hbridge_setspeed(int pin1, int pin2, long motorspeed, long min_speed = 0)
-{
-  if (abs(motorspeed) < min_speed)
-  {
-    motorspeed = 0;
-  }
-  if (motorspeed >= 0)
-  {
-    digitalWrite(pin1, HIGH);
-    analogWrite(pin2, PWM_RANGE - motorspeed);
-  }
-  else
-  {
-    digitalWrite(pin1, LOW);
-    analogWrite(pin2, -motorspeed);
-  }
-}
-
 float mapFloat(float value, float fromLow, float fromHigh, float toLow, float toHigh)
 {
   return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
@@ -179,13 +210,13 @@ void updateMotors()
 
   if (motors_halt)
   {
-  #ifdef USE_CONFIG_BLIMP2Z
-    hbridge_setspeed(PIN_1ZMOTOR, PIN_2ZMOTOR, 0);
-  #else
+#ifdef USE_CONFIG_BLIMP2Z
+    motorZ.halt();
+#else
     analogWrite(PIN_ZMOTOR, 0);
-  #endif
-    hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, 0);
-    hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, 0);
+#endif
+    motorA.halt();
+    motorB.halt();
   }
   else
   {
@@ -214,11 +245,11 @@ void updateMotors()
       regelX = (1.0) * (float)(ui_joystick_x)*max_draai_factor;
     }
 
-  #ifdef USE_CONFIG_BLIMP2Z
-    int doel_motorZsnelheid = map(ui_slider2, 0, 360, -PWM_RANGE, PWM_RANGE); 
-  #else
+#ifdef USE_CONFIG_BLIMP2Z
+    int doel_motorZsnelheid = map(ui_slider2, 0, 360, -PWM_RANGE, PWM_RANGE);
+#else
     int doel_motorZsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE); // voor zweefmotor
-  #endif
+#endif
     if (abs(ui_joystick_y * ui_joystick_x) >= 5)
     {
       last_activity_joystick = millis();
@@ -254,13 +285,13 @@ void updateMotors()
     float motorsnelheidA = mapFloat(-temp2, -180.0, 180.0, -(float)PWM_RANGE, (float)PWM_RANGE);
     float motorsnelheidB = mapFloat(-temp1, -180.0, 180.0, -(float)PWM_RANGE, (float)PWM_RANGE);
 
-    hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, (long)motorsnelheidA, MOTOR_MINSPEED);
-    hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, (long)motorsnelheidB, MOTOR_MINSPEED);
+    motorA.setSpeed( (long)motorsnelheidA, MOTOR_MINSPEED);
+    motorB.setSpeed((long)motorsnelheidB, MOTOR_MINSPEED);
 
     motorZ_snelheid.easeTo(doel_motorZsnelheid);
     motorZ_snelheid.update();
 #ifdef USE_CONFIG_BLIMP2Z
-    hbridge_setspeed(PIN_1ZMOTOR, PIN_2ZMOTOR, motorZ_snelheid.getCurrentValue(), MOTORZ_MINSPEED);
+    motorZ.setSpeed(motorZ_snelheid.getCurrentValue(), MOTORZ_MINSPEED);
 #else
     analogWrite(PIN_ZMOTOR, motorZ_snelheid.getCurrentValue()); // We passen de snelheid van de motor aan naar zijn nieuwe snelheid motorZ_snelheid
 #endif
@@ -304,7 +335,7 @@ void init_motors()
   ui_slider2 = 180;
 #else
   ui_slider2 = 0;
-#endif   
+#endif
   ui_joystick_x = 0;
   ui_joystick_y = 0;
   motorZ_snelheid.setValue(0);
@@ -399,13 +430,13 @@ void setup()
   analogWriteFrequency(MOTOR_FREQ);
 #endif
 #ifdef USE_CONFIG_BLIMP2Z
-  hbridge_setspeed(PIN_1ZMOTOR, PIN_2ZMOTOR, 0);
+  motorZ.halt();
 #else
   analogWrite(PIN_ZMOTOR, 0);
 #endif
 
-  hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, 0);
-  hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, 0);
+  motorA.halt();
+  motorB.halt();
 
   delay(200); // 200 milliseconden wachten tot de stroom stabiel is
 
@@ -569,7 +600,7 @@ void setup()
   ws2812fx.setMode(WS2812FX_MODE);
   ws2812fx.start();
 #endif
-   
+
   init_voltage_monitor();
 
   last_activity_message = millis();
@@ -818,7 +849,6 @@ void loop()
     ws2812fx.service();
   }
 #endif
-
 
   // delay(2);
 }
