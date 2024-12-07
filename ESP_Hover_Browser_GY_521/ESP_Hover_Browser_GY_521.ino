@@ -89,6 +89,7 @@ int ui_slider2 = 0; // 0 .. 360
 #define MOTOR_FREQ 512 // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
 
 Easer motorZ_snelheid;
+Easer motorA_snelheid;
 bool motors_halt;
 
 class hbridge
@@ -135,8 +136,10 @@ private:
 
 #ifdef USE_CONFIG_BLIMP2Z
 hbridge motorZ(PIN_1ZMOTOR, PIN_2ZMOTOR);
-#endif
 hbridge motorA(PIN_1AMOTOR, PIN_2AMOTOR);
+#elif !defined (USE_CONFIG_BLIMP2X1Y1Z)
+hbridge motorA(PIN_1AMOTOR, PIN_2AMOTOR);
+#endif
 hbridge motorB(PIN_1BMOTOR, PIN_2BMOTOR);
 
 bool gyroBeschikbaar = false;
@@ -211,16 +214,20 @@ void updateMotors()
   {
 #ifdef USE_CONFIG_BLIMP2Z
     motorZ.halt();
+    motorA.halt();
+#elif defined(USE_CONFIG_BLIMP2X1Y1Z)
+    analogWrite(PIN_2AMOTOR, 0);
+    analogWrite(PIN_ZMOTOR, 0);
 #else
+    motorA.halt();
     analogWrite(PIN_ZMOTOR, 0);
 #endif
-    motorA.halt();
     motorB.halt();
   }
   else
   {
     float regelX = 0.0;
-    const float max_draai_factor = GYRO_REGELING_MAX_DRAAI;
+    float max_draai_factor = GYRO_REGELING_MAX_DRAAI;
 
     if (gyroBeschikbaar) // gyro
     {
@@ -241,13 +248,16 @@ void updateMotors()
     }
     else
     {
+#ifdef USE_CONFIG_BLIMP2X1Y1Z
+        max_draai_factor = mapFloat((float)ui_slider1, -180.0, 180.0, 0.5, GYRO_REGELING_MAX_DRAAI);
+#endif
       regelX = (1.0) * (float)(ui_joystick_x)*max_draai_factor;
     }
 
 #ifdef USE_CONFIG_BLIMP2Z
     int doel_motorZsnelheid = map(ui_slider2, 0, 360, -PWM_RANGE, PWM_RANGE);
 #else
-    int doel_motorZsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE); // voor zweefmotor
+    int doel_motorZsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE); // voor zweefmotor of upmotor bij ESP01 blimp
 #endif
     if (abs(ui_joystick_y * ui_joystick_x) >= 5)
     {
@@ -278,14 +288,30 @@ void updateMotors()
 #endif
 
     // x en y omzetten naar motorsnelheden
-    float temp1 = constrain((float)ui_joystick_y + regelX, -180, 180);
-    float temp2 = constrain((float)ui_joystick_y - regelX, -180, 180);
+#ifdef USE_CONFIG_BLIMP2X1Y1Z
+        float temp1 = constrain(regelX, -180, 180);
+        float temp2 = constrain((float)ui_joystick_y, -180, 180);
+#else
+        float temp1 = constrain((float)ui_joystick_y + regelX, -180, 180);
+        float temp2 = constrain((float)ui_joystick_y - regelX, -180, 180);
+#endif
 
-    float motorsnelheidA = mapFloat(-temp2, -180.0, 180.0, -(float)PWM_RANGE, (float)PWM_RANGE);
     float motorsnelheidB = mapFloat(-temp1, -180.0, 180.0, -(float)PWM_RANGE, (float)PWM_RANGE);
 
-    motorA.setSpeed( (long)motorsnelheidA, MOTOR_MINSPEED);
-    motorB.setSpeed((long)motorsnelheidB, MOTOR_MINSPEED);
+#ifdef USE_CONFIG_BLIMP2X1Y1Z
+        float doel_motorAsnelheid = mapFloat(-temp2, -180.0, 180.0, -(float)PWM_RANGE, (float)PWM_RANGE);
+        if (doel_motorAsnelheid < 0)
+        {
+           doel_motorAsnelheid = 0;
+        }
+        motorA_snelheid.easeTo(doel_motorAsnelheid);
+        motorA_snelheid.update();
+        analogWrite(PIN_2AMOTOR, motorA_snelheid.getCurrentValue()); // We passen de snelheid van de motor aan naar zijn nieuwe snelheid motorZ_snelheid
+#else
+        float motorsnelheidA = mapFloat(-temp2, -180.0, 180.0, -(float)PWM_RANGE, (float)PWM_RANGE);
+        motorA.setSpeed( (long)motorsnelheidA, MOTOR_MINSPEED);
+#endif
+        motorB.setSpeed((long)motorsnelheidB, MOTOR_MINSPEED);
 
     motorZ_snelheid.easeTo(doel_motorZsnelheid);
     motorZ_snelheid.update();
@@ -338,6 +364,9 @@ void init_motors()
   ui_joystick_x = 0;
   ui_joystick_y = 0;
   motorZ_snelheid.setValue(0);
+#ifdef USE_CONFIG_BLIMP2X1Y1Z
+  motorA_snelheid.setValue(0);
+#endif 
   motors_halt = false;
 
   updateMotors();
@@ -358,6 +387,9 @@ void led_set(int ledmode, boolean except_when_dual_use)
 #endif
 #ifdef PIN_LEDCONNECTIE
   digitalWrite(PIN_LEDCONNECTIE, ledmode);
+  #ifdef USE_CONFIG_BLIMP2X1Y1Z
+    digitalWrite(PIN_LEDCONNECTIE2, ledmode); // in deze configuratie motorpin mee laten doen om motor stil te houden.
+  #endif  
 #endif
 }
 
@@ -403,16 +435,18 @@ void collision_effect() // VOOR BOTSDETECTIE
 
 void setup()
 {
+#if !defined(USE_CONFIG_BLIMP2X1Y1Z)  
   setup_pin_mode_output(PIN_1AMOTOR);
-  setup_pin_mode_output(PIN_2AMOTOR);
-  setup_pin_mode_output(PIN_1BMOTOR);
-  setup_pin_mode_output(PIN_2BMOTOR);
-#ifdef USE_CONFIG_BLIMP2Z
+#endif
+#if defined(USE_CONFIG_BLIMP2Z)
   setup_pin_mode_output(PIN_1ZMOTOR);
   setup_pin_mode_output(PIN_2ZMOTOR);
 #else
   setup_pin_mode_output(PIN_ZMOTOR);
 #endif
+setup_pin_mode_output(PIN_2AMOTOR);
+setup_pin_mode_output(PIN_1BMOTOR);
+setup_pin_mode_output(PIN_2BMOTOR);
 
 #ifdef ESP8266
   // Aangezien de PWM range van analogWrite afhankelijk van de Arduino ESP8266 versie 255 ofwel 1023 is, stellen we de range vast in op 1023
@@ -428,13 +462,17 @@ void setup()
   // Verander de frequentie van analogWrite van 1000 Hz naar 400 Hz voor een aangenamer geluid
   analogWriteFrequency(MOTOR_FREQ);
 #endif
+
 #ifdef USE_CONFIG_BLIMP2Z
   motorZ.halt();
+  motorA.halt();
+#elif defined(USE_CONFIG_BLIMP2X1Y1Z)
+  analogWrite(PIN_ZMOTOR, 0);
+  analogWrite(PIN_2AMOTOR, 0);
 #else
+  motorA.halt();
   analogWrite(PIN_ZMOTOR, 0);
 #endif
-
-  motorA.halt();
   motorB.halt();
 
   delay(200); // 200 milliseconden wachten tot de stroom stabiel is
@@ -462,6 +500,12 @@ void setup()
   motorZ_snelheid.begin(0, false);
 #endif
   motorZ_snelheid.set_speed((float)MOTORZ_TIME_UP / (float)PWM_RANGE);
+
+#ifdef USE_CONFIG_BLIMP2X1Y1Z
+  motorA_snelheid.begin(0, true);
+  motorA_snelheid.set_speed((float)MOTORA_TIME_UP / (float)PWM_RANGE);
+#endif
+    
 
   init_motors();
 
@@ -671,7 +715,7 @@ void handle_message(websockets::WebsocketsMessage msg)
 
 void onConnect()
 {
-#ifdef PIN_LED_DUALUSE
+#if defined(PIN_LED_DUALUSE) && !defined(USE_CONFIG_BLIMP2X1Y1Z) //ander soort dual use 2X1Y1Z als ik het goed begrijp, aangepast omdat anders de B motor aan gaat
   digitalWrite(PIN_LEDCONNECTIE, LOW);
 #else
   led_set(LED_BRIGHTNESS_OFF, false);

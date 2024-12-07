@@ -9,7 +9,7 @@
 // #define ENV_HOVER3MGYRO_ESP32S2_LOLIN_S2_MINI
 
 // #define ENV_BLIMP_ESP32C3_SUPERMINI_V0
-
+#define ENV_BLIMP_ESP01_V0
 // Als de defines in platformio.ini gedefinieerd zijn:
 // #define ENV_USER_DEFINED
 
@@ -246,6 +246,30 @@ enum
 #define LED_BRIGHTNESS_ON  LOW
 #define LED_BRIGHTNESS_OFF HIGH
 
+#elif defined(ENV_BLIMP_ESP01_V0)
+#define USE_CONFIG_BLIMP2X1Y1Z
+// #define DEBUG_SERIAL Serial
+
+#define PIN_2AMOTOR          0 // zou nog kunnen hernoemd worden
+#define PIN_1BMOTOR          3
+#define PIN_2BMOTOR          1
+#define PIN_ZMOTOR           2
+#define PIN_LEDCONNECTIE     1 // dual use met motorpin
+#define PIN_LEDCONNECTIE2    3 // om andere motorpin mee te laten volgen bij led knipperen en dus de motor niet in te schakelen.
+#define PIN_LED_DUALUSE
+
+// #define PIN_SDA            9 // 3            
+// #define PIN_SCL            10 // 4
+
+#define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
+#define MOTORA_TIME_UP 500 // ms to go to ease to full power of a motor
+
+#define LED_BRIGHTNESS_ON  LOW
+#define LED_BRIGHTNESS_OFF HIGH
+
+#define VOLTAGE_FACTOR 1060.0f 
+
+
 #elif defined ENV_USER_DEFINED
 // defines staan buiten de code
 
@@ -295,6 +319,15 @@ enum
 #define GYRO_REGELING_MAX_P     2.4
 #define GYRO_REGELING_MAX_DRAAI 0.5
 #define GYRO_REGELING_BIAS      1.0
+
+#define WIFI_SOFTAP_SSID_PREFIX "Blimp-"
+
+#elif defined (USE_CONFIG_BLIMP2X1Y1Z)
+
+// "Gyro" instellingen voor Blimp
+//#define USE_GY521 //geen gyro dus
+#define GYRO_REGELING_MAX_DRAAI 1 //eigenlijk geen gyro, maar wel deze factor
+
 
 #define WIFI_SOFTAP_SSID_PREFIX "Blimp-"
 
