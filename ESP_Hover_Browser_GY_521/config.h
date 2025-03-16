@@ -8,7 +8,7 @@
 // #define ENV_HOVER3MGYRO_ESP32C3_SUPERMINI
 // #define ENV_HOVER3MGYRO_ESP32S2_LOLIN_S2_MINI
 //#define ENV_BLIMP_ESP32C3_SUPERMINI_V0
-#define ENV_BLIMP_ESP32C3_WROOM_V0
+// #define ENV_BLIMP_ESP32C3_WROOM_V0
 
 // Als de defines in platformio.ini gedefinieerd zijn:
 // #define ENV_USER_DEFINED
