@@ -122,7 +122,7 @@ enum
 
 #define USE_CONFIG_HOVER3M
 
-#define DEBUG_SERIAL Serial
+//#define DEBUG_SERIAL Serial
 
 #define PIN_1AMOTOR          0
 #define PIN_2AMOTOR          1
@@ -145,7 +145,7 @@ enum
 
 #define USE_CONFIG_HOVER3M
 
-#define DEBUG_SERIAL Serial
+//#define DEBUG_SERIAL Serial
 
 #define PIN_1AMOTOR          12 // Positie D8 op Wemos D1 mini
 #define PIN_2AMOTOR          11 // Positie D7 op Wemos D1 mini
