@@ -284,7 +284,7 @@ void updateMotors()
     float motorsnelheidA = mapFloat(-temp2, -180.0, 180.0, -(float)PWM_RANGE, (float)PWM_RANGE);
     float motorsnelheidB = mapFloat(-temp1, -180.0, 180.0, -(float)PWM_RANGE, (float)PWM_RANGE);
 
-    motorA.setSpeed( (long)motorsnelheidA, MOTOR_MINSPEED);
+    motorA.setSpeed((long)motorsnelheidA, MOTOR_MINSPEED);
     motorB.setSpeed((long)motorsnelheidB, MOTOR_MINSPEED);
 
     motorZ_snelheid.easeTo(doel_motorZsnelheid);
