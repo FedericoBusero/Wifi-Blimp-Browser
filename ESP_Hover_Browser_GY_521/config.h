@@ -317,6 +317,8 @@ enum
 #define GYRO_REGELING_BIAS      1.0
 #define GYRO_LPF_TF             0.080 // Tf in seconds
 
+#define XY_MOTOR_MAX    1.0 //later regelbaar maken
+
 #elif defined (USE_CONFIG_BLIMP)
 
 // Gyro instellingen voor Blimp
@@ -330,7 +332,7 @@ enum
 #define GYRO_REGELING_BIAS      1.0
 #define GYRO_LPF_TF             0.080 // Tf in seconds
 
-#define XY_MOTOR_MAX    1 //later regelbaar maken
+#define XY_MOTOR_MAX    1.0 //later regelbaar maken
 
 #define WIFI_SOFTAP_SSID_PREFIX "Blimp-"
 
