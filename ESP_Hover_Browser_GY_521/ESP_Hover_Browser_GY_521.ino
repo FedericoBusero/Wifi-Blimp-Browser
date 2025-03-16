@@ -228,7 +228,6 @@ void updateMotors()
 #ifdef USE_FASTIMU
       // "gyro"-regeling
       float Pfactor = mapFloat((float)ui_slider1, -180.0, 180.0, 0.0, GYRO_REGELING_MAX_P);
-      const float max_draai_factor = GYRO_REGELING_MAX_DRAAI;
       const float bias = GYRO_REGELING_BIAS;
 
       float werkelijke_draaisnelheid = getGyro();
