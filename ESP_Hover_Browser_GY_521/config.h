@@ -74,7 +74,7 @@ enum
 #define GY521_I2C_ADDRESS 0x68 // alternatief 0x69
 
 #if defined(CONFIG_IDF_TARGET_ESP32C3)
-#define VOLTAGE_THRESHOLD 0.0 // bij testen op USB out of range //3.1 // onder dit voltage uit, om op hol slaan te vermijden op ESP32C3. Gemeten op batterij zelf.
+#define VOLTAGE_THRESHOLD 3.0 // bij testen op USB out of range //3.1 // onder dit voltage uit, om op hol slaan te vermijden op ESP32C3. Gemeten op batterij zelf.
 #else
 #define VOLTAGE_THRESHOLD 2.7 // onder dit voltage uit, om de batterij te beschermen, gemeten na de spanningsregelaar bij ESP8266.
 #endif
