@@ -219,10 +219,10 @@ enum
 
 #define PIN_1AMOTOR          5
 #define PIN_2AMOTOR          6
-#define PIN_1BMOTOR          20 //7
-#define PIN_2BMOTOR          21 //10
-#define PIN_1ZMOTOR           7 //20
-#define PIN_2ZMOTOR          10 //21
+#define PIN_1BMOTOR          20
+#define PIN_2BMOTOR          21
+#define PIN_1ZMOTOR          7
+#define PIN_2ZMOTOR          10
 #define PIN_LEDCONNECTIE     8 
 #define PIN_LED_DUALUSE
 
