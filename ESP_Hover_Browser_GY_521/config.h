@@ -225,6 +225,7 @@ enum
 #define PIN_2ZMOTOR          10
 #define PIN_LEDCONNECTIE     8 
 #define PIN_LED_DUALUSE
+#define PIN_BATMONITOR       1
 
 #define PIN_SDA           3
 #define PIN_SCL            4
