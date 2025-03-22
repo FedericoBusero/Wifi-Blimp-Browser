@@ -273,6 +273,7 @@ enum
 #define GYRO_REGELING_MAX_DRAAI 0.5
 #define GYRO_REGELING_BIAS      1.0
 
+#define XY_MOTOR_MAX    1.0 // later regelbaar maken 0.0 - 1.0
 
 #elif defined (USE_CONFIG_BLIMP)
 
@@ -283,6 +284,8 @@ enum
 #define GYRO_REGELING_MAX_P     2.4
 #define GYRO_REGELING_MAX_DRAAI 0.5
 #define GYRO_REGELING_BIAS      1.0
+
+#define XY_MOTOR_MAX    1.0 // later regelbaar maken 0.0 - 1.0
 
 #define WIFI_SOFTAP_SSID_PREFIX "Blimp-"
 
@@ -295,6 +298,8 @@ enum
 #define GYRO_REGELING_MAX_P     2.4
 #define GYRO_REGELING_MAX_DRAAI 0.5
 #define GYRO_REGELING_BIAS      1.0
+
+#define XY_MOTOR_MAX   0.75 // later regelbaar maken 0.0 - 1.0
 
 #define WIFI_SOFTAP_SSID_PREFIX "Blimp-"
 
