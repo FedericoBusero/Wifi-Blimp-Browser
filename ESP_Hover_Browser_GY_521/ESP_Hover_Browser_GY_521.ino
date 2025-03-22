@@ -718,8 +718,8 @@ void updatestatusbar()
         snprintf(statusstr, sizeof(statusstr), "%4.2f V", voltage);
       }
 #ifdef DEBUG_SERIAL
-      // DEBUG_SERIAL.print("Sending status: ");
-      // DEBUG_SERIAL.println(statusstr);
+      DEBUG_SERIAL.print("Sending status: ");
+      DEBUG_SERIAL.println(statusstr);
 #endif
       sclient.send(statusstr);
     }
@@ -747,7 +747,7 @@ void updatestatusbar()
       }
     }
   }
-#elif defined(USE_GY521)
+#else
   static unsigned long lastupdate_status = 0;
   unsigned long currentmillis = millis();
   char statusstr[50];
@@ -758,13 +758,19 @@ void updatestatusbar()
 
     if (gyroBeschikbaar)
     {
+#ifdef USE_GY521
       snprintf(statusstr, sizeof(statusstr), "gyro:%4.2f", getGyro());
-#ifdef DEBUG_SERIAL
-      // DEBUG_SERIAL.print("Sending status: ");
-      // DEBUG_SERIAL.println(statusstr);
 #endif
-      sclient.send(statusstr);
     }
+    else
+    {
+      snprintf(statusstr, sizeof(statusstr), "");
+    }
+#ifdef DEBUG_SERIAL
+    DEBUG_SERIAL.print("Sending status: ");
+    DEBUG_SERIAL.println(statusstr);
+#endif
+    sclient.send(statusstr);
   }
 #endif
 }
