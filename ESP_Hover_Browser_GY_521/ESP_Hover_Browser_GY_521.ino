@@ -281,8 +281,8 @@ void updateMotors()
     float temp1 = constrain((float)ui_joystick_y + regelX, -180, 180);
     float temp2 = constrain((float)ui_joystick_y - regelX, -180, 180);
 
-    float motorsnelheidA = mapFloat(-temp2, -180.0, 180.0, -(float)PWM_RANGE, (float)PWM_RANGE);
-    float motorsnelheidB = mapFloat(-temp1, -180.0, 180.0, -(float)PWM_RANGE, (float)PWM_RANGE);
+    float motorsnelheidA = mapFloat(-temp2, -180.0, 180.0, -(float)PWM_RANGE * XY_MOTOR_MAX, (float)PWM_RANGE* XY_MOTOR_MAX);
+    float motorsnelheidB = mapFloat(-temp1, -180.0, 180.0, -(float)PWM_RANGE * XY_MOTOR_MAX, (float)PWM_RANGE* XY_MOTOR_MAX);
 
     motorA.setSpeed((long)motorsnelheidA, MOTOR_MINSPEED);
     motorB.setSpeed((long)motorsnelheidB, MOTOR_MINSPEED);
