@@ -189,7 +189,7 @@ enum
 #define PIN_LEDCONNECTIE   2 
 #define PIN_LED_DUALUSE
 
-#define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
+#define MOTORZ_TIME_UP 1000 // ms to go to ease to full power of a motor
 
 #define USE_WS2812FX
 #define PIN_WS2812FX       D4 // =GPIO2 dual use led
