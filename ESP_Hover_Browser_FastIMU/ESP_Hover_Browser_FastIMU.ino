@@ -236,7 +236,6 @@ void updateMotors()
       float Pfactor = mapFloat((float)ui_slider1, -180.0, 180.0, 0.0, GYRO_REGELING_MAX_P);
       const float bias = GYRO_REGELING_BIAS;
 
-      sensor.read();
       float werkelijke_draaisnelheid = getGyro();
 
       // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
