@@ -179,21 +179,16 @@ float getGyro()
   }
 #ifdef GYRO_FLIP
   measured_value = -measured_value;
-
-  // VOOR BOTSDETECTIE
-  collision =
-
-      (sq(sensor.getAccelX()) +
-       sq(sensor.getAccelY()) +
-       sq(abs(sensor.getAccelZ() + 1))) > ACCELERATION_THRESHOLD;
-#else
-  // VOOR BOTSDETECTIE
-  collision =
-
-      (sq(sensor.getAccelX()) +
-       sq(sensor.getAccelY()) +
-       sq(abs(sensor.getAccelZ() - 1))) > ACCELERATION_THRESHOLD;
 #endif
+
+  float accelX = sensor.getAccelX();
+  float accelY = sensor.getAccelY();
+#ifdef GYRO_FLIP
+  float accelZ = sensor.getAccelZ() + 1;
+#else
+  float accelZ = sensor.getAccelZ() - 1;
+#endif
+  collision = (sq(accelX) + sq(accelY) + sq(accelZ)) > ACCELERATION_THRESHOLD; // VOOR BOTSDETECTIE
   return measured_value;
 }
 #endif
