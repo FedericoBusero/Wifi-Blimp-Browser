@@ -112,7 +112,7 @@ enum
 #define PIN_SDA           4 // D2 = GPIO4 op Wemos D1 mini lite
 #define PIN_SCL            5 // D1 = GPIO5 op Wemos D1 mini lite
 
-#define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
+#define MOTORZ_TIME_UP 1000 // ms to go to ease to full power of a motor
 
 // Pas de voltagefactor aan, dat is bij elke chip verschillend. Calibreer bv. met USB stroom die 3.3V op de chip moet geven
 #define VOLTAGE_FACTOR 910.0f 
