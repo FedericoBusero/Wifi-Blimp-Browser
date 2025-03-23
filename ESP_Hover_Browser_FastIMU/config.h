@@ -351,7 +351,7 @@ enum
 
 // Gyro instellingen voor Blimp
 #define GYRO_REGELING_MAX_P     2.4
-#define GYRO_REGELING_MAX_DRAAI 0.5
+#define GYRO_REGELING_MAX_DRAAI 1.0
 #define GYRO_REGELING_BIAS      1.0
 #define GYRO_LPF_TF             0.080 // Tf in seconds
 
