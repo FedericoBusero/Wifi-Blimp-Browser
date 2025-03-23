@@ -68,8 +68,6 @@ enum
 #define WIFI_SOFTAP_PASSWORD "12345678"
 #define WIFI_SOFTAP_CHANNEL 1 // 1-13
 
-#define GY521_I2C_ADDRESS 0x68 // alternatief 0x69
-
 #if defined(CONFIG_IDF_TARGET_ESP32C3)
 #define VOLTAGE_THRESHOLD 3.1 // onder dit voltage uit, om op hol slaan te vermijden op ESP32C3. Gemeten op batterij zelf.
 #else
@@ -224,6 +222,11 @@ enum
 #define PIN_LED_DUALUSE
 #define PIN_BATMONITOR     1
 
+#define USE_GY521
+#define GY521_I2C_ADDRESS 0x68 // alternatief 0x69
+#define GYRO_DIRECTION GYRO_DIRECTION_Z
+#define GYRO_FLIP
+
 #define PIN_SDA            3           
 #define PIN_SCL            4
 
@@ -268,6 +271,7 @@ enum
 
 // gyro instellingen voor Hover3M
 #define USE_GY521
+#define GY521_I2C_ADDRESS 0x68 // alternatief 0x69
 #define GYRO_DIRECTION GYRO_DIRECTION_Z
 #define GYRO_REGELING_MAX_P     2.4
 #define GYRO_REGELING_MAX_DRAAI 0.5
@@ -279,6 +283,7 @@ enum
 
 // Gyro instellingen voor Blimp
 #define USE_GY521
+#define GY521_I2C_ADDRESS 0x68 // alternatief 0x69
 #define GYRO_DIRECTION GYRO_DIRECTION_Z
 #define GYRO_FLIP
 #define GYRO_REGELING_MAX_P     2.4
@@ -292,9 +297,6 @@ enum
 #elif defined (USE_CONFIG_BLIMP2Z)
 
 // Gyro instellingen voor Blimp
-#define USE_GY521
-#define GYRO_DIRECTION GYRO_DIRECTION_Z
-#define GYRO_FLIP
 #define GYRO_REGELING_MAX_P     2.4
 #define GYRO_REGELING_MAX_DRAAI 0.5
 #define GYRO_REGELING_BIAS      1.0
