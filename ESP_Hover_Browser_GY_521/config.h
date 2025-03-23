@@ -23,7 +23,9 @@ Als je een ander board wenst te definiëren, zijn volgende defines nodig:
     - een blimp (zeppelin) met 1 Z-motor en 2 bidirectionele motoren
     
 * Als een gyro gebruikt wordt, zijn volgende defines nodig:
-- USE_GY521
+- USE_FASTIMU
+- FASTIMU_TYPE // Currently supported by FASTIMU: MPU9255 MPU9250 MPU6886 MPU6500 MPU6050 ICM20689 ICM20690 BMI055 BMX055 BMI160 LSM6DS3 LSM6DSL QMI8658
+- IMU_I2C_ADDRESS // 0x68 standaard bij MPU6050, 0x6B standaard bij LSM6DS3
 - GYRO_REGELING_P
 - GYRO_REGELING_MAX_DRAAI
 - GYRO_REGELING_BIAS
@@ -222,8 +224,9 @@ enum
 #define PIN_LED_DUALUSE
 #define PIN_BATMONITOR     1
 
-#define USE_GY521
-#define GY521_I2C_ADDRESS 0x68 // alternatief 0x69
+#define USE_FASTIMU
+#define FASTIMU_TYPE MPU6050
+#define IMU_I2C_ADDRESS 0x68
 #define GYRO_DIRECTION GYRO_DIRECTION_Z
 #define GYRO_FLIP
 
@@ -270,8 +273,9 @@ enum
 #define WIFI_SOFTAP_SSID_PREFIX "hover3m-"
 
 // gyro instellingen voor Hover3M
-#define USE_GY521
-#define GY521_I2C_ADDRESS 0x68 // alternatief 0x69
+#define USE_FASTIMU
+#define FASTIMU_TYPE MPU6050
+#define IMU_I2C_ADDRESS 0x68
 #define GYRO_DIRECTION GYRO_DIRECTION_Z
 #define GYRO_REGELING_MAX_P     2.4
 #define GYRO_REGELING_MAX_DRAAI 0.5
@@ -282,8 +286,9 @@ enum
 #elif defined (USE_CONFIG_BLIMP)
 
 // Gyro instellingen voor Blimp
-#define USE_GY521
-#define GY521_I2C_ADDRESS 0x68 // alternatief 0x69
+#define USE_FASTIMU
+#define FASTIMU_TYPE MPU6050
+#define IMU_I2C_ADDRESS 0x68
 #define GYRO_DIRECTION GYRO_DIRECTION_Z
 #define GYRO_FLIP
 #define GYRO_REGELING_MAX_P     2.4
