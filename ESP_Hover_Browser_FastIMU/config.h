@@ -280,6 +280,7 @@ enum
 #define GYRO_REGELING_MAX_P     2.4
 #define GYRO_REGELING_MAX_DRAAI 0.5
 #define GYRO_REGELING_BIAS      1.0
+#define GYRO_LPF_TF             0.080 // Tf in seconds
 
 #define XY_MOTOR_MAX    1.0 // later regelbaar maken 0.0 - 1.0
 
@@ -294,6 +295,7 @@ enum
 #define GYRO_REGELING_MAX_P     2.4
 #define GYRO_REGELING_MAX_DRAAI 0.5
 #define GYRO_REGELING_BIAS      1.0
+#define GYRO_LPF_TF             0.080 // Tf in seconds
 
 #define XY_MOTOR_MAX    1.0 // later regelbaar maken 0.0 - 1.0
 
@@ -305,6 +307,7 @@ enum
 #define GYRO_REGELING_MAX_P     2.4
 #define GYRO_REGELING_MAX_DRAAI 0.5
 #define GYRO_REGELING_BIAS      1.0
+#define GYRO_LPF_TF             0.080 // Tf in seconds
 
 #define XY_MOTOR_MAX   0.75 // later regelbaar maken 0.0 - 1.0
 
