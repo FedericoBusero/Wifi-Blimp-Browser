@@ -223,7 +223,6 @@ enum
 #define PIN_1ZMOTOR          7
 #define PIN_2ZMOTOR          10
 #define PIN_LEDCONNECTIE     8 
-#define PIN_LED_DUALUSE
 #define PIN_BATMONITOR     1
 
 #define USE_FASTIMU
@@ -236,7 +235,7 @@ enum
 #define PIN_SCL            4
 
 #define USE_WS2812FX
-#define PIN_WS2812FX       8 // dual use led
+#define PIN_WS2812FX       9 // dual use led
 #define WS2812FX_NUMLEDS    5
 #define WS2812FX_RGB_ORDER  NEO_GRB
 #define WS2812FX_BRIGHTNESS 35 // 0 .. 255
