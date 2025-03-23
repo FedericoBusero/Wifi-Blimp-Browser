@@ -227,6 +227,12 @@ enum
 // #define PIN_LED_DUALUSE
 #define PIN_BATMONITOR       1
 
+#define USE_FASTIMU
+#define FASTIMU_TYPE MPU6050
+#define IMU_I2C_ADDRESS 0x68
+#define GYRO_DIRECTION GYRO_DIRECTION_Z
+#define GYRO_FLIP
+
 #define PIN_SDA           3
 #define PIN_SCL            4
 
@@ -265,6 +271,12 @@ enum
 #define USE_WS2812FX
 #define PIN_WS2812FX       9 
 #define PIN_BATMONITOR     1
+
+#define USE_FASTIMU
+#define FASTIMU_TYPE LSM6DS3
+#define IMU_I2C_ADDRESS 0x6B
+#define GYRO_DIRECTION GYRO_DIRECTION_Z
+#define GYRO_FLIP
 
 #define PIN_SDA            19          
 #define PIN_SCL            10
@@ -340,11 +352,6 @@ enum
 #elif defined (USE_CONFIG_BLIMP2Z)
 
 // Gyro instellingen voor Blimp
-#define USE_FASTIMU
-#define FASTIMU_TYPE LSM6DS3
-#define IMU_I2C_ADDRESS 0x6B
-#define GYRO_DIRECTION GYRO_DIRECTION_Z
-#define GYRO_FLIP
 #define GYRO_REGELING_MAX_P     2.4
 #define GYRO_REGELING_MAX_DRAAI 1
 #define GYRO_REGELING_BIAS      1.0
