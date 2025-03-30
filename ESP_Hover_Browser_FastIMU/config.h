@@ -258,10 +258,10 @@ enum
 
 // No DEBUG_SERIAL Serial : pin 20 & 21 in use
 
-#define PIN_1AMOTOR          4
-#define PIN_2AMOTOR          5
-#define PIN_1BMOTOR          21
-#define PIN_2BMOTOR          20
+#define PIN_1AMOTOR          21
+#define PIN_2AMOTOR          20
+#define PIN_1BMOTOR          4
+#define PIN_2BMOTOR          5
 #define PIN_1ZMOTOR          6
 #define PIN_2ZMOTOR          7
 #define PIN_LEDCONNECTIE     8 
@@ -355,7 +355,7 @@ enum
 #define GYRO_REGELING_BIAS      1.0
 #define GYRO_LPF_TF             0.080 // Tf in seconds
 
-#define XY_MOTOR_MAX   0.75 // later regelbaar maken 0.0 - 1.0
+#define XY_MOTOR_MAX   0.85 // later regelbaar maken 0.6 - 1.0
 
 #define WIFI_SOFTAP_SSID_PREFIX "Blimp-"
 
