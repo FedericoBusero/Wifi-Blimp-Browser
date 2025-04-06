@@ -2,7 +2,7 @@
    Code voor het besturen van een hover mbv Wifi via de browser
 
    Hoe gebruiken?
-   Voeg wifi netwerk hover-xxxx toe met paswoord 12345678
+   Voeg wifi netwerk hover-xxxx of Blimp-xxxx toe met paswoord 12345678
    Er is op dat netwerk uiteraard geen internet, dus "wifi behouden" aanvinken indien dat gevraagd wordt
    Dan ga je naar de browser (chrome, firefox, safari, ..) naar de website 192.168.4.1 of http://h.be
 
