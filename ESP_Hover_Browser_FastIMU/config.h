@@ -34,6 +34,7 @@ Als je een ander board wenst te definiëren, zijn volgende defines nodig:
 - GYRO_DIRECTION : GYRO_DIRECTION_X, GYRO_DIRECTION_Y of GYRO_DIRECTION_Z
 - (optioneel) GYRO_FLIP : gebruik de negatieve waarde van de gyro: als de gyro omgekeerd hangt
 - (optioneel) PIN_SDA en PIN_SCL : indien niet gedefinieerd, worden de standaard Wire library pinnen van het bord gebruikt. 
+- (optioneel) XY_MOTOR_LIMIT_SLIDER : om de slider de max motorpower in te stellen (0 .. 1), zoniet is de slider regelaar van P-waarde
   Als één van de I2C pinnen ook als PIN_LEDCONNECTIE gebruikt wordt, definieer ook PIN_LED_DUALUSE
 
 * Als je seriële output wenst (en de RX/TX pinnen zijn niet in gebruik voor andere doelen):
@@ -365,4 +366,5 @@ enum
 #endif
 
 #endif
+
 
