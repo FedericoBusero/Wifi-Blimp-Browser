@@ -329,7 +329,8 @@ enum
 #define GYRO_REGELING_BIAS      1.0
 #define GYRO_LPF_TF             0.080 // Tf in seconds
 
-#define XY_MOTOR_MAX    1.0 // later regelbaar maken 0.0 - 1.0
+#define XY_MOTOR_MAX    1.0
+#define XY_MOTOR_LIMIT_SLIDER
 
 #elif defined (USE_CONFIG_BLIMP)
 
@@ -366,5 +367,6 @@ enum
 #endif
 
 #endif
+
 
 
