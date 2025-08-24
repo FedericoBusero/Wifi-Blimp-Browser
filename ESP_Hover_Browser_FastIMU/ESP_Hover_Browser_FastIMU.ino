@@ -110,12 +110,12 @@ public:
 
     if (motorspeed >= 0)
     {
-      digitalWrite(pin1, HIGH);
-      analogWrite(pin2, PWM_RANGE - motorspeed);
+      analogWrite(pin1, motorspeed);
+      analogWrite(pin2, 0);
     }
     else
     {
-      digitalWrite(pin1, LOW);
+      analogWrite(pin1, 0);
       analogWrite(pin2, -motorspeed);
     }
     currentspeed = motorspeed;
@@ -123,8 +123,8 @@ public:
 
   void halt()
   {
-    digitalWrite(pin1, HIGH);
-    analogWrite(pin2, PWM_RANGE);
+    analogWrite(pin1, 0);
+    analogWrite(pin2, 0);
     currentspeed = 0;
   }
 
@@ -872,5 +872,6 @@ void loop()
 
   // delay(2);
 }
+
 
 
