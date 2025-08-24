@@ -228,6 +228,11 @@ void updateMotors()
   {
     float regelX = 0.0;
     const float max_draai_factor = GYRO_REGELING_MAX_DRAAI;
+#ifdef XY_MOTOR_LIMIT_SLIDER
+    float xy_motor_limit = mapFloat((float)ui_slider1, -180.0, 180.0, 0.2 * XY_MOTOR_MAX, XY_MOTOR_MAX);
+#else
+    float xy_motor_limit = XY_MOTOR_MAX;
+#endif
 
     if (gyroBeschikbaar) // gyro
     {
@@ -236,10 +241,8 @@ void updateMotors()
 
 #ifdef XY_MOTOR_LIMIT_SLIDER
       float Pfactor = GYRO_REGELING_MAX_P;
-      float xy_motor_limit = mapFloat((float)ui_slider1, -180.0, 180.0, 0.2 * XY_MOTOR_MAX, XY_MOTOR_MAX);
 #else
       float Pfactor = mapFloat((float)ui_slider1, -180.0, 180.0, 0.0, GYRO_REGELING_MAX_P);
-      float xy_motor_limit = XY_MOTOR_MAX;
 #endif
        const float bias = GYRO_REGELING_BIAS;
 
@@ -869,4 +872,5 @@ void loop()
 
   // delay(2);
 }
+
 
