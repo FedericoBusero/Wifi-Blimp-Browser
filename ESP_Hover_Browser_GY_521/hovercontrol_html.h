@@ -84,7 +84,7 @@ const char index_html[] PROGMEM = R"=====(
 <div id='outerContainer'>
 <span id="connectiondisplay">Trying to connect</span>
 <input id="servotrim" type="range" min="-180" max="180" value="0"   step="1" class="slider-color" oninput="send(3, this.value,80,this)" onChange="send(3, this.value,0,this)" />
-<input id="maxspeed" type="range" min="0"    max="360" value="240" step="1" class="slider-color" oninput="send(2, this.value,80,this)" onChange="send(2, this.value,0,this)" />
+<input id="maxspeed" type="range" min="0"    max="360" value="180" step="1" class="slider-color" oninput="send(2, this.value,80,this)" onChange="send(2, this.value,0,this)" />
 <br>
   <div id='container'>
     <div id='item'> </div>
