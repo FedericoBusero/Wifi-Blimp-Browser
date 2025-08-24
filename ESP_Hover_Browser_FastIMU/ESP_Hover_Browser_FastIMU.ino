@@ -244,7 +244,7 @@ void updateMotors()
 #else
       float Pfactor = mapFloat((float)ui_slider1, -180.0, 180.0, 0.0, GYRO_REGELING_MAX_P);
 #endif
-       const float bias = GYRO_REGELING_BIAS;
+      const float bias = GYRO_REGELING_BIAS;
 
       float werkelijke_draaisnelheid = getGyro();
 
@@ -872,6 +872,7 @@ void loop()
 
   // delay(2);
 }
+
 
 
 
