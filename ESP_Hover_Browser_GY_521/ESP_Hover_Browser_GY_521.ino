@@ -86,12 +86,6 @@ int ui_joystick_y = 0;
 int ui_slider1 = 0; // -180 .. 180
 int ui_slider2 = 0; // 0 .. 360
 
-#ifdef XY_MOTOR_MAX //motorlimit  opzetten als variabele, want wordt mogelijks aangepast door slider
-float XY_MOTOR_LIMIT = XY_MOTOR_MAX;
-#else
-float XY_MOTOR_LIMIT = 1.0;
-#endif
-
 #define MOTOR_FREQ 512 // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
 
 Easer motorZ_snelheid;
@@ -239,11 +233,12 @@ void updateMotors()
     {
 #ifdef USE_FASTIMU
       // "gyro"-regeling
-      #ifdef XY_MOTOR_LIMIT_SLIDER
+#ifdef XY_MOTOR_LIMIT_SLIDER
       float Pfactor = GYRO_REGELING_MAX_P;
-      XY_MOTOR_LIMIT = mapFloat((float)ui_slider1, -180.0, 180.0, 0.2 * XY_MOTOR_MAX, XY_MOTOR_MAX); //overschrijven variabele indien slider zo geconfigureerd
+      float xy_motor_limit = mapFloat((float)ui_slider1, -180.0, 180.0, 0.2 * XY_MOTOR_MAX, XY_MOTOR_MAX); //overschrijven variabele indien slider zo geconfigureerd
 #else
       float Pfactor = mapFloat((float)ui_slider1, -180.0, 180.0, 0.0, GYRO_REGELING_MAX_P);
+      float xy_motor_limit = XY_MOTOR_MAX;
 #endif
       const float bias = GYRO_REGELING_BIAS;
 
@@ -298,8 +293,8 @@ void updateMotors()
     float temp1 = constrain((float)ui_joystick_y + regelX, -180, 180);
     float temp2 = constrain((float)ui_joystick_y - regelX, -180, 180);
 
-    float motorsnelheidA = XY_MOTOR_LIMIT * mapFloat(-temp2, -180.0, 180.0, -(float)PWM_RANGE * XY_MOTOR_MAX, (float)PWM_RANGE* XY_MOTOR_MAX);
-    float motorsnelheidB = XY_MOTOR_LIMIT * mapFloat(-temp1, -180.0, 180.0, -(float)PWM_RANGE * XY_MOTOR_MAX, (float)PWM_RANGE* XY_MOTOR_MAX);
+    float motorsnelheidA = mapFloat(-temp2, -180.0, 180.0, -(float)PWM_RANGE * xy_motor_limit, (float)PWM_RANGE* xy_motor_limit);
+    float motorsnelheidB = mapFloat(-temp1, -180.0, 180.0, -(float)PWM_RANGE * xy_motor_limit, (float)PWM_RANGE* xy_motor_limit);
 
     motorA.setSpeed((long)motorsnelheidA, MOTOR_MINSPEED);
     motorB.setSpeed((long)motorsnelheidB, MOTOR_MINSPEED);
@@ -873,3 +868,4 @@ void loop()
 
   // delay(2);
 }
+
