@@ -8,7 +8,8 @@
 // #define ENV_HOVER3MGYRO_ESP32C3_SUPERMINI
 // #define ENV_HOVER3MGYRO_ESP32S2_LOLIN_S2_MINI
 
-#define ENV_BLIMP_ESP32C3_SUPERMINI_V0
+// #define ENV_BLIMP_ESP32C3_SUPERMINI_V0
+#define ENV_BLIMP_ESP32C3_WROOM_V0
 
 // Als de defines in platformio.ini gedefinieerd zijn:
 // #define ENV_USER_DEFINED
@@ -23,10 +24,13 @@ Als je een ander board wenst te definiëren, zijn volgende defines nodig:
     - een blimp (zeppelin) met 1 Z-motor en 2 bidirectionele motoren
     
 * Als een gyro gebruikt wordt, zijn volgende defines nodig:
-- USE_GY521
+- USE_FASTIMU
+- FASTIMU_TYPE // Currently supported by FASTIMU: MPU9255 MPU9250 MPU6886 MPU6500 MPU6050 ICM20689 ICM20690 BMI055 BMX055 BMI160 LSM6DS3 LSM6DSL QMI8658
+- IMU_I2C_ADDRESS // 0x68 standaard bij MPU6050, 0x6B standaard bij LSM6DS3
 - GYRO_REGELING_P
 - GYRO_REGELING_MAX_DRAAI
 - GYRO_REGELING_BIAS
+- GYRO_LPF_TF   Tf in seconds
 - GYRO_DIRECTION : GYRO_DIRECTION_X, GYRO_DIRECTION_Y of GYRO_DIRECTION_Z
 - (optioneel) GYRO_FLIP : gebruik de negatieve waarde van de gyro: als de gyro omgekeerd hangt
 - (optioneel) PIN_SDA en PIN_SCL : indien niet gedefinieerd, worden de standaard Wire library pinnen van het bord gebruikt. 
@@ -68,10 +72,8 @@ enum
 #define WIFI_SOFTAP_PASSWORD "12345678"
 #define WIFI_SOFTAP_CHANNEL 1 // 1-13
 
-#define GY521_I2C_ADDRESS 0x68 // alternatief 0x69
-
 #if defined(CONFIG_IDF_TARGET_ESP32C3)
-#define VOLTAGE_THRESHOLD 3.1 // onder dit voltage uit, om op hol slaan te vermijden op ESP32C3. Gemeten op batterij zelf.
+#define VOLTAGE_THRESHOLD 3.0 // onder dit voltage uit, om op hol slaan te vermijden op ESP32C3. Gemeten op batterij zelf.
 #else
 #define VOLTAGE_THRESHOLD 2.7 // onder dit voltage uit, om de batterij te beschermen, gemeten na de spanningsregelaar bij ESP8266.
 #endif
@@ -110,7 +112,7 @@ enum
 #define PIN_SDA           4 // D2 = GPIO4 op Wemos D1 mini lite
 #define PIN_SCL            5 // D1 = GPIO5 op Wemos D1 mini lite
 
-#define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
+#define MOTORZ_TIME_UP 1000 // ms to go to ease to full power of a motor
 
 // Pas de voltagefactor aan, dat is bij elke chip verschillend. Calibreer bv. met USB stroom die 3.3V op de chip moet geven
 #define VOLTAGE_FACTOR 910.0f 
@@ -122,7 +124,7 @@ enum
 
 #define USE_CONFIG_HOVER3M
 
-#define DEBUG_SERIAL Serial
+//#define DEBUG_SERIAL Serial
 
 #define PIN_1AMOTOR          0
 #define PIN_2AMOTOR          1
@@ -145,7 +147,7 @@ enum
 
 #define USE_CONFIG_HOVER3M
 
-#define DEBUG_SERIAL Serial
+//#define DEBUG_SERIAL Serial
 
 #define PIN_1AMOTOR          12 // Positie D8 op Wemos D1 mini
 #define PIN_2AMOTOR          11 // Positie D7 op Wemos D1 mini
@@ -188,7 +190,7 @@ enum
 #define PIN_LEDCONNECTIE   2 
 #define PIN_LED_DUALUSE
 
-#define MOTORZ_TIME_UP 200 // ms to go to ease to full power of a motor
+#define MOTORZ_TIME_UP 1000 // ms to go to ease to full power of a motor
 
 #define USE_WS2812FX
 #define PIN_WS2812FX       D4 // =GPIO2 dual use led
@@ -221,14 +223,19 @@ enum
 #define PIN_1ZMOTOR          7
 #define PIN_2ZMOTOR          10
 #define PIN_LEDCONNECTIE     8 
-#define PIN_LED_DUALUSE
 #define PIN_BATMONITOR     1
+
+#define USE_FASTIMU
+#define FASTIMU_TYPE MPU6050
+#define IMU_I2C_ADDRESS 0x68
+#define GYRO_DIRECTION GYRO_DIRECTION_Z
+#define GYRO_FLIP
 
 #define PIN_SDA            3           
 #define PIN_SCL            4
 
 #define USE_WS2812FX
-#define PIN_WS2812FX       8 // dual use led
+#define PIN_WS2812FX       9 // dual use led
 #define WS2812FX_NUMLEDS    5
 #define WS2812FX_RGB_ORDER  NEO_GRB
 #define WS2812FX_BRIGHTNESS 35 // 0 .. 255
@@ -242,6 +249,51 @@ enum
 
 // Pas de voltagefactor aan, dat is bij elke chip verschillend. Calibreer bv. met USB stroom die 3.3V op de chip moet geven
 #define VOLTAGE_FACTOR 850.0f 
+
+#define LED_BRIGHTNESS_ON  LOW
+#define LED_BRIGHTNESS_OFF HIGH
+
+#elif defined(ENV_BLIMP_ESP32C3_WROOM_V0)
+#define USE_CONFIG_BLIMP2Z
+
+// No DEBUG_SERIAL Serial : pin 20 & 21 in use
+
+#define PIN_1AMOTOR          21
+#define PIN_2AMOTOR          20
+#define PIN_1BMOTOR          4
+#define PIN_2BMOTOR          5
+#define PIN_1ZMOTOR          6
+#define PIN_2ZMOTOR          7
+#define PIN_LEDCONNECTIE     8 
+#define PIN_LED_DUALUSE // dual use led
+#define USE_WS2812FX
+#define PIN_WS2812FX       9 
+#define PIN_BATMONITOR     1
+
+#define USE_FASTIMU
+#define FASTIMU_TYPE LSM6DS3
+#define IMU_I2C_ADDRESS 0x6B
+#define GYRO_DIRECTION GYRO_DIRECTION_Z
+#define GYRO_FLIP
+
+#define PIN_SDA            19          
+#define PIN_SCL            10
+
+#define USE_WS2812FX
+#define PIN_WS2812FX       9 // dual use led
+#define WS2812FX_NUMLEDS    1
+#define WS2812FX_RGB_ORDER  NEO_GRB
+#define WS2812FX_BRIGHTNESS 35 // 0 .. 255
+#define WS2812FX_SPEED 1000 // in ms
+#define WS2812FX_COLOR 0x007BFF // blauw
+#define WS2812FX_COLLISION 0xFF0000 // rood
+#define WS2812FX_MODE FX_MODE_FADE // Volledige lijst op https://github.com/kitesurfer1404/WS2812FX/blob/master/src/modes_arduino.h
+
+#define MOTORZ_TIME_UP 500 // ms to go to ease to full power of a motor
+#define MOTORZ_MINSPEED (PWM_RANGE/8)
+
+// Pas de voltagefactor aan, dat is bij elke chip verschillend. Calibreer bv. met USB stroom die 3.3V op de chip moet geven
+#define VOLTAGE_FACTOR 820.0f 
 
 #define LED_BRIGHTNESS_ON  LOW
 #define LED_BRIGHTNESS_OFF HIGH
@@ -267,34 +319,44 @@ enum
 #define WIFI_SOFTAP_SSID_PREFIX "hover3m-"
 
 // gyro instellingen voor Hover3M
-#define USE_GY521
+#define USE_FASTIMU
+#define FASTIMU_TYPE MPU6050
+#define IMU_I2C_ADDRESS 0x68
 #define GYRO_DIRECTION GYRO_DIRECTION_Z
 #define GYRO_REGELING_MAX_P     2.4
 #define GYRO_REGELING_MAX_DRAAI 0.5
 #define GYRO_REGELING_BIAS      1.0
+#define GYRO_LPF_TF             0.080 // Tf in seconds
 
+#define XY_MOTOR_MAX    1.0 // later regelbaar maken 0.0 - 1.0
 
 #elif defined (USE_CONFIG_BLIMP)
 
 // Gyro instellingen voor Blimp
-#define USE_GY521
+#define USE_FASTIMU
+#define FASTIMU_TYPE MPU6050
+#define IMU_I2C_ADDRESS 0x68
 #define GYRO_DIRECTION GYRO_DIRECTION_Z
 #define GYRO_FLIP
 #define GYRO_REGELING_MAX_P     2.4
 #define GYRO_REGELING_MAX_DRAAI 0.5
 #define GYRO_REGELING_BIAS      1.0
+#define GYRO_LPF_TF             0.080 // Tf in seconds
+
+#define XY_MOTOR_MAX    1.0 // later regelbaar maken 0.0 - 1.0
 
 #define WIFI_SOFTAP_SSID_PREFIX "Blimp-"
 
 #elif defined (USE_CONFIG_BLIMP2Z)
 
 // Gyro instellingen voor Blimp
-#define USE_GY521
-#define GYRO_DIRECTION GYRO_DIRECTION_Z
-#define GYRO_FLIP
 #define GYRO_REGELING_MAX_P     2.4
 #define GYRO_REGELING_MAX_DRAAI 0.5
 #define GYRO_REGELING_BIAS      1.0
+#define GYRO_LPF_TF             0.080 // Tf in seconds
+
+#define XY_MOTOR_MAX   1 
+#define XY_MOTOR_LIMIT_SLIDER
 
 #define WIFI_SOFTAP_SSID_PREFIX "Blimp-"
 
