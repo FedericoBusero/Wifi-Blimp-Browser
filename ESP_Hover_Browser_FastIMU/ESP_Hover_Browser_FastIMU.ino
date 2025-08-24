@@ -233,8 +233,15 @@ void updateMotors()
     {
 #ifdef USE_FASTIMU
       // "gyro"-regeling
+
+#ifdef XY_MOTOR_LIMIT_SLIDER
+      float Pfactor = GYRO_REGELING_MAX_P;
+      float xy_motor_limit = mapFloat((float)ui_slider1, -180.0, 180.0, 0.2 * XY_MOTOR_MAX, XY_MOTOR_MAX);
+#else
       float Pfactor = mapFloat((float)ui_slider1, -180.0, 180.0, 0.0, GYRO_REGELING_MAX_P);
-      const float bias = GYRO_REGELING_BIAS;
+      float xy_motor_limit = XY_MOTOR_MAX;
+#endif
+       const float bias = GYRO_REGELING_BIAS;
 
       float werkelijke_draaisnelheid = getGyro();
 
@@ -287,8 +294,8 @@ void updateMotors()
     float temp1 = constrain((float)ui_joystick_y + regelX, -180, 180);
     float temp2 = constrain((float)ui_joystick_y - regelX, -180, 180);
 
-    float motorsnelheidA = mapFloat(-temp2, -180.0, 180.0, -(float)PWM_RANGE * XY_MOTOR_MAX, (float)PWM_RANGE* XY_MOTOR_MAX);
-    float motorsnelheidB = mapFloat(-temp1, -180.0, 180.0, -(float)PWM_RANGE * XY_MOTOR_MAX, (float)PWM_RANGE* XY_MOTOR_MAX);
+    float motorsnelheidA = mapFloat(-temp2, -180.0, 180.0, -(float)PWM_RANGE * xy_motor_limit, (float)PWM_RANGE * xy_motor_limit);
+    float motorsnelheidB = mapFloat(-temp1, -180.0, 180.0, -(float)PWM_RANGE * xy_motor_limit, (float)PWM_RANGE * xy_motor_limit);
 
     motorA.setSpeed((long)motorsnelheidA, MOTOR_MINSPEED);
     motorB.setSpeed((long)motorsnelheidB, MOTOR_MINSPEED);
@@ -862,3 +869,4 @@ void loop()
 
   // delay(2);
 }
+
