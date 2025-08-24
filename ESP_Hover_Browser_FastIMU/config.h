@@ -9,7 +9,7 @@
 // #define ENV_HOVER3MGYRO_ESP32S2_LOLIN_S2_MINI
 
 // #define ENV_BLIMP_ESP32C3_SUPERMINI_V0
-// #define ENV_BLIMP_ESP32C3_WROOM_V0
+#define ENV_BLIMP_ESP32C3_WROOM_V0
 
 // Als de defines in platformio.ini gedefinieerd zijn:
 // #define ENV_USER_DEFINED
@@ -34,7 +34,6 @@ Als je een ander board wenst te definiëren, zijn volgende defines nodig:
 - GYRO_DIRECTION : GYRO_DIRECTION_X, GYRO_DIRECTION_Y of GYRO_DIRECTION_Z
 - (optioneel) GYRO_FLIP : gebruik de negatieve waarde van de gyro: als de gyro omgekeerd hangt
 - (optioneel) PIN_SDA en PIN_SCL : indien niet gedefinieerd, worden de standaard Wire library pinnen van het bord gebruikt. 
-- (optioneel) XY_MOTOR_LIMIT_SLIDER : om de slider de max motorpower in te stellen (0 .. 1), zoniet is de slider regelaar van P-waarde
   Als één van de I2C pinnen ook als PIN_LEDCONNECTIE gebruikt wordt, definieer ook PIN_LED_DUALUSE
 
 * Als je seriële output wenst (en de RX/TX pinnen zijn niet in gebruik voor andere doelen):
@@ -329,8 +328,7 @@ enum
 #define GYRO_REGELING_BIAS      1.0
 #define GYRO_LPF_TF             0.080 // Tf in seconds
 
-#define XY_MOTOR_MAX    1.0
-#define XY_MOTOR_LIMIT_SLIDER
+#define XY_MOTOR_MAX    1.0 // later regelbaar maken 0.0 - 1.0
 
 #elif defined (USE_CONFIG_BLIMP)
 
@@ -345,8 +343,7 @@ enum
 #define GYRO_REGELING_BIAS      1.0
 #define GYRO_LPF_TF             0.080 // Tf in seconds
 
-#define XY_MOTOR_MAX    1.0
-#define XY_MOTOR_LIMIT_SLIDER
+#define XY_MOTOR_MAX    1.0 // later regelbaar maken 0.0 - 1.0
 
 #define WIFI_SOFTAP_SSID_PREFIX "Blimp-"
 
@@ -358,7 +355,7 @@ enum
 #define GYRO_REGELING_BIAS      1.0
 #define GYRO_LPF_TF             0.080 // Tf in seconds
 
-#define XY_MOTOR_MAX   1.0
+#define XY_MOTOR_MAX   1 
 #define XY_MOTOR_LIMIT_SLIDER
 
 #define WIFI_SOFTAP_SSID_PREFIX "Blimp-"
@@ -367,6 +364,3 @@ enum
 #endif
 
 #endif
-
-
-
