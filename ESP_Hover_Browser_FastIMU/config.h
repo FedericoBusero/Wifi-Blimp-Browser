@@ -75,13 +75,13 @@ enum
 
 #define WIFI_SOFTAP_PASSWORD "12345678"
 #define WIFI_SOFTAP_CHANNEL 1 // 1-13
+#define NO_BATTERY_VOLTAGE_THRESHOLD 1.0 // onder dit voltage, veronderstellen we dat er geen batterij aangesloten is.
 
 #if defined(CONFIG_IDF_TARGET_ESP32C3)
 #define VOLTAGE_THRESHOLD 3.0 // onder dit voltage uit, om op hol slaan te vermijden op ESP32C3. Gemeten op batterij zelf.
 #else
 #define VOLTAGE_THRESHOLD 2.7 // onder dit voltage uit, om de batterij te beschermen, gemeten na de spanningsregelaar bij ESP8266.
 #endif
-#define NO_BATTERY_VOLTAGE_THRESHOLD 1.0 // onder dit voltage, veronderstellen we dat er geen batterij aangesloten is.
 
 #define ACCELERATION_THRESHOLD 0.1 // boven de som van kwadraten van de acceleraties boven deze waarde wordt als botsing beschouwd. VOOR BOTSDETECTIE
 #define TIMEOUT_MS_COLLISION 3000L // Aantal milliseconden kleurverandering blijven tonen bij botsing VOOR BOTSDETECTIE
