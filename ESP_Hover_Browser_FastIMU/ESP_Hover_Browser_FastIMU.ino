@@ -252,12 +252,12 @@ void updateMotors()
 
       float doel_draaisnelheid = (float)ui_joystick_x * (-1.0) * max_draai_factor;
       regelX = Pfactor * (werkelijke_draaisnelheid - doel_draaisnelheid) - bias * doel_draaisnelheid;
-      regelX = constrain(regelX, -180.0, 180.0);
+      regelX = constrain(regelX, -180.0, 180.0) * MAAL_DRAAI;
 #endif
     }
     else
     {
-      regelX = (1.0) * (float)(ui_joystick_x)*max_draai_factor;
+      regelX = (1.0) * (float)(ui_joystick_x)*max_draai_factor * MAAL_DRAAI;
     }
 
 #ifdef USE_CONFIG_BLIMP2Z
@@ -299,7 +299,10 @@ void updateMotors()
 
     float motorsnelheidA = mapFloat(-temp2, -180.0, 180.0, -(float)PWM_RANGE * xy_motor_limit, (float)PWM_RANGE * xy_motor_limit);
     float motorsnelheidB = mapFloat(-temp1, -180.0, 180.0, -(float)PWM_RANGE * xy_motor_limit, (float)PWM_RANGE * xy_motor_limit);
-
+    
+    motorsnelheidA = constrain((float)motorsnelheidA,-(float)PWM_RANGE,(float)PWM_RANGE);
+    motorsnelheidB = constrain((float)motorsnelheidB,-(float)PWM_RANGE,(float)PWM_RANGE);
+    
     motorA.setSpeed((long)motorsnelheidA, MOTOR_MINSPEED);
     motorB.setSpeed((long)motorsnelheidB, MOTOR_MINSPEED);
 
@@ -717,7 +720,7 @@ void updatestatusbar()
     lastupdate_voltage = currentmillis;
     float voltage = getVoltage();
 
-    if (voltage >= VOLTAGE_THRESHOLD)
+    if ((voltage >= VOLTAGE_THRESHOLD) || (voltage <= NO_BATTERY_VOLTAGE_THRESHOLD))
     {
       if (gyroBeschikbaar)
       {
@@ -745,17 +748,31 @@ void updatestatusbar()
       sclient.send(statusstr);
       motors_pause();
       delay(20000); // boodschap wordt 20 seconden getoond in browser alvorens hij disconnecteert
-      WiFi.mode(WIFI_OFF);
-#ifdef ESP8266
-      WiFi.forceSleepBegin();
-#endif
-      delay(1);
-      while (1)
+      float voltage = getVoltage();
+      if (voltage <= NO_BATTERY_VOLTAGE_THRESHOLD) //recheck if there actually is a battery connected, only now because voltage goes down slowly after disconnectingb battery
       {
-        led_set(LED_BRIGHTNESS_ON, false);
-        delay(10);
-        led_set(LED_BRIGHTNESS_OFF, false);
+        snprintf(statusstr, sizeof(statusstr), "No battery, not shutting down");
+#ifdef DEBUG_SERIAL
+        DEBUG_SERIAL.print("Sending status: ");
+        DEBUG_SERIAL.println(statusstr);
+#endif
+        sclient.send(statusstr);
         delay(5000);
+      }
+      else
+      {
+        WiFi.mode(WIFI_OFF);
+  #ifdef ESP8266
+        WiFi.forceSleepBegin();
+  #endif
+        delay(1);
+        while (1)
+        {
+          led_set(LED_BRIGHTNESS_ON, false);
+          delay(10);
+          led_set(LED_BRIGHTNESS_OFF, false);
+          delay(5000);
+        }
       }
     }
   }
