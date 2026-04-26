@@ -1,5 +1,5 @@
 # Wifi-Blimp-Browser
-Wifi bestuurde (vanuit een browser ) blimp (zeppelin) op een ESP8266 (NodeMCU, Wemos D1 mini) of ESP32/ESP32C3 en een optionele gyro GY-521 of LSM6DS3TR-C
+Wifi bestuurde (vanuit een browser ) blimp (zeppelin) op een ESP32C3 en een optionele gyro (bv. GY-521 of LSM6DS3TR-C)
 
 ![blimp.png](blimp.png "Blimp example pictures")
 
@@ -15,14 +15,14 @@ Dit project gaat over het besturen van voertuigen (blimp/zeppelin, hovercraft) m
 * De communicatie verloopt via **Wifi** m.b.v. een **SoftAP** (WifiPoint). Het voertuig heeft dus een eigen access point aan boord, er is dus geen echte internetverbinding.
 * Het is ontwikkeld voor zeppelins(blimp) maar er zijn ook configuratievoorbeelden voor hovercrafts (die met linker- en rechtermotor werken, dus niet met servo).
 * **Gyro-stabilisatie:** Maakt gebruik van de `FastIMU` library en een Low Pass Filter voor stabiele vlucht of vaart.
-* **Cross-platform:** Ondersteuning voor ESP8266 (Lolin D1 Mini) en diverse ESP32 varianten (C3 Supermini, S2 Mini, WROOM).
+* Hoewel de configuratie gebaseerd is op ESP32-C3, is code compatibel met andere ESP32 of ESP8266-chips.
 
 ## Hardware Vereisten
 
 Afhankelijk van de gekozen configuratie in `config.h`:
-* **Microcontroller:** ESP8266 of ESP32 (C3, S2, etc.).
-* **IMU:** MPU6050 (via I2C op adres 0x68).
-* **3 DC-Motoren:** Ondersteuning voor DC-motoren en bidirectionele motoren (afhankelijk van het type: Blimp of Hover3M).
+* **Microcontroller:** ESP32-C3
+* **IMU:** bv. LSM6DS3TR-C of MPU6050
+* **3 DC-Motoren:** Ondersteuning voor DC-motoren en bidirectionele motoren (afhankelijk van het type: Blimp of Hover3M). Dat zijn 2 motoren voor het links/rechts sturen en 1 motor voor het op/neer sturen.
 * 3-voudige **H-brug**
 * **LiPo-batterij**
 * **Ballon** met helium gevuld
