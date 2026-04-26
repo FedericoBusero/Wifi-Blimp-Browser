@@ -2,7 +2,7 @@
    Code voor het besturen van een hover mbv Wifi via de browser
 
    Hoe gebruiken?
-   Voeg wifi netwerk hover-xxxx toe met paswoord 12345678
+   Voeg wifi netwerk hover-xxxx of Blimp-xxxx toe met paswoord 12345678
    Er is op dat netwerk uiteraard geen internet, dus "wifi behouden" aanvinken indien dat gevraagd wordt
    Dan ga je naar de browser (chrome, firefox, safari, ..) naar de website 192.168.4.1 of http://h.be
 
@@ -16,10 +16,10 @@
 #include <ArduinoWebsockets.h> // uit arduino library manager : "ArduinoWebsockets" by Gil Maimon, https://github.com/gilmaimon/ArduinoWebsockets
 #include "config.h"
 
-#ifdef USE_GY521
-#include "GY521.h" // library; https://github.com/RobTillaart/GY521/ minimum versie 0.5.3
-GY521 sensor(GY521_I2C_ADDRESS);
-
+#ifdef USE_FASTIMU
+#include "FastIMU.h" // library; https://github.com/LiquidCGS/FastIMU minimum versie 1.2.8 voor LSM6DS3TR-C
+#include "lowpass_filter.h"
+FASTIMU_TYPE imu;
 #endif
 
 // Architectuur afhankelijke settings
@@ -27,7 +27,7 @@ GY521 sensor(GY521_I2C_ADDRESS);
 
 #include <ESPAsyncWebSrv.h> // ESPAsyncWebSrv, version 1.2.6 by dvarrel : https://github.com/dvarrel/ESPAsyncWebSrv/
 #include <WiFi.h>
-#include <AsyncTCP.h>   // https://github.com/me-no-dev/AsyncTCP
+#include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
 
 #define PWM_RANGE 255 // PWM range voor analogWrite
 #define MOTOR_MINSPEED 2
@@ -36,7 +36,7 @@ GY521 sensor(GY521_I2C_ADDRESS);
 
 #include <ESPAsyncWebServer.h> // https://github.com/me-no-dev/ESPAsyncWebServer
 #include <WiFi.h>
-#include <AsyncTCP.h>   // https://github.com/me-no-dev/AsyncTCP
+#include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
 
 #define PWM_RANGE 255 // PWM range voor analogWrite
 #define MOTOR_MINSPEED 0
@@ -74,7 +74,7 @@ WebsocketsClient sclient;
 // Dat moet hoger zijn dan timeout interval in html functie ws_onopen_ping
 #define TIMEOUT_MS_MOTORS 1200L
 #define TIMEOUT_MS_LED 1L         // Aantal milliseconden dat LED blijft branden na het ontvangen van een boodschap
-#define TIMEOUT_MS_VOLTAGE 10000L // Aantal milliseconden tussen update voltage
+#define TIMEOUT_MS_STATUS 10000L  // Aantal milliseconden tussen update status&voltage
 #define TIMEOUT_MS_JOYSTICK 2000L // Aantal milliseconden nadat joystick voor laatste maal gebruikt werd, L&R motoren uit
 
 unsigned long last_activity_message;
@@ -86,12 +86,61 @@ int ui_joystick_y = 0;
 int ui_slider1 = 0; // -180 .. 180
 int ui_slider2 = 0; // 0 .. 360
 
-#define MOTOR_FREQ 400     // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
+#define MOTOR_FREQ 512 // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
 
 Easer motorZ_snelheid;
 bool motors_halt;
 
+class hbridge
+{
+public:
+  hbridge(int _pin1, int _pin2)
+      : pin1(_pin1), pin2(_pin2), currentspeed(0)
+  {
+  }
+
+  void setSpeed(long motorspeed, long min_speed = 0)
+  {
+    if (abs(motorspeed) < min_speed)
+    {
+      motorspeed = 0;
+    }
+
+    if (motorspeed == currentspeed) return;
+
+    if (motorspeed >= 0)
+    {
+      analogWrite(pin1, motorspeed);
+      analogWrite(pin2, 0);
+    }
+    else
+    {
+      analogWrite(pin1, 0);
+      analogWrite(pin2, -motorspeed);
+    }
+    currentspeed = motorspeed;
+  }
+
+  void halt()
+  {
+    analogWrite(pin1, 0);
+    analogWrite(pin2, 0);
+    currentspeed = 0;
+  }
+
+private:
+  int pin1, pin2;
+  int currentspeed;
+};
+
+#ifdef USE_CONFIG_BLIMP2Z
+hbridge motorZ(PIN_1ZMOTOR, PIN_2ZMOTOR);
+#endif
+hbridge motorA(PIN_1AMOTOR, PIN_2AMOTOR);
+hbridge motorB(PIN_1BMOTOR, PIN_2BMOTOR);
+
 bool gyroBeschikbaar = false;
+bool collision = false; // VOOR BOTSDETECTIE
 
 #ifdef USE_WS2812FX
 #include <WS2812FX.h> // https://github.com/kitesurfer1404/WS2812FX
@@ -109,49 +158,52 @@ void setup_pin_mode_output(int pin)
   pinMode(pin, OUTPUT);
 }
 
-#ifdef USE_GY521
+#ifdef USE_FASTIMU
 float getGyro()
 {
-  float measured_value = 0.0;
-  sensor.read();
-  switch (GYRO_DIRECTION)
-  {
-  case GYRO_DIRECTION_X:
-    measured_value = sensor.getGyroX();
-    break;
+  static LowPassFilter lpf(GYRO_LPF_TF);
+  static unsigned long lastupdate_gyro = 0;
 
-  case GYRO_DIRECTION_Y:
-    measured_value = sensor.getGyroY();
-    break;
-
-  case GYRO_DIRECTION_Z:
-    measured_value = sensor.getGyroZ();
-    break;
-  }
-#ifdef GYRO_FLIP
-  measured_value = -measured_value;
-#endif
-  return measured_value;
-}
-#endif
-
-void hbridge_setspeed(int pin1, int pin2, long motorspeed, long min_speed = 0)
-{
-  if (abs(motorspeed) < min_speed)
+  unsigned long currentmillis = millis();
+  if (currentmillis > lastupdate_gyro + 1) // min 1 ms tussen aanroepen gyro
   {
-    motorspeed = 0;
-  }
-  if (motorspeed > 0)
-  {
-    digitalWrite(pin1, HIGH);
-    analogWrite(pin2, PWM_RANGE - motorspeed);
+    lastupdate_gyro = currentmillis;
+    GyroData gyroData;
+    float measured_value = 0.0;
+
+    imu.update();
+    imu.getGyro(&gyroData);
+    switch (GYRO_DIRECTION)
+    {
+    case GYRO_DIRECTION_X:
+      measured_value = gyroData.gyroX;
+      break;
+
+    case GYRO_DIRECTION_Y:
+      measured_value = gyroData.gyroY;
+      break;
+
+    case GYRO_DIRECTION_Z:
+      measured_value = gyroData.gyroZ;
+      break;
+    }
+  #ifdef GYRO_FLIP
+    measured_value = -measured_value;
+  #endif
+
+    float accelX = 0; // TODO
+    float accelY = 0; // TODO
+    float accelZ = 0; // TODO
+    collision = (sq(accelX) + sq(accelY) + sq(accelZ)) > ACCELERATION_THRESHOLD; // VOOR BOTSDETECTIE
+
+    return lpf(measured_value);
   }
   else
   {
-    digitalWrite(pin1, LOW);
-    analogWrite(pin2, -motorspeed);
+    return lpf.getLastValue();
   }
 }
+#endif
 
 float mapFloat(float value, float fromLow, float fromHigh, float toLow, float toHigh)
 {
@@ -164,23 +216,36 @@ void updateMotors()
 
   if (motors_halt)
   {
+#ifdef USE_CONFIG_BLIMP2Z
+    motorZ.halt();
+#else
     analogWrite(PIN_ZMOTOR, 0);
-    hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, 0);
-    hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, 0);
+#endif
+    motorA.halt();
+    motorB.halt();
   }
   else
   {
     float regelX = 0.0;
     const float max_draai_factor = GYRO_REGELING_MAX_DRAAI;
+#ifdef XY_MOTOR_LIMIT_SLIDER
+    float xy_motor_limit = mapFloat((float)ui_slider1, -180.0, 180.0, 0.2 * XY_MOTOR_MAX, XY_MOTOR_MAX);
+#else
+    float xy_motor_limit = XY_MOTOR_MAX;
+#endif
 
     if (gyroBeschikbaar) // gyro
     {
-#ifdef USE_GY521
+#ifdef USE_FASTIMU
       // "gyro"-regeling
+
+#ifdef XY_MOTOR_LIMIT_SLIDER
+      float Pfactor = GYRO_REGELING_MAX_P;
+#else
       float Pfactor = mapFloat((float)ui_slider1, -180.0, 180.0, 0.0, GYRO_REGELING_MAX_P);
+#endif
       const float bias = GYRO_REGELING_BIAS;
 
-      sensor.read();
       float werkelijke_draaisnelheid = getGyro();
 
       // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
@@ -195,7 +260,11 @@ void updateMotors()
       regelX = (1.0) * (float)(ui_joystick_x)*max_draai_factor;
     }
 
+#ifdef USE_CONFIG_BLIMP2Z
+    int doel_motorZsnelheid = map(ui_slider2, 0, 360, -PWM_RANGE, PWM_RANGE);
+#else
     int doel_motorZsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE); // voor zweefmotor
+#endif
     if (abs(ui_joystick_y * ui_joystick_x) >= 5)
     {
       last_activity_joystick = millis();
@@ -228,15 +297,19 @@ void updateMotors()
     float temp1 = constrain((float)ui_joystick_y + regelX, -180, 180);
     float temp2 = constrain((float)ui_joystick_y - regelX, -180, 180);
 
-    float motorsnelheidA = mapFloat(-temp2, -180.0, 180.0, -(float)PWM_RANGE, (float)PWM_RANGE);
-    float motorsnelheidB = mapFloat(-temp1, -180.0, 180.0, -(float)PWM_RANGE, (float)PWM_RANGE);
+    float motorsnelheidA = mapFloat(-temp2, -180.0, 180.0, -(float)PWM_RANGE * xy_motor_limit, (float)PWM_RANGE * xy_motor_limit);
+    float motorsnelheidB = mapFloat(-temp1, -180.0, 180.0, -(float)PWM_RANGE * xy_motor_limit, (float)PWM_RANGE * xy_motor_limit);
 
-    hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, (long)motorsnelheidA, MOTOR_MINSPEED);
-    hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, (long)motorsnelheidB, MOTOR_MINSPEED);
+    motorA.setSpeed((long)motorsnelheidA, MOTOR_MINSPEED);
+    motorB.setSpeed((long)motorsnelheidB, MOTOR_MINSPEED);
 
     motorZ_snelheid.easeTo(doel_motorZsnelheid);
     motorZ_snelheid.update();
+#ifdef USE_CONFIG_BLIMP2Z
+    motorZ.setSpeed(motorZ_snelheid.getCurrentValue(), MOTORZ_MINSPEED);
+#else
     analogWrite(PIN_ZMOTOR, motorZ_snelheid.getCurrentValue()); // We passen de snelheid van de motor aan naar zijn nieuwe snelheid motorZ_snelheid
+#endif
 
 #ifdef DEBUG_SERIAL
     //   DEBUG_SERIAL.print(F("temp1 "));
@@ -273,7 +346,11 @@ void motors_resume()
 void init_motors()
 {
   ui_slider1 = 0;
+#ifdef USE_CONFIG_BLIMP2Z
+  ui_slider2 = 180;
+#else
   ui_slider2 = 0;
+#endif
   ui_joystick_x = 0;
   ui_joystick_y = 0;
   motorZ_snelheid.setValue(0);
@@ -318,13 +395,40 @@ float getVoltage()
 #endif
 }
 
+void collision_effect() // VOOR BOTSDETECTIE
+{
+#ifdef USE_WS2812FX
+  static unsigned long last_collision_effect = 0;
+  unsigned long currentmillis = millis();
+
+  if (collision)
+  {
+    ws2812fx.setColor(WS2812FX_COLLISION);
+    last_collision_effect = currentmillis;
+  }
+  else
+  {
+    if (currentmillis > last_collision_effect + TIMEOUT_MS_COLLISION) // langer dan TIMEOUT_MS_COLLISION geleden dat er een botsingb gedetecteerd werdws2812fx.setColor(WS2812FX_COLOR);
+    {
+      ws2812fx.setColor(WS2812FX_COLOR);
+    }
+  }
+#endif
+  // eventueel nog botseffect zonder WS2812 toe te voegen
+}
+
 void setup()
 {
   setup_pin_mode_output(PIN_1AMOTOR);
   setup_pin_mode_output(PIN_2AMOTOR);
   setup_pin_mode_output(PIN_1BMOTOR);
   setup_pin_mode_output(PIN_2BMOTOR);
+#ifdef USE_CONFIG_BLIMP2Z
+  setup_pin_mode_output(PIN_1ZMOTOR);
+  setup_pin_mode_output(PIN_2ZMOTOR);
+#else
   setup_pin_mode_output(PIN_ZMOTOR);
+#endif
 
 #ifdef ESP8266
   // Aangezien de PWM range van analogWrite afhankelijk van de Arduino ESP8266 versie 255 ofwel 1023 is, stellen we de range vast in op 1023
@@ -340,10 +444,14 @@ void setup()
   // Verander de frequentie van analogWrite van 1000 Hz naar 400 Hz voor een aangenamer geluid
   analogWriteFrequency(MOTOR_FREQ);
 #endif
+#ifdef USE_CONFIG_BLIMP2Z
+  motorZ.halt();
+#else
   analogWrite(PIN_ZMOTOR, 0);
+#endif
 
-  hbridge_setspeed(PIN_1AMOTOR, PIN_2AMOTOR, 0);
-  hbridge_setspeed(PIN_1BMOTOR, PIN_2BMOTOR, 0);
+  motorA.halt();
+  motorB.halt();
 
   delay(200); // 200 milliseconden wachten tot de stroom stabiel is
 
@@ -364,30 +472,35 @@ void setup()
   delay(10);
   led_set(LED_BRIGHTNESS_OFF, false);
 
-  init_motors();
-
-  led_set(LED_BRIGHTNESS_ON, false);
-
+#ifdef USE_CONFIG_BLIMP2Z
+  motorZ_snelheid.begin(0, true);
+#else
   motorZ_snelheid.begin(0, false);
+#endif
   motorZ_snelheid.set_speed((float)MOTORZ_TIME_UP / (float)PWM_RANGE);
+
+  init_motors();
 
   gyroBeschikbaar = false;
 
-#ifdef USE_GY521
+#ifdef USE_FASTIMU
   // setup gyro module
 #ifdef PIN_SDA
   Wire.begin(PIN_SDA, PIN_SCL);
 #else
   Wire.begin();
 #endif
+  Wire.setClock(400000); //400khz clock
   delay(100);
   for (int t = 0; t < 3; t++) // 3 keer proberen of gyro beschikbaar is
   {
-    if (sensor.wakeup() == false)
+    calData calib = { 0 };  //Calibration data
+    int err = imu.init(calib, IMU_I2C_ADDRESS);
+    if (err != 0)
     {
 #ifdef DEBUG_SERIAL
       DEBUG_SERIAL.print(millis());
-      DEBUG_SERIAL.println("\tCould not connect to GY521");
+      DEBUG_SERIAL.println("\tCould not connect to gyro");
 #endif
       delay(1000);
     }
@@ -400,21 +513,17 @@ void setup()
 
   if (gyroBeschikbaar)
   {
-    sensor.setAccelSensitivity(2); // 8g
-    sensor.setGyroSensitivity(1);  // 500 degrees/s
-    sensor.setDLPFMode(6);         // 5 Hz low pass filter
+    imu.setGyroRange(500);
+    imu.setAccelRange(8);
 
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.println("start...");
 #endif
 
     // set all calibration errors to zero
-    sensor.gxe = 0;
-    sensor.gye = 0;
-    sensor.gze = 0;
-    sensor.read();
+    // TODO
   }
-#endif // USE_GY521
+#endif // USE_FASTIMU
 #ifdef PIN_LED_DUALUSE
   led_init();
 #endif
@@ -502,7 +611,7 @@ void setup()
   ws2812fx.setMode(WS2812FX_MODE);
   ws2812fx.start();
 #endif
-   
+
   init_voltage_monitor();
 
   last_activity_message = millis();
@@ -603,7 +712,7 @@ void updatestatusbar()
   unsigned long currentmillis = millis();
   char statusstr[50];
 
-  if (currentmillis > lastupdate_voltage + TIMEOUT_MS_VOLTAGE)
+  if (currentmillis > lastupdate_voltage + TIMEOUT_MS_STATUS)
   {
     lastupdate_voltage = currentmillis;
     float voltage = getVoltage();
@@ -612,8 +721,8 @@ void updatestatusbar()
     {
       if (gyroBeschikbaar)
       {
-#ifdef USE_GY521
-        snprintf(statusstr, sizeof(statusstr), "%4.2f V gz:%4.2f", voltage, getGyro());
+#ifdef USE_FASTIMU
+        snprintf(statusstr, sizeof(statusstr), "%4.2f V gyro:%4.2f", voltage, getGyro());
 #endif
       }
       else
@@ -621,8 +730,8 @@ void updatestatusbar()
         snprintf(statusstr, sizeof(statusstr), "%4.2f V", voltage);
       }
 #ifdef DEBUG_SERIAL
-      // DEBUG_SERIAL.print("Sending status: ");
-      // DEBUG_SERIAL.println(statusstr);
+      DEBUG_SERIAL.print("Sending status: ");
+      DEBUG_SERIAL.println(statusstr);
 #endif
       sclient.send(statusstr);
     }
@@ -649,6 +758,31 @@ void updatestatusbar()
         delay(5000);
       }
     }
+  }
+#else
+  static unsigned long lastupdate_status = 0;
+  unsigned long currentmillis = millis();
+  char statusstr[50];
+
+  if (currentmillis > lastupdate_status + TIMEOUT_MS_STATUS)
+  {
+    lastupdate_status = currentmillis;
+
+    if (gyroBeschikbaar)
+    {
+#ifdef USE_FASTIMU
+      snprintf(statusstr, sizeof(statusstr), "gyro:%4.2f", getGyro());
+#endif
+    }
+    else
+    {
+      snprintf(statusstr, sizeof(statusstr), "");
+    }
+#ifdef DEBUG_SERIAL
+    DEBUG_SERIAL.print("Sending status: ");
+    DEBUG_SERIAL.println(statusstr);
+#endif
+    sclient.send(statusstr);
   }
 #endif
 }
@@ -685,12 +819,16 @@ void loop()
 
       updatestatusbar();
 
+#ifdef USE_FASTIMU
+      getGyro(); // update low pass filter gyro
+#endif
       static unsigned long lastupdate_motors = 0;
       unsigned long currentmillis = millis();
       if (currentmillis > lastupdate_motors + 10) // min 10 ms tussen aanroepen updatemotors als er geen nieuwe waarde ontvangen is vanuit browser
       {
         lastupdate_motors = currentmillis;
         updateMotors();
+        collision_effect();
       }
     }
     else
@@ -731,7 +869,6 @@ void loop()
     ws2812fx.service();
   }
 #endif
-
 
   // delay(2);
 }
