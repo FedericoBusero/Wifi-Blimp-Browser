@@ -68,7 +68,7 @@ De webinterface bevat de volgende elementen:
 
 ## Hoe maak je een blimp/zeppelin?
 Voor workshops kan je terecht bij [masynmachien](https://www.masynmachien.be/)
-* De Nederlandstalige bouwbeschrijving van masynmachiens Wifi bestuurde "zeppelin" bind je [hier](https://drive.google.com/file/d/1kgbARLVWbW1ju_md69NMXsFJ5Pm3_wp5/view?pli=1)
+* De Nederlandstalige bouwbeschrijving van masynmachiens Wifi bestuurde "zeppelin" vind je [hier](https://drive.google.com/file/d/1kgbARLVWbW1ju_md69NMXsFJ5Pm3_wp5/view?pli=1)
 * English build instructions of MasynMachien's Wi-Fi Controlled "Zeppelin" can be found [here](https://drive.google.com/file/d/1wyDzlwFDYCTluwN-NWTXZ2bfNyR8x3mo/view)
 ---
 *Ontwikkeld voor hobbyisten en educatieve doeleinden.*
