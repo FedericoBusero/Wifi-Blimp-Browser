@@ -257,7 +257,7 @@ enum
 #define LED_BRIGHTNESS_ON  LOW
 #define LED_BRIGHTNESS_OFF HIGH
 
-#elif defined(ENV_BLIMP_ESP32C3_WROOM_V0) // Makerfair Gent 2025
+#elif defined(ENV_BLIMP_ESP32C3_WROOM_V0) // Maker Fair Gent 2025
 #define USE_CONFIG_BLIMP2Z
 
 // No DEBUG_SERIAL Serial : pin 20 & 21 in use
@@ -302,7 +302,7 @@ enum
 #define LED_BRIGHTNESS_ON  LOW
 #define LED_BRIGHTNESS_OFF HIGH
 
-#elif defined(ENV_BLIMP_ESP32C3_WROOM_V2) // Makerfair Gent 2025
+#elif defined(ENV_BLIMP_ESP32C3_WROOM_V2) // Maker Fair Gent 2025
 #define USE_CONFIG_BLIMP2Z
 
 // #define DEBUG_SERIAL Serial
@@ -347,7 +347,7 @@ enum
 #define LED_BRIGHTNESS_ON  LOW
 #define LED_BRIGHTNESS_OFF HIGH
 
-#elif defined(ENV_BLIMP_ESP32C3_WROOM_V3)   // Hasselt 2025, Makerfair Eindhoven 2025, Makerfait Gent 2026
+#elif defined(ENV_BLIMP_ESP32C3_WROOM_V3)   // Makderday Hasselt 2025, Maker Days Eindhoven 2025, Maker Faire Gent 2026
 #define USE_CONFIG_BLIMP2Z
 
 // #define DEBUG_SERIAL Serial
