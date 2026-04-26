@@ -302,7 +302,7 @@ enum
 #define LED_BRIGHTNESS_ON  LOW
 #define LED_BRIGHTNESS_OFF HIGH
 
-#elif defined(ENV_BLIMP_ESP32C3_WROOM_V2) // Niet gebruikt in workshop
+#elif defined(ENV_BLIMP_ESP32C3_WROOM_V2) // Makerfair Gent 2025
 #define USE_CONFIG_BLIMP2Z
 
 // #define DEBUG_SERIAL Serial
