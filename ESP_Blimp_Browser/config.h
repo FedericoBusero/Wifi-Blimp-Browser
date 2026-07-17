@@ -348,7 +348,7 @@ enum
 #define LED_BRIGHTNESS_ON  LOW
 #define LED_BRIGHTNESS_OFF HIGH
 
-#elif defined(ENV_BLIMP_ESP32C3_WROOM_V3 // Makerday Hasselt 2025, Maker Days Eindhoven 2025, Maker Faire Gent 2026
+#elif defined(ENV_BLIMP_ESP32C3_WROOM_V3) // Makerday Hasselt 2025, Maker Days Eindhoven 2025, Maker Faire Gent 2026
 
 #define PIN_1AMOTOR          10
 #define PIN_2AMOTOR          7
@@ -357,7 +357,7 @@ enum
 #define PIN_1ZMOTOR          4 
 #define PIN_2ZMOTOR          5
 
-#elif defined(ENV_BLIMP_ESP32C3_WROOM_V3_REVERSED_MOTORS // Windreiter
+#elif defined(ENV_BLIMP_ESP32C3_WROOM_V3_REVERSED_MOTORS) // Windreiter
 
 #define PIN_1AMOTOR          7
 #define PIN_2AMOTOR          10
