@@ -13,6 +13,7 @@
 // there is no ENV_BLIMP_ESP32C3_WROOM_V1
 // #define ENV_BLIMP_ESP32C3_WROOM_V2
 // #define ENV_BLIMP_ESP32C3_WROOM_V3
+// #define ENV_BLIMP_ESP32C3_WROOM_V3_REVERSED_MOTORS
 
 // Als de defines in platformio.ini gedefinieerd zijn:
 // #define ENV_USER_DEFINED
@@ -347,10 +348,7 @@ enum
 #define LED_BRIGHTNESS_ON  LOW
 #define LED_BRIGHTNESS_OFF HIGH
 
-#elif defined(ENV_BLIMP_ESP32C3_WROOM_V3)   // Makderday Hasselt 2025, Maker Days Eindhoven 2025, Maker Faire Gent 2026
-#define USE_CONFIG_BLIMP2Z
-
-// #define DEBUG_SERIAL Serial
+#elif defined(ENV_BLIMP_ESP32C3_WROOM_V3
 
 #define PIN_1AMOTOR          10
 #define PIN_2AMOTOR          7
@@ -358,6 +356,21 @@ enum
 #define PIN_2BMOTOR          3
 #define PIN_1ZMOTOR          4 
 #define PIN_2ZMOTOR          5
+
+#elif defined(ENV_BLIMP_ESP32C3_WROOM_V3_REVERSED_MOTORS
+
+#define PIN_1AMOTOR          7
+#define PIN_2AMOTOR          10
+#define PIN_1BMOTOR          3
+#define PIN_2BMOTOR          0
+#define PIN_1ZMOTOR          5 
+#define PIN_2ZMOTOR          4
+
+#elif defined(ENV_BLIMP_ESP32C3_WROOM_V3 || ENV_BLIMP_ESP32C3_WROOM_V3_REVERSED_MOTORS) // PCB V3, V3.1, V3.2 & V3.3,  Makerday Hasselt 2025, Maker Days Eindhoven 2025, Maker Faire Gent 2026
+#define USE_CONFIG_BLIMP2Z
+
+// #define DEBUG_SERIAL Serial
+
 #define PIN_LEDCONNECTIE     8 
 #define PIN_LED_DUALUSE // dual use led
 #define USE_WS2812FX
