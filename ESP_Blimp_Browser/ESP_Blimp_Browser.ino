@@ -293,9 +293,10 @@ void updateMotors()
     // DEBUG_SERIAL.println(regelX);
 #endif
 
-    // x en y omzetten naar motorsnelheden
-    float temp1 = constrain((float)ui_joystick_y + regelX, -180, 180);
-    float temp2 = constrain((float)ui_joystick_y - regelX, -180, 180);
+    // converting x and y to motorspeed
+    float ui_joystick_y_constrain = constrain((float)ui_joystick_y, -(180-fabsf(regelX)), 180-fabsf(regelX)); // maximal stearing also at full forward or backward
+    float temp1 = constrain((float) ui_joystick_y_constrain + regelX, -180, 180);
+    float temp2 = constrain((float) ui_joystick_y_constrain - regelX, -180, 180);
 
     float motorsnelheidA = mapFloat(-temp2, -180.0, 180.0, -(float)PWM_RANGE * xy_motor_limit, (float)PWM_RANGE * xy_motor_limit);
     float motorsnelheidB = mapFloat(-temp1, -180.0, 180.0, -(float)PWM_RANGE * xy_motor_limit, (float)PWM_RANGE * xy_motor_limit);
