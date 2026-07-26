@@ -75,7 +75,7 @@ enum
 #ifndef ENV_USER_DEFINED
 
 #define WIFI_SOFTAP_PASSWORD "12345678"
-#define WIFI_SOFTAP_CHANNEL 1 // 1-13 - 1 ,6 and 13 are "legal"
+#define WIFI_SOFTAP_CHANNEL 1 // 1-13, preferably use only channels 1, 6, and 11 to avoid interference.
 
 #if defined(CONFIG_IDF_TARGET_ESP32C3)
 #define VOLTAGE_THRESHOLD 3.0 // Below this voltage the board is shut down, to avoid battery damage and uncontrolled behavior (measured on the battery).
