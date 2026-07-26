@@ -1,19 +1,19 @@
 /*
-   Code voor het besturen van een hover mbv Wifi via de browser
+   Code for controlling an airship or 3-motor hovercraft via Wi-Fi using a browser
 
-   Hoe gebruiken?
-   Voeg wifi netwerk hover-xxxx of Blimp-xxxx toe met paswoord 12345678
-   Er is op dat netwerk uiteraard geen internet, dus "wifi behouden" aanvinken indien dat gevraagd wordt
-   Dan ga je naar de browser (chrome, firefox, safari, ..) naar de website 192.168.4.1 of http://h.be
+   How to use it?
+   Add the Wi-Fi network ‘Hover-xxxxxx’ or ‘Blimp-xxxx’ with the password 12345678
+   There is, of course, no internet connection on that network, so tick ‘Keep Wi-Fi on’ if promptedOn Android, it is often necessary to switch off mobile data
+   Then open your browser (Chrome, Firefox, Safari, etc.) and go to the website http://h.be or 192.168.4.1
 
-   De bovenste regel toont de connectie-status. Op ESP8266 wordt het voltage getoond tijdens de connectie, te calibreren met VOLTAGE_FACTOR
-   De bovenste slider wordt gebruikt om de gevoeligheid van de gyro te regelen (p-factor)
-   De slider eronder stelt de zweefmotor in.
-   Met de joystick worden 2 stuwmotoren bestuurd
+   The top line shows the connection status. On the ESP8266 and masynmachien boards, the voltage is displayed during the connection; this can be calibrated using VOLTAGE_FACTOR
+   The top slider is used to control either the maximum power of the thrust motors or the sensitivity of the gyro (p-factor)
+   The slider below it adjusts the hover/elevator motor.
+   The joystick is used to control the two thrust motors
 
 */
 
-#include <ArduinoWebsockets.h> // uit arduino library manager : "ArduinoWebsockets" by Gil Maimon, https://github.com/gilmaimon/ArduinoWebsockets
+#include <ArduinoWebsockets.h> // from arduino library manager : "ArduinoWebsockets" by Gil Maimon, https://github.com/gilmaimon/ArduinoWebsockets
 #include "config.h"
 
 #ifdef USE_FASTIMU
@@ -22,14 +22,14 @@
 FASTIMU_TYPE imu;
 #endif
 
-// Architectuur afhankelijke settings
+// Architecture dependent settings
 #if defined(CONFIG_IDF_TARGET_ESP32C3)
 
 #include <ESPAsyncWebSrv.h> // ESPAsyncWebSrv, version 1.2.6 by dvarrel : https://github.com/dvarrel/ESPAsyncWebSrv/
 #include <WiFi.h>
 #include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
 
-#define PWM_RANGE 255 // PWM range voor analogWrite
+#define PWM_RANGE 255 // PWM range for analogWrite
 #define MOTOR_MINSPEED 2
 
 #elif defined(ARDUINO_ARCH_ESP32)
@@ -38,17 +38,17 @@ FASTIMU_TYPE imu;
 #include <WiFi.h>
 #include <AsyncTCP.h> // https://github.com/me-no-dev/AsyncTCP
 
-#define PWM_RANGE 255 // PWM range voor analogWrite
+#define PWM_RANGE 255 // PWM range for analogWrite
 #define MOTOR_MINSPEED 0
 
 #else // ESP8266
-ADC_MODE(ADC_VCC); // Nodig voor het inlezen van het voltage met ESP.getVcc
+ADC_MODE(ADC_VCC); // Needed for reading the voltage with ESP.getVcc
 
-#include <ESPAsyncWebServer.h> // https://github.com/me-no-dev/ESPAsyncWebServer op ESP8266: https://github.com/me-no-dev/ESPAsyncTCP installeren
+#include <ESPAsyncWebServer.h> // https://github.com/me-no-dev/ESPAsyncWebServer, on ESP8266: install https://github.com/me-no-dev/ESPAsyncTCP
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h> // https://github.com/me-no-dev/ESPAsyncTCP
 
-#define PWM_RANGE 1023 // PWM range voor analogWrite
+#define PWM_RANGE 1023 // PWM range for analogWrite
 #define MOTOR_MINSPEED 0
 
 #endif
@@ -62,7 +62,7 @@ const char password[] = WIFI_SOFTAP_PASSWORD;
 DNSServer dnsServer;
 #endif
 
-#include "hovercontrol_html.h" // Deze code niet verplaatsen naar de ino file, want de preprocessor kan die overhoop halen
+#include "hovercontrol_html.h" // Do not move this code to the ino file, because it can mix up the preprocessor
 
 using namespace websockets;
 WebsocketsServer server;
@@ -70,12 +70,12 @@ AsyncWebServer webserver(80);
 WebsocketsClient sclient;
 
 // timeoutes
-// Timeout om motoren uit veiligheid stil te leggen, na x milliseconden niks te hebben ontvangen.
-// Dat moet hoger zijn dan timeout interval in html functie ws_onopen_ping
+// Timeout to switch of motors for safety, after not receiving anything for x milliseconds
+// Should be higher than timeout interval in html function ws_onopen_ping
 #define TIMEOUT_MS_MOTORS 1200L
-#define TIMEOUT_MS_LED 1L         // Aantal milliseconden dat LED blijft branden na het ontvangen van een boodschap
-#define TIMEOUT_MS_STATUS 10000L  // Aantal milliseconden tussen update status&voltage
-#define TIMEOUT_MS_JOYSTICK 2000L // Aantal milliseconden nadat joystick voor laatste maal gebruikt werd, L&R motoren uit
+#define TIMEOUT_MS_LED 1L         // number of milliseconds the LED stays on after receiving a message
+#define TIMEOUT_MS_STATUS 10000L  //  number of milliseconds between updating status&voltage
+#define TIMEOUT_MS_JOYSTICK 2000L //  number of milliseconds after using the joystick, switching of L&R motors
 
 unsigned long last_activity_message;
 
@@ -86,7 +86,7 @@ int ui_joystick_y = 0;
 int ui_slider1 = 0; // -180 .. 180
 int ui_slider2 = 0; // 0 .. 360
 
-#define MOTOR_FREQ 512 // Frequentie van analogWrite in Hz, bepaalt het geluid van de motor
+#define MOTOR_FREQ 512 // Frequention for analogWrite in Hz, determines the sound of the motor
 
 Easer motorZ_snelheid;
 bool motors_halt;
@@ -140,7 +140,7 @@ hbridge motorA(PIN_1AMOTOR, PIN_2AMOTOR);
 hbridge motorB(PIN_1BMOTOR, PIN_2BMOTOR);
 
 bool gyroBeschikbaar = false;
-bool collision = false; // VOOR BOTSDETECTIE
+bool collision = false; // for collision detection
 
 #ifdef USE_WS2812FX
 #include <WS2812FX.h> // https://github.com/kitesurfer1404/WS2812FX
@@ -165,7 +165,7 @@ float getGyro()
   static unsigned long lastupdate_gyro = 0;
 
   unsigned long currentmillis = millis();
-  if (currentmillis > lastupdate_gyro + 1) // min 1 ms tussen aanroepen gyro
+  if (currentmillis > lastupdate_gyro + 1) // minimum 1 ms between calling gyro
   {
     lastupdate_gyro = currentmillis;
     GyroData gyroData;
@@ -237,7 +237,7 @@ void updateMotors()
     if (gyroBeschikbaar) // gyro
     {
 #ifdef USE_FASTIMU
-      // "gyro"-regeling
+      // "gyro"-control
 
 #ifdef XY_MOTOR_LIMIT_SLIDER
       float Pfactor = GYRO_REGELING_MAX_P;
@@ -248,7 +248,7 @@ void updateMotors()
 
       float werkelijke_draaisnelheid = getGyro();
 
-      // sturen in verhouding tot afwijking, X van joystick bepaalt hoe snel we willen draaien
+      // steering in proportion to deviation. The X value from the joystick determines how fast we want to turn
 
       float doel_draaisnelheid = (float)ui_joystick_x * (-1.0) * max_draai_factor;
       regelX = Pfactor * (werkelijke_draaisnelheid - doel_draaisnelheid) - bias * doel_draaisnelheid;
@@ -263,7 +263,7 @@ void updateMotors()
 #ifdef USE_CONFIG_BLIMP2Z
     int doel_motorZsnelheid = map(ui_slider2, 0, 360, -PWM_RANGE, PWM_RANGE);
 #else
-    int doel_motorZsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE); // voor zweefmotor
+    int doel_motorZsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE); // for hover motor
 #endif
     if (abs(ui_joystick_y * ui_joystick_x) >= 5)
     {
@@ -272,7 +272,7 @@ void updateMotors()
     else
     {
 #ifdef USE_CONFIG_HOVER3M
-      doel_motorZsnelheid = 0; // bij joystick los ook zweefmotor uit
+      doel_motorZsnelheid = 0; // When the joystick is centered, the hover motor is also switched off
 #endif
     }
     if (millis() > last_activity_joystick + TIMEOUT_MS_JOYSTICK)
@@ -309,7 +309,7 @@ void updateMotors()
 #ifdef USE_CONFIG_BLIMP2Z
     motorZ.setSpeed(motorZ_snelheid.getCurrentValue(), MOTORZ_MINSPEED);
 #else
-    analogWrite(PIN_ZMOTOR, motorZ_snelheid.getCurrentValue()); // We passen de snelheid van de motor aan naar zijn nieuwe snelheid motorZ_snelheid
+    analogWrite(PIN_ZMOTOR, motorZ_snelheid.getCurrentValue()); // We adapt the motor speed to its new speed motorZ_snelheid
 #endif
 
 #ifdef DEBUG_SERIAL
@@ -381,22 +381,22 @@ void led_set(int ledmode, boolean except_when_dual_use)
 void init_voltage_monitor()
 {
 #if defined(ESP32) && defined(PIN_BATMONITOR)
-  analogSetAttenuation(ADC_0db); // op de ESP32 varianten gebruiken we een externe weerstandbrug om het batterijvoltage te meten en zetten we de interne weerstandsbrug op "geen spanningsdeling"
+  analogSetAttenuation(ADC_0db); // On the ESP32 based masynmachien boards, we use an external resistor bridge to measure the battery voltage and set the internal resistor bridge to ‘no voltage division’
 #endif
 }
 
 float getVoltage()
 {
 #ifdef ESP8266
-  return (float)ESP.getVcc() / (float)VOLTAGE_FACTOR; // op ESP8266 modules is VCC met de ene ADC pin verbonden
+  return (float)ESP.getVcc() / (float)VOLTAGE_FACTOR; // On ESP8266 modules, VCC is connected to the single ADC pins
 #elif defined(ESP32) && defined(PIN_BATMONITOR) && defined(VOLTAGE_FACTOR)
-  return (float)analogRead(PIN_BATMONITOR) / (float)VOLTAGE_FACTOR; // op ESP32 modules is VBAT zelf via spanningsdeler met een ADC1 pin te verbinden (ADC2 niet gebruiken)
+  return (float)analogRead(PIN_BATMONITOR) / (float)VOLTAGE_FACTOR; // On ESP32 modules, VBAT can be connected to an ADC1 pin via a voltage divider (do not use ADC2)
 #else
   return (float)0;
 #endif
 }
 
-void collision_effect() // VOOR BOTSDETECTIE
+void collision_effect() // for collision detection (TODO)
 {
 #ifdef USE_WS2812FX
   static unsigned long last_collision_effect = 0;
@@ -409,13 +409,13 @@ void collision_effect() // VOOR BOTSDETECTIE
   }
   else
   {
-    if (currentmillis > last_collision_effect + TIMEOUT_MS_COLLISION) // langer dan TIMEOUT_MS_COLLISION geleden dat er een botsingb gedetecteerd werdws2812fx.setColor(WS2812FX_COLOR);
+    if (currentmillis > last_collision_effect + TIMEOUT_MS_COLLISION) // longer than TIMEOUT_MS_COLLISION ago that a collision was detected
     {
       ws2812fx.setColor(WS2812FX_COLOR);
     }
   }
 #endif
-  // eventueel nog botseffect zonder WS2812 toe te voegen
+  
 }
 
 void setup()
@@ -432,17 +432,17 @@ void setup()
 #endif
 
 #ifdef ESP8266
-  // Aangezien de PWM range van analogWrite afhankelijk van de Arduino ESP8266 versie 255 ofwel 1023 is, stellen we de range vast in op 1023
+  // As the PWM range of `analogWrite` is either 255 or 1023, depending on the version of the Arduino ESP8266, we set the range to 1023
   analogWriteRange(PWM_RANGE);
 
-  // Verander de frequentie van analogWrite van 1000 Hz naar 400 Hz voor een aangenamer geluid
+  // Change the frequency of `analogWrite` from 1000 Hz to 400 Hz for a more pleasant motor sound
   analogWriteFreq(MOTOR_FREQ);
 #if ARDUINO_ESP8266_MAJOR >= 3
-  // workaround extreeme trage servo write vanaf Arduino 3: https://github.com/esp8266/Arduino/issues/8081
+  // workaround for extreme slow servo write from Arduino 3 on: https://github.com/esp8266/Arduino/issues/8081
   enablePhaseLockedWaveform();
 #endif
 #elif defined(ESP32)
-  // Verander de frequentie van analogWrite van 1000 Hz naar 400 Hz voor een aangenamer geluid
+  // Change the frequency of `analogWrite` from 1000 Hz to 400 Hz for a more pleasant motor sound
   analogWriteFrequency(MOTOR_FREQ);
 #endif
 #ifdef USE_CONFIG_BLIMP2Z
@@ -454,7 +454,7 @@ void setup()
   motorA.halt();
   motorB.halt();
 
-  delay(200); // 200 milliseconden wachten tot de stroom stabiel is
+  delay(200); // waiting 200 milliseconds till the current is stable
 
 #ifdef DEBUG_SERIAL
   delay(1000);
@@ -464,7 +464,7 @@ void setup()
 
   led_init();
 
-  // De LED flasht 2x om te tonen dat er een reboot is
+  // LED flashes 2 times to indicate a reboot
   led_set(LED_BRIGHTNESS_ON, false);
   delay(10);
   led_set(LED_BRIGHTNESS_OFF, false);
@@ -493,7 +493,7 @@ void setup()
 #endif
   Wire.setClock(400000); //400khz clock
   delay(100);
-  for (int t = 0; t < 3; t++) // 3 keer proberen of gyro beschikbaar is
+  for (int t = 0; t < 3; t++) // try 3 times if the gyro is available
   {
     calData calib = { 0 };  //Calibration data
     int err = imu.init(calib, IMU_I2C_ADDRESS);
@@ -529,7 +529,7 @@ void setup()
   led_init();
 #endif
 
-  // Wifi instellingen
+  // Wifi settings
   WiFi.persistent(true);
 
   uint8_t macAddr[6];
@@ -537,10 +537,10 @@ void setup()
 
 #if defined(USE_SOFTAP)
   WiFi.disconnect();
-  /* zet een access point op */
+  /* set up an access point */
   WiFi.mode(WIFI_AP);
 
-  // ssidmac = ssid + 4 laatste hexadecimale waarden van het MAC-adres
+  // ssidmac = ssid + 4 last hexadecimal values of the MAC-address
   char ssidmac[33];
   sprintf(ssidmac, "%s%02X%02X", ssid, macAddr[4], macAddr[5]);
   WiFi.softAP(ssidmac, password, WIFI_SOFTAP_CHANNEL);
@@ -551,13 +551,13 @@ void setup()
   DEBUG_SERIAL.print(F("IP: "));
   DEBUG_SERIAL.println(apIP);
 #endif
-  /* DNS server opzetten die alle domeinen vertaalt naar apIP */
+  /* set up DNS server translating all domains to apIP */
   dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
   dnsServer.start(53, "h.be", apIP);
 
 #else
   WiFi.softAPdisconnect(true);
-  // host_name = "Hover-" + 6 hexadecimale waarden van het MAC-adres
+  // host_name = "Hover-" + 6 hexadecimal values of  van het MAC-adres
   char host_name[33];
   sprintf(host_name, "Hover-%02X%02X%02X", macAddr[3], macAddr[4], macAddr[5]);
 #ifdef DEBUG_SERIAL
@@ -574,7 +574,7 @@ void setup()
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
-  // Even wachten tot er verbinding is met het wifi netwerk
+  // Waiting a moment for connection with the Wi-Fi network
   for (int i = 0; i < 15 && WiFi.status() != WL_CONNECTED; i++)
   {
 #ifdef DEBUG_SERIAL
@@ -745,7 +745,7 @@ void updatestatusbar()
 #endif
       sclient.send(statusstr);
       motors_pause();
-      delay(20000); // boodschap wordt 20 seconden getoond in browser alvorens hij disconnecteert
+      delay(20000); // message is shown for 20 seconds before disconnecting
       WiFi.mode(WIFI_OFF);
 #ifdef ESP8266
       WiFi.forceSleepBegin();
@@ -815,8 +815,8 @@ void loop()
   if (is_connected)
   {
     if (sclient.available())
-    {                 // als return non-nul, dan is er een client geconnecteerd
-      sclient.poll(); // als return non-nul, dan is er iets ontvangen
+    {                 // if return is non-zero, a client is connected
+      sclient.poll(); // if return is non-zero, something was received
 
       updatestatusbar();
 
@@ -825,7 +825,7 @@ void loop()
 #endif
       static unsigned long lastupdate_motors = 0;
       unsigned long currentmillis = millis();
-      if (currentmillis > lastupdate_motors + 10) // min 10 ms tussen aanroepen updatemotors als er geen nieuwe waarde ontvangen is vanuit browser
+      if (currentmillis > lastupdate_motors + 10) // minimum 10 ms between calling updatemotors if no new value is received from the browser
       {
         lastupdate_motors = currentmillis;
         updateMotors();
@@ -834,12 +834,12 @@ void loop()
     }
     else
     {
-      // niet langer geconnecteerd
+      // no longer connected
       onDisconnect();
       is_connected = 0;
     }
   }
-  if (server.poll()) // als er een nieuwe socket aangevraagd is
+  if (server.poll()) // if a new socket is requested
   {
 #ifdef DEBUG_SERIAL
     DEBUG_SERIAL.print(F("server.poll is_connected="));
