@@ -294,7 +294,7 @@ void updateMotors()
 #endif
 
     // converting x and y to motorspeed
-    float ui_joystick_y_constrain = constrain((float)ui_joystick_y, -(180-fabsf(regelX)), 180-fabsf(regelX)); //maximal stearing also at full forward or backward
+    float ui_joystick_y_constrain = constrain((float)ui_joystick_y, -(180-fabsf(regelX)), 180-fabsf(regelX)); // maximal stearing also at full forward or backward
     float temp1 = constrain((float) ui_joystick_y_constrain + regelX, -180, 180);
     float temp2 = constrain((float) ui_joystick_y_constrain - regelX, -180, 180);
 
