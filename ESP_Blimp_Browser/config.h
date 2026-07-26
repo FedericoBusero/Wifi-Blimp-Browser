@@ -13,6 +13,7 @@
 // there is no ENV_BLIMP_ESP32C3_WROOM_V1
 // #define ENV_BLIMP_ESP32C3_WROOM_V2
 // #define ENV_BLIMP_ESP32C3_WROOM_V3
+// #define ENV_BLIMP_ESP32C3_WROOM_V3_REVERSED_MOTORS
 
 // Als de defines in platformio.ini gedefinieerd zijn:
 // #define ENV_USER_DEFINED
