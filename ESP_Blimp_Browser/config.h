@@ -348,8 +348,8 @@ enum
 #define LED_BRIGHTNESS_ON  LOW
 #define LED_BRIGHTNESS_OFF HIGH
 
-#elif defined(ENV_BLIMP_ESP32C3_WROOM_V3) || defined(ENV_BLIMP_ESP32C3_WROOM_V3_REVERSED_MOTORS) 
-// PCB V3, V3.1, V3.2 & V3.3,  Makerday Hasselt 2025, Maker Days Eindhoven 2025, Maker Faire Gent 2026, Fri3d Camp 2026, Maker Days Eindhoven 2026, FTI NEXT dagen oktoberfest 2026 
+#elif defined(ENV_BLIMP_ESP32C3_WROOM_V3) || defined(ENV_BLIMP_ESP32C3_WROOM_V3_REVERSED_MOTORS)
+// PCB V3, V3.1, V3.2 & V3.3,  Makerday Hasselt 2025, Maker Days Eindhoven 2025, Maker Faire Gent 2026, Fri3d Camp 2026, Maker Days Eindhoven 2026, FTI NEXT dagen oktoberfest 2026
 
 #define USE_CONFIG_BLIMP2Z
 
