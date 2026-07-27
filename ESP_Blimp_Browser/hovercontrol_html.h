@@ -1,299 +1,253 @@
-const char index_html[] PROGMEM = R"=====(
-<!DOCTYPE html>
-<html>
-<head>
-<meta name='viewport'         content='width=device-width,         initial-scale=1.0,         user-scalable=no' />
-<title>HoverControl</title>
+import logging
+from mpos import Activity
+import lvgl as lv
+from mpos import WifiService
 
-<style>
-#outerContainer {
-  width: 80%;
-  margin: auto;
-}
-</style>
+import asyncio
+import aiohttp
+import network
 
+# Fri3d badge 2024
+from mpos.board.fri3d_2024 import adc_up_down, adc_left_right, btn_y, btn_b, btn_a
 
-<style> 
-#container {
-     width: 100%;
-     height: 65vh;
-     background-color: #333;
-     display: flex;
-     align-items: center;
-     justify-content: center;
-     overflow: hidden;
-     border-radius: 7px;
-     touch-action: none;
-}
- #item {
-     width: 100px;
-     height: 100px;
-     background-color: rgb(245, 230, 99);
-     border: 10px solid rgba(136, 136, 136, .5);
-     border-radius: 50%;
-     touch-action: none;
-     user-select: none;
-}
- #item:hover {
-     cursor: pointer;
-     border-width: 20px;
-}
- #item:active {
-     background-color: rgba(168, 218, 220, 1.00);
-}
-</style>
-<style>
-.slider-color {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 20px;
-  margin-top: 10px;
-  margin-bottom: 15px;
-  border-radius: 5px;
-  background: #d3d3d3;
-  outline: none;
-  opacity:0.7;
-  -webkit-transition: opacity .15s ease-in-out;
-  transition: opacity .15s ease-in-out;
-}
-.slider-color:hover {
-  opacity:1;
-}
-.slider-color::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #4CAF50;
-  cursor: pointer;
-}
-.slider-color::-moz-range-thumb {
-  width: 40px;
-  height: 40px;
-  border: 0;
-  border-radius: 50%;
-  background: #4CAF50;
-  cursor: pointer;
-}
+JOYSTICK_RECTANGLE_WIDTH = const(80)
+JOYSTICK_RECTANGLE_HEIGHT = const(80)
+JOYSTICK_CIRCLE_RADIUS = const(30)
 
 
-</style>
-</head>
-<body>
-<div id='outerContainer'>
-<span id="connectiondisplay">Trying to connect</span>
-<input id="servotrim" type="range" min="-180" max="180" value="0"   step="1" class="slider-color" oninput="send(3, this.value,80,this)" onChange="send(3, this.value,0,this)" />
-<input id="maxspeed" type="range" min="0"    max="360" value="180" step="1" class="slider-color" oninput="send(2, this.value,80,this)" onChange="send(2, this.value,0,this)" />
-<br>
-  <div id='container'>
-    <div id='item'> </div>
-  </div>
-</div>
+class Main(Activity):
 
-<script>
-var trimslider = document.querySelector('#servotrim');
-var maxspeedslider = document.querySelector('#maxspeed');
-var dragItem = document.querySelector('#item');
-var joystick = document.querySelector('#container');
-
-function send(id,value,min_time_transmit,elem) {
-    var now = new Date().getTime();
-    if (elem.sendTimeout)
-    {
-       clearTimeout(elem.sendTimeout);
-       elem.sendTimeout = null;
-    }
-    if (ws.readyState !== WebSocket.OPEN) {
-      return;
-    }
-    if(elem.lastSend === undefined || now - elem.lastSend >= min_time_transmit) {
-        if (ws.bufferedAmount>0)
-        {
-          elem.lastId = id;
-          elem.lastValue = value;
-          elem.sendTimeout = setTimeout(function send_trafficjam() {
-            elem.sendTimeout = null;
-            send(elem.lastId,elem.lastValue,min_time_transmit,elem);
-          }, min_time_transmit);
-        }
-        else
-        {
-          try {
-            ws.send(id+':'+value);
-            elem.lastSend = new Date().getTime();
-            return;
-          } catch(e) {
-            console.log(e);
-          }
-        }
-    }
-    else
-    {
-        elem.lastValue = value;
-        elem.lastId = id;
-        var ms = elem.lastSend !== undefined ? min_time_transmit - (now - elem.lastSend) : min_time_transmit;
-        if(ms < 0)
-            ms = 0;
-        elem.sendTimeout = setTimeout(function send_waittransmit() {
-            elem.sendTimeout = null;
-            send(elem.lastId,elem.lastValue,min_time_transmit,elem);
-        }, ms);
-    }
-}
-
-var retransmitInterval;
-const connectiondisplay= document.getElementById('connectiondisplay');
-const WS_URL = "ws://" + window.location.host + ":82";
-var ws;
-
-function connect_ws() {
-  ws = new WebSocket(WS_URL);
-  
-  ws.onopen = function() {
-    connectiondisplay.textContent = "Connected";
-    send(3, trimslider.value,0,trimslider);
-    send(2, maxspeedslider.value,0,maxspeedslider); 
-    retransmitInterval=setInterval(function ws_onopen_ping() {
-      if (ws.bufferedAmount == 0)
-      {
-        ws.send("0");
-      }
-    }, 1000);
-  };
-
-  ws.onclose = function() {
-    if (checkConnectionInterval)
-    {
-      connectiondisplay.textContent = "Disconnected";
-    }
-    else
-    {
-      connectiondisplay.textContent = "Disconnected. Another client is active, refresh to continue";
-    }
-
-    if (retransmitInterval)    
-    {        
-      clearInterval(retransmitInterval);        
-      retransmitInterval = null;     
-    }
-  };
-
-  ws.onmessage = function (message) {
-    if (typeof message.data === "string") {
-      if (message.data === "CLOSE")
-      {
-        if (checkConnectionInterval)
-        {        
-          clearInterval(checkConnectionInterval);
-          checkConnectionInterval= null;     
-        }
-      }
-      else
-      {
-        connectiondisplay.textContent = message.data;
-      }
-    }
-  };
-}
-
-connect_ws();
-
-var checkConnectionInterval = setInterval(function check_connection_interval() {
-  if (ws.readyState == WebSocket.CLOSED) {
-    connectiondisplay.textContent = "Reconnecting ...";
-    connect_ws();
-  }
-}, 5000);
-
-const joystickfactor = 2.8;
+    refresh_joystick_timer = None
+    refresh_wifi_timer = None
+    refresh_button_timer = None
+    wifi_label = None
+    ws_task = None
     
+    # Joystick waarden (-180 tot 180)
+    joy_x = 0
+    joy_y = 0
 
-// currentX, currentY, touchid, initialX, initialY
-joystick.active = false;
-joystick.autocenter = true;
-joystick.xOffset = 0;
-joystick.yOffset = 0;
+    def get_wifi_ssid(self):
+        ssid = WifiService.get_current_ssid()
+        if ssid:
+            return f"Wi-Fi: {ssid}"
+        return "No Wifi"
+    
+    def onCreate(self):
+        print("onCreate RemoteControl")
+        screen = lv.obj()
+        self.status_label = lv.label(screen)
+        self.status_label.set_text("Trying to connect")
+        self.status_label.align(lv.ALIGN.TOP_LEFT, 30, 30)
 
-joystick.dragStart = function (e) {
-  if (e.target === dragItem) {
-    if (e.type === 'touchstart') {
-        this.touchid = e.changedTouches[0].identifier;
-        this.initialX = e.changedTouches[0].clientX - this.xOffset;
-        this.initialY = e.changedTouches[0].clientY - this.yOffset;
-    } else {
-        this.initialX = e.clientX - this.xOffset;
-        this.initialY = e.clientY - this.yOffset;
-    }
-    this.active = true;
-  }
-}
+        # SSID Label bovenaan het scherm
+        self.wifi_label = lv.label(screen)
+        self.wifi_label.set_text(self.get_wifi_ssid())
+        self.wifi_label.align(lv.ALIGN.TOP_MID, 0, 10)
+        
+        # Create a black rectangle with a green border
+        self.rect = lv.obj(screen)
+        self.rect.set_size(JOYSTICK_RECTANGLE_WIDTH, JOYSTICK_RECTANGLE_HEIGHT)
+        self.rect.set_style_radius(0, lv.PART.MAIN)
+        self.rect.set_style_bg_color(lv.color_black(), lv.PART.MAIN)
+        self.rect.set_style_border_color(lv.color_hex(0x00FF00), lv.PART.MAIN)
+        self.rect.set_style_border_width(1, lv.PART.MAIN)
+        self.rect.remove_flag(lv.obj.FLAG.SCROLLABLE)
+        self.rect.align(lv.ALIGN.TOP_LEFT, 30, 150)
 
-joystick.dragEnd = function(e) {
-    if (e.target === dragItem) {
-      if (this.autocenter)
-      {
-            this.currentX=0; this.currentY=0;
-            this.xOffset =0; this.yOffset =0;
-      }
-      this.initialX = this.currentX;
-      this.initialY = this.currentY;
-      this.active = false;
-      this.setTranslate();
-    }
-}
+        self.circ_area = lv.obj(self.rect)
+        self.circ_area.set_size(JOYSTICK_CIRCLE_RADIUS, JOYSTICK_CIRCLE_RADIUS)
+        self.circ_area.set_style_radius(lv.RADIUS_CIRCLE, lv.PART.MAIN)
+        self.circ_area.set_style_bg_color(lv.color_hex(0x00FF00), lv.PART.MAIN)
+        self.circ_area.set_style_border_width(0, lv.PART.MAIN)
+        
+        self.slider1 = lv.slider(screen)
+        self.slider1.set_range(-1000, 1000)
+        self.slider1.set_value(0, False)
+        self.slider1.align(lv.ALIGN.TOP_LEFT, 30, 80)
+        self.slider1.add_event_cb(self.compensate_joystick_cb, lv.EVENT.KEY, None)
+        self.slider1.add_event_cb(self.on_slider_change, lv.EVENT.VALUE_CHANGED, None)
+        
+        # Label om de slider waarde te tonen
+        self.slider1_label = lv.label(screen)
+        self.slider1_label.set_text("Waarde: 0")
+        self.slider1_label.align(lv.ALIGN.TOP_LEFT, 30, 100)
 
-joystick.drag = function (e) {
-    if (this.active) {
-        e.preventDefault();
-        if (e.type === 'touchmove') {
-          for (var i=0; i<e.changedTouches.length; i++) {
-              var id = e.changedTouches[i].identifier;
-              if (id == this.touchid) {
-                this.currentX = e.changedTouches[i].clientX - this.initialX;
-                this.currentY = e.changedTouches[i].clientY - this.initialY;
-              }
-          }  
-        } else {
-            this.currentX = e.clientX - this.initialX;
-            this.currentY = e.clientY - this.initialY;
-        }
-        if (this.currentY >= (this.offsetHeight / joystickfactor))  {
-            this.currentY = this.offsetHeight / joystickfactor;
-        }
-        if (this.currentY <= (-this.offsetHeight / joystickfactor))  {
-            this.currentY = -this.offsetHeight / joystickfactor;
-        }
-        if (this.currentX >= (this.offsetWidth / joystickfactor))  {
-            this.currentX = this.offsetWidth / joystickfactor;
-        }
-        if (this.currentX <= (-this.offsetWidth / joystickfactor))  {
-            this.currentX = -this.offsetWidth / joystickfactor;
-        }
-        this.xOffset = this.currentX;
-        this.yOffset = this.currentY;
-        this.setTranslate();
-    }
-}
+        self.setContentView(screen)
 
-joystick.setTranslate = function () {
-    var transformstr = 'translate(' + this.currentX + 'px, ' + this.currentY + 'px)';
-    dragItem.style.transform = transformstr;
-    dragItem.style.webkitTransform = transformstr;
-    var xval = this.currentX * 180 / (this.offsetWidth / joystickfactor);
-    var yval = this.currentY * 180 / (this.offsetHeight / joystickfactor);
-    send('1',Math.round(xval) + ',' + Math.round(yval),80,this);
-}
+    def onStart(self, screen):
+        print("starting joystick refresh_timer")
+        self.refresh_joystick_timer = lv.timer_create(self.refresh_joystick, 80, None)
+        self.refresh_wifi_timer = lv.timer_create(self.refresh_wifi, 10000, None)
+        self.refresh_button_timer = lv.timer_create(self.refresh_buttons, 80, None)
+        
+        # Silence the MPOS focus_direction logger while this screen is active (joystick events)
+        logging.getLogger("mpos.ui.focus_direction").setLevel(logging.ERROR)
+        
+        print("start websocket program started")
+        # Maak een achtergrondtaak aan op de reeds draaiende asyncio loop
+        loop = asyncio.get_event_loop()
+        self.ws_task = loop.create_task(self.main_websocket())
 
-joystick.addEventListener('touchstart', function(event) { this.dragStart(event); }.bind(joystick), false);
-joystick.addEventListener('touchend',   function(event) { this.dragEnd(event);   }.bind(joystick), false);
-joystick.addEventListener('touchmove',  function(event) { this.drag(event);      }.bind(joystick), false);
-joystick.addEventListener('mousedown',  function(event) { this.dragStart(event); }.bind(joystick), false);
-document.addEventListener('mouseup',    function(event) { this.dragEnd(event);   }.bind(joystick), false);
-document.addEventListener('mousemove',  function(event) { this.drag(event);      }.bind(joystick), false);
+    def onStop(self, screen):
+        if self.refresh_joystick_timer:
+            print("stopping joystick refresh_timer")
+            self.refresh_joystick_timer.delete()
 
-</script>
-</body>
-</html>
+        if self.refresh_wifi_timer:
+            print("stopping wifi refresh_timer")
+            self.refresh_wifi_timer.delete()
 
-)=====";
+        if self.refresh_button_timer:
+            print("stopping button refresh_timer")
+            self.refresh_button_timer.delete()
+
+        # Stop de websocket taak als deze nog draait
+        if self.ws_task:
+            print("stopping websocket task")
+            self.ws_task.cancel()
+            self.ws_task = None
+            
+        # Restore default logging level when leaving
+        logging.getLogger("mpos.ui.focus_direction").setLevel(logging.WARNING)
+
+    def refresh_buttons(self, timer):
+        if btn_y.value() == 0:
+            current_value = self.slider1.get_value()
+            new_value = min(1000, current_value + 10)
+            self.slider1.set_value(new_value, False)
+            self.on_slider_change(None)
+        if btn_b.value() == 0:
+            current_value = self.slider1.get_value()
+            new_value = max(-1000, current_value - 10)
+            self.slider1.set_value(new_value, False)
+            self.on_slider_change(None)
+        if btn_a.value() == 0:
+            self.slider1.set_value(0, False)
+            self.on_slider_change(None)
+
+    def refresh_joystick(self, timer):
+        # Fri3d badge 2024
+        raw_y = adc_up_down.read()
+        raw_x = adc_left_right.read()
+        
+        # Map de analoge waarden naar schermcoördinaten voor het bolletje
+        if self.circ_area:
+            x_pos = lv.map(raw_x, 0, 4095, -int(JOYSTICK_RECTANGLE_WIDTH/2), int(JOYSTICK_RECTANGLE_WIDTH/2))
+            y_pos = lv.map(raw_y, 4095, 0, -int(JOYSTICK_RECTANGLE_HEIGHT/2), int(JOYSTICK_RECTANGLE_HEIGHT/2))
+            self.circ_area.set_pos(x_pos + int(JOYSTICK_CIRCLE_RADIUS/2), y_pos + int(JOYSTICK_CIRCLE_RADIUS/2))
+
+        # Map de ADC waarden naar het bereik -180 tot 180 voor de WebSocket
+        self.joy_x = lv.map(raw_x, 0, 4095, -180, 180)
+        self.joy_y = lv.map(raw_y, 4095, 0, -180, 180)
+
+    def refresh_wifi(self, timer):
+        if self.wifi_label:
+            self.wifi_label.set_text(self.get_wifi_ssid())
+            
+    def on_slider_change(self, event):
+        if self.slider1_label:
+            self.slider1_label.set_text(f"Waarde: {self.slider1.get_value()}")
+
+    def compensate_joystick_cb(self, e):
+        if e.get_code() == lv.EVENT.KEY:
+            key = e.get_key()
+            slider_obj = self.slider1
+            current_val = slider_obj.get_value()
+            
+            # Als de joystick RIGHT/UP/LEFT/DOWN key event geeft, wordt de waarde aangepast +/- 1, dan
+            # doen we net omgekeerde om waarde weer goed te krijgen
+            if key in (lv.KEY.RIGHT, lv.KEY.UP):
+                slider_obj.set_value(current_val - 1, None)
+                self.on_slider_change(None)
+            elif key in (lv.KEY.LEFT, lv.KEY.DOWN):
+                slider_obj.set_value(current_val + 1, None)
+                self.on_slider_change(None)
+
+    async def send_ping_loop(self, ws):
+        """Sends periodic ping data to the WebSocket server."""
+        try:
+            while True:
+                msg = "0"
+                print(f"--> Sending ping: {msg}")
+                await ws.send_str(msg)
+                await asyncio.sleep(1)  # Send every second
+        except asyncio.CancelledError:
+            pass
+
+    async def send_joystick_loop(self, ws):
+        """Sends live joystick coordinates to the WebSocket server."""
+        try:
+            while True:
+                msg = f"1:{self.joy_x},{self.joy_y}"
+                print(f"--> Sending joystick: {msg}")
+                await ws.send_str(msg)
+                await asyncio.sleep(0.4)  # Send every 400ms
+        except asyncio.CancelledError:
+            pass
+
+    async def receive_loop(self, ws):
+        """Listens for incoming messages from the server."""
+        try:
+            async for msg in ws:
+                if msg.type == aiohttp.WSMsgType.TEXT:
+                    print(f"<-- Received: {msg.data}")
+                    if self.status_label:
+                        self.status_label.set_text(msg.data)
+                elif msg.type in (aiohttp.WSMsgType.CLOSED, aiohttp.WSMsgType.ERROR):
+                    print("WebSocket connection closed or encountered an error.")
+                    break
+        except asyncio.CancelledError:
+            pass
+        except Exception as e:
+            print("Error in receive loop:", e)
+
+    async def main_websocket(self):
+        SERVER_IP = "192.168.4.1"
+        PORT = 82
+        url = f"ws://{SERVER_IP}:{PORT}/"
+        
+        while True:
+            ping_sender = None
+            joy_sender = None
+            receiver = None
+            
+            try:
+                print(f"Connecting to {url}...")
+                if self.status_label:
+                    self.status_label.set_text("Connecting...")
+
+                async with aiohttp.ClientSession() as session:
+                    async with session.ws_connect(url) as ws:
+                        print("Connected to 192.168.4.1:82!")
+                        if self.status_label:
+                            self.status_label.set_text("Connected")
+                        
+                        ping_sender = asyncio.create_task(self.send_ping_loop(ws))
+                        joy_sender = asyncio.create_task(self.send_joystick_loop(ws))
+                        receiver = asyncio.create_task(self.receive_loop(ws))
+                        
+                        # await asyncio.gather(ping_sender, joy_sender, receiver)
+                        await asyncio.gather(receiver)
+
+            except asyncio.CancelledError:
+                print("WebSocket main task gracefully cancelled.")
+                break  # Stop de loop definitief wanneer de activiteit stopt (onStop)
+
+            except (OSError, aiohttp.ClientError, Exception) as e:
+                print(f"WebSocket connection lost or failed: {e}")
+                if self.status_label:
+                    self.status_label.set_text("Reconnecting ...")
+
+            finally:
+                # Zorg dat de subtaken altijd worden gestopt voordat we opnieuw verbinden
+                if ping_sender:
+                    ping_sender.cancel()
+                if joy_sender:
+                    joy_sender.cancel()
+                if receiver:
+                    receiver.cancel()
+
+            # Wacht 5 seconden alvorens opnieuw te proberen
+            print("Retrying connection in 5 seconds...")
+            await asyncio.sleep(5)
