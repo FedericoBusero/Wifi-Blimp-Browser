@@ -29,12 +29,16 @@ masynmachien has developped an extremely lightweigt board (only 3.3 grams) based
 
 ## Installation & Use
 
-### 1. Installing Libraries
-Ensure that the following libraries are installed in your Arduino IDE (ESP32C3 version):
+### 1. Installing Libraries and Board Cores (ESP32C3 version)
+Ensure that the following libraries are installed in your Arduino IDE:
 * [ArduinoWebsockets](https://github.com/gilmaimon/ArduinoWebsockets) by Gil Maimon.
 * [FastIMU](https://github.com/LiquidCGS/FastIMU) (version 1.2.8 or higher).
 * [AsyncTCP](https://github.com/me-no-dev/AsyncTCP)
 * [ESPAsyncWebSrv](https://github.com/dvarrel/ESPAsyncWebSrv), version 1.2.9
+
+Install the board cores “ESP32 by Espressif System” version 2.0.17 (version 3 series gave problems, latest versions not tested).
+For ESP32-C3 based boards (like the masynmachien bord) set the board to Lolin C3 mini.
+Under Tools enable "USB CDC On Boot" and "Erase All Flash Before Sketch Upload".
 
 ### 2. Configurations
 Open config.h and select your hardware profile by uncommenting the relevant #define:
