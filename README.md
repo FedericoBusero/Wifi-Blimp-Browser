@@ -1,15 +1,23 @@
 # Wifi-Blimp-Browser
-Wifi bestuurde (vanuit een browser ) blimp (zeppelin) op een ESP32C3 en een optionele gyro (bv. GY-521 of LSM6DS3TR-C)
+Wi-Fi controlled (from browser) blimp (airship, dirigeable, zeppelin) on ESP8266 or ESP32-C3, with optional gyro (e.g. GY-521 or LSM6DS3TR-C).
 
 ![blimp.png](blimp.png "Blimp example pictures")
 
-Wifi-Blimp-Browser bevat de software voor het aansturen van op afstand bestuurbare voertuigen (zoals blimps/zeppelins) ontwikkeld door MasynMachien gebaseerd op ESP8266 of ESP32.. De besturing vindt plaats via een interactieve webinterface in de browser, waardoor er geen aparte app geïnstalleerd hoeft te worden.
+Wifi-Blimp-Browser contains the software for remote controlled vehicles (such as blimps) developed by masynmachien, based on the ESP8266 or ESP32. Control is done via an interactive web interface in the browser, meaning there is no need to install a separate app.
 
-Het project maakt gebruik van een IMU (gyroscope) voor stabilisatie en biedt ondersteuning voor verschillende hardwareconfiguraties.
+The project uses an IMU (gyroscope) for stabilising straight-line movement and supports various hardware configurations.
 
-Dit project gaat over het besturen van voertuigen (blimp/zeppelin, hovercraft) met bidrectionele linker- en rechter DC-motoren.  Wil je liever een hovercraft met servo besturen, ga dan naar het ander project [Wifi-Hovercraft-Browser](https://github.com/FedericoBusero/Wifi-Hovercraft-Browser)
+This project focuses on controlling vehicles (blimps, hovercrafts) with bidirectional left and right DC motors and a third DC motor for lift (uni- or bidirectional) or hovering. If you’d prefer to control a hovercraft using a servo, please see the other project, [Wifi-Hovercraft-Browser](https://github.com/FedericoBusero/Wifi-Hovercraft-Browser)
 
-## Kenmerken
+## Features
+* **Web-based interface:** Control your vehicle using a joystick and sliders in your browser (Chrome, Safari, Firefox).
+* Communication takes place via **Wi-Fi** using a **SoftAP** (WifiPoint). The vehicle therefore has its own on-board access point, so no actual internet connection is required.
+* It was developed for airships (blimps, airships), but there are also configuration examples for hovercrafts (the type with left and right motors, rather than servos).
+* **Gyro stabilisation:** Uses the FastIMU library and a low-pass filter for stable flight or navigation.
+* Although the configuration is based on the ESP32-C3, the code is compatible with other ESP32 or ESP8266 chips.
+
+## Hardware Requirements
+
 
 * **Web-based Interface:** Bedien je voertuig via een joystick en sliders in je browser (Chrome, Safari, Firefox).
 * De communicatie verloopt via **Wifi** m.b.v. een **SoftAP** (WifiPoint). Het voertuig heeft dus een eigen access point aan boord, er is dus geen echte internetverbinding.
