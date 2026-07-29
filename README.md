@@ -29,7 +29,7 @@ masynmachien has developped an extremely lightweigt board (only 3.3 grams) based
 
 ## Installation & Use
 
-### 1. Installing Libraries and Board Cores (ESP32C3 version)
+### 1. Installing Libraries and Board Cores (ESP32-C3 version)
 Ensure that the following libraries are installed in your Arduino IDE:
 * [ArduinoWebsockets](https://github.com/gilmaimon/ArduinoWebsockets) by Gil Maimon.
 * [FastIMU](https://github.com/LiquidCGS/FastIMU) (version 1.2.8 or higher).
