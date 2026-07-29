@@ -20,10 +20,12 @@ This project focuses on controlling vehicles (blimps, hovercrafts) with bidirect
 Depending on the configuration selected in config.h:
 * **Microcontroller**: ESP32-C3
 * **IMU**: e.g. LSM6DS3TR-C or MPU6050
-* **3 DC motors**: Support for DC motors (uni- and bidirectional, depending on the type: Blimp or Hover3M). These consist of 2 motors for left/right steering and 1 motor for up/down control.
+* **3 DC motors**: Support for DC motors (uni- and bidirectional, depending on the type: Blimp or Hover3M). These consist of 2 motors for left/right steering and 1 motor for up/down or hovering.
 * **3 H-bridges** or 2 H-bridges and a FET
 * 1s **LiPo battery**
 * **Helium**-filled balloon
+
+masynmachien has developped an extremely lightweigt board (only 3.3 grams) based on the ESP32-C3 WROOM, with gyro, 3 H-bridges, voltage regulator, USB-C, power mux, switch and charger. Contact: [masynmachien](https://www.masynmachien.be/)
 
 ## Installation & Use
 
@@ -71,7 +73,7 @@ The web interface contains the following elements:
 * **Emergency stop**: If the connection is lost (Disconnect), the motors will stop for safety reasons.
  
 ## How to Build a blimp/zeppelin?
-* For workshops, contact masynmachien
+* For workshops, contact [masynmachien](https://www.masynmachien.be/)
 * De Nederlandstalige bouwbeschrijving van masynmachiens wifi bestuurde "zeppelin" vind je vind je [hier](https://drive.google.com/file/d/1kgbARLVWbW1ju_md69NMXsFJ5Pm3_wp5/view?pli=1)
 * English build instructions for MasynMachien’s Wi-Fi-controlled “zeppelin” can be found [here](https://drive.google.com/file/d/1wyDzlwFDYCTluwN-NWTXZ2bfNyR8x3mo/view)
 ---
