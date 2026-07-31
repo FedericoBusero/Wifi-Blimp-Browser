@@ -265,8 +265,7 @@ void updateMotors()
 #else
     int doel_motorZsnelheid = map(ui_slider2, 0, 360, 0, PWM_RANGE); // for hover motor
 #endif
-    if (abs(ui_joystick_y * ui_joystick_x) >= 5)
-    {
+    if ((abs(ui_joystick_y)+1) * (abs(ui_joystick_x)+1) >= 5)    {
       last_activity_joystick = millis();
     }
     else
